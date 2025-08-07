@@ -1,13 +1,11 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
-  width: 100%;
-  max-width: 1024px;
+export const ProfileBox = styled.div`
   margin: 0 auto;
-  padding: 1rem;
   background-color: #f9fafb;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
 `;
 
 export const Header = styled.div`
@@ -16,21 +14,22 @@ export const Header = styled.div`
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e5e7eb;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 `;
 
 export const Profile = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-`;
 
-export const Avatar = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 9999px;
-  background-color: #d1d5db;
-  div {
-    font-weight: bold;
+  @media (max-width: 500px) {
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -49,6 +48,7 @@ export const InfoBox = styled.div`
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   font-size: 0.875rem;
+  cursor: pointer;
 `;
 
 export const Highlight = styled.span`
@@ -152,4 +152,67 @@ export const ReviewStatus = styled.a`
   color: #3b82f6;
   margin-top: 0.25rem;
   text-decoration: none;
+`;
+
+export const ViewAllBtn = styled.button`
+  display: block;
+  width: 90%;
+  margin: 1rem auto;
+  font-size: 0.875rem;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+`
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ModalContent = styled.div`
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+  h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1rem;
+
+    li {
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+  }
+`;
+
+export const CloseBtn = styled.button`
+  margin-top: 1.5rem;
+  background-color: #ef4444;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
 `;
