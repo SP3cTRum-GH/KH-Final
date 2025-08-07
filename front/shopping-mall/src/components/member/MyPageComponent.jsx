@@ -26,7 +26,13 @@ import {
     ViewAllBtn,
     ModalOverlay,
     ModalContent,
-    CloseBtn
+    CloseBtnWrapper,
+    CloseBtn,
+    LevelStatus,
+    ProgressBar,
+    ProgressFill,
+    LevelRange,
+    ProfileBtnWrapper
 } from "./MyPageStyle";
 
 
@@ -42,6 +48,26 @@ const MyPageComponent = () => {
         { id: 7, name: "Reebok Club C 85", size: "255", date: "25/03/28", status: "결제 완료", reviewed: false },
     ]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
+    const [filterType, setFilterType] = useState('all'); // 'all', 'toReview', 'reviewed'
+    const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
+
+    const levelInfo = [
+        { level: 1, name: '브론즈', min: 0, max: 9 },
+        { level: 2, name: '실버', min: 10, max: 19 },
+        { level: 3, name: '골드', min: 20, max: 29 },
+        { level: 4, name: '플래티넘', min: 30, max: 39 },
+        { level: 5, name: '다이아몬드', min: 40, max: Infinity },
+    ];
+
+    const currentLevel = levelInfo.find(lvl => purchaseCount >= lvl.min && purchaseCount <= lvl.max);
+    const nextLevel = levelInfo.find(lvl => lvl.level === currentLevel.level + 1);
+
+    const percent = nextLevel
+        ? ((purchaseCount - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100
+        : 100;
+
 
 
     const handleReview = (itemId) => {
@@ -53,18 +79,30 @@ const MyPageComponent = () => {
         );
     };
 
+    const handleProfileUpdate = (e) => {
+        e.preventDefault();
+        const newEmail = e.target.email.value;
+        const newName = e.target.name.value;
+        setUser({ email: newEmail, name: newName });
+        setIsProfileModalOpen(false);
+    };
+
     const paymentCompletedCount = purchaseHistory.filter(item => item.status === "결제 완료").length;
     const reviewedCount = purchaseHistory.filter(item => item.reviewed).length;
+    const toReviewCount = paymentCompletedCount - reviewedCount;
 
-    const displayedItems = showAll ? purchaseHistory : purchaseHistory.slice(0, 5);
+    const filteredHistory = purchaseHistory.filter(item => {
+        if (filterType === 'all') {
+            return true;
+        } else if (filterType === 'toReview') {
+            return item.status === "결제 완료" && !item.reviewed;
+        } else if (filterType === 'reviewed') {
+            return item.reviewed;
+        }
+        return true;
+    });
 
-    const grades = [
-        { level: 1, name: "브론즈", condition: "구매 0~4건" },
-        { level: 2, name: "실버", condition: "구매 5~9건" },
-        { level: 3, name: "골드", condition: "구매 10~19건" },
-        { level: 4, name: "플래티넘", condition: "구매 20~29건" },
-        { level: 5, name: "다이아몬드", condition: "구매 30건 이상" }
-    ];
+    const displayedItems = showAll ? filteredHistory : filteredHistory.slice(0, 5);
 
     return (
         <>
@@ -72,11 +110,11 @@ const MyPageComponent = () => {
                 <Header>
                     <Profile>
                         <div>
-                            <p>test@jjjj.com</p>
-                            <p>이름</p>
+                            <p>{user.email}</p>
+                            <p>{user.name}</p>
                         </div>
                     </Profile>
-                    <Button>프로필 수정</Button>
+                    <Button onClick={() => setIsProfileModalOpen(true)}>프로필 수정</Button>
                 </Header>
 
                 <InfoBox onClick={() => setIsModalOpen(true)}>
@@ -84,7 +122,7 @@ const MyPageComponent = () => {
                 </InfoBox>
 
                 <ReviewInfo>
-                    작성 가능한 후기 <Emphasize>{paymentCompletedCount - reviewedCount}개</Emphasize>
+                    작성 가능한 후기 <Emphasize>{toReviewCount}개</Emphasize>
                 </ReviewInfo>
             </ProfileBox>
 
@@ -92,13 +130,13 @@ const MyPageComponent = () => {
                 <Title>구매 내역 ({purchaseHistory.length})</Title>
 
                 <StatusBox>
-                    <StatusItem>
+                    <StatusItem onClick={() => setFilterType('all')} style={{ cursor: 'pointer' }}>
                         <StatusLabel>결제 완료</StatusLabel>
                         <StatusValue color="red">{paymentCompletedCount}</StatusValue>
                     </StatusItem>
-                    <StatusItem>
-                        <StatusLabel>리뷰 작성</StatusLabel>
-                        <StatusValue>{reviewedCount}</StatusValue>
+                    <StatusItem onClick={() => setFilterType('toReview')} style={{ cursor: 'pointer' }}>
+                        <StatusLabel>리뷰 올리기</StatusLabel>
+                        <StatusValue>{toReviewCount}</StatusValue>
                     </StatusItem>
                 </StatusBox>
 
@@ -134,6 +172,18 @@ const MyPageComponent = () => {
                 <ModalOverlay onClick={() => setIsModalOpen(false)}>
                     <ModalContent onClick={(e) => e.stopPropagation()}>
                         <h3>등급 안내</h3>
+
+                        <LevelStatus>
+                            현재 등급: <strong>{currentLevel.name}</strong> ({purchaseCount}회 구매)
+                        </LevelStatus>
+
+                        <ProgressBar>
+                            <ProgressFill percent={percent} />
+                        </ProgressBar>
+                        <LevelRange>
+                            {currentLevel.name}
+                            {nextLevel && <span>{nextLevel.name}까지 {nextLevel.min - purchaseCount}회 남음</span>}
+                        </LevelRange>
                         <ul>
                             <li>Lv. 1 브론즈: 0~9회 구매</li>
                             <li>Lv. 2 실버: 10~19회 구매</li>
@@ -141,7 +191,39 @@ const MyPageComponent = () => {
                             <li>Lv. 4 플래티넘: 30~39회 구매</li>
                             <li>Lv. 5 다이아몬드: 40회 이상 구매</li>
                         </ul>
-                        <CloseBtn onClick={() => setIsModalOpen(false)}>닫기</CloseBtn>
+                        <CloseBtnWrapper>
+                            <CloseBtn onClick={() => setIsModalOpen(false)}>닫기</CloseBtn>
+                        </CloseBtnWrapper>
+                    </ModalContent>
+                </ModalOverlay>
+            )}
+
+            {isProfileModalOpen && (
+                <ModalOverlay onClick={() => setIsProfileModalOpen(false)}>
+                    <ModalContent as="form" onSubmit={handleProfileUpdate} onClick={(e) => e.stopPropagation()}>
+                        <h3>프로필 수정</h3>
+                        <ul>
+                            <li>
+                                <label>이름</label>
+                                <input type="text" name="name" defaultValue={user.name} placeholder="이름을 입력하세요" />
+                            </li>
+                            <li>
+                                <label>이메일</label>
+                                <input type="email" name="email" defaultValue={user.email} placeholder="이메일을 입력하세요" />
+                            </li>
+                            <li>
+                                <label>연락처</label>
+                                <input type="text" name="tel" defaultValue={user.tel} placeholder="연락처를 입력하세요" />
+                            </li>
+                            <li>
+                                <label>주소</label>
+                                <input type="address" name="addr" defaultValue={user.addr} placeholder="주소를 입력하세요" />
+                            </li>
+                        </ul>
+                        <ProfileBtnWrapper>
+                            <CloseBtn type="submit">수정</CloseBtn>
+                            <CloseBtn onClick={() => setIsProfileModalOpen(false)}>닫기</CloseBtn>
+                        </ProfileBtnWrapper>
                     </ModalContent>
                 </ModalOverlay>
             )}

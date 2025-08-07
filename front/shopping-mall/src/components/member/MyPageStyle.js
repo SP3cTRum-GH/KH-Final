@@ -27,6 +27,10 @@ export const Profile = styled.div`
   align-items: center;
   gap: 1rem;
 
+  p {
+    padding: 2px;
+  }
+
   @media (max-width: 500px) {
     flex-direction: column;
     align-items: flex-start;
@@ -39,6 +43,7 @@ export const Button = styled.button`
   border: 1px solid #d1d5db;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
+  cursor: pointer;
 `;
 
 export const InfoBox = styled.div`
@@ -100,6 +105,7 @@ export const StatusValue = styled.div`
   font-size: 1.125rem;
   font-weight: bold;
   color: ${props => props.color === "red" ? "#ef4444" : "#111827"};
+  margin-top: 5px;
 `;
 
 export const ListItem = styled.div`
@@ -197,22 +203,76 @@ export const ModalContent = styled.div`
   }
 
   ul {
-    margin: 0;
-    padding-left: 1rem;
-
     li {
-      margin-bottom: 0.5rem;
-      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      label {
+        width: 80px; /* 라벨의 고정 너비 */
+        font-weight: 500;
+      }
+      input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+      }
     }
   }
 `;
+export const CloseBtnWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  padding: 3px;
+`;
 
 export const CloseBtn = styled.button`
-  margin-top: 1.5rem;
-  background-color: #ef4444;
+  margin-top: 1rem;
+  background-color: tomato;
   color: white;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.25rem;
   cursor: pointer;
 `;
+
+export const LevelStatus = styled.div`
+  margin-top: 1rem;
+  font-size: 0.95rem;
+`;
+
+export const ProgressBar = styled.div`
+  margin-top: 0.5rem;
+  width: 100%;
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+`;
+
+export const ProgressFill = styled.div`
+  height: 100%;
+  width: ${props => props.percent}%;
+  background-color: #3b82f6;
+  transition: width 0.4s ease-in-out;
+`;
+
+export const LevelRange = styled.div`
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  display: flex;
+  justify-content: space-between;
+  color: #6b7280;
+  padding-bottom: 20px;
+
+  span {
+    font-weight: 500;
+  }
+`;
+
+export const ProfileBtnWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+`
