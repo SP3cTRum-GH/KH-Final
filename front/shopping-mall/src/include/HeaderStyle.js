@@ -1,13 +1,15 @@
 import styled from "styled-components"
 
 export const Nav = styled.div`
-    /* width: 100%; */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     background-color: black;
     padding:  10px;
     margin-bottom: 50px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
     
     > img {
       display: none;   
@@ -17,6 +19,7 @@ export const Nav = styled.div`
     display: flex;
     flex-direction: row; /* 세로 정렬 */
     align-items: center;
+    margin-bottom: 0;
 
       img {
         display: block;

@@ -1,0 +1,20 @@
+package com.kh.finalProject.tables.cartItem.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CartItemDTO {
+    private Long cartItemNo;
+    private Long productNo;
+    private String productName;
+    private int quantity;
+    private BigDecimal totalPrice;
+}

@@ -7,7 +7,8 @@ export const CarouselContainer = styled.div`
   overflow: hidden;
 
     @media (max-width: 500px) {
-        height: 300px;
+        height: 100%;
+        /* height: 400px; */
     }
     
     div {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   Nav,
   MenuToggle,
@@ -8,10 +9,13 @@ import {
   MobileMenu,
   MenuGroup,
 } from "./HeaderStyle";
+import useCustomLogin from "../hooks/useCustomLogin";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const loginState = useSelector((state) => state.loginSlice);
+  const { doLogout } = useCustomLogin();
 
   return (
     <Nav>
@@ -41,23 +45,34 @@ const Header = () => {
               </label>
             </MenuItem>
           </div>
-          <div className="MenuItemRight">
-            <MenuItem>
-              <label htmlFor="menuCheckbox">
-                <a href="/cart">장바구니</a>
-              </label>
-            </MenuItem>
-            <MenuItem>
-              <label htmlFor="menuCheckbox">
-                <a href="/mypage">마이페이지</a>
-              </label>
-            </MenuItem>
-            <MenuItem>
-              <label htmlFor="menuCheckbox">
-                <a href="/login">로그인</a>
-              </label>
-            </MenuItem>
-          </div>
+
+          {loginState.memberId ? (
+            <div className="MenuItemRight">
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="/cart">장바구니</a>
+                </label>
+              </MenuItem>
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="/mypage">마이페이지</a>
+                </label>
+              </MenuItem>
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="#" onClick={() => doLogout()}>로그아웃</a>
+                </label>
+              </MenuItem>
+            </div>
+          ) : (
+            <>
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="/login">로그인</a>
+                </label>
+              </MenuItem>
+            </>
+          )}
         </MobileMenu>
       ) : (
         <Menu>
@@ -81,23 +96,33 @@ const Header = () => {
             </div>
           </MenuGroup>
           <img src="" alt="메인 로고" onClick={() => navigate("/")} />
-          <div className="MenuItemRight">
-            <MenuItem>
-              <label htmlFor="menuCheckbox">
-                <a href="/cart">장바구니</a>
-              </label>
-            </MenuItem>
-            <MenuItem>
-              <label htmlFor="menuCheckbox">
-                <a href="/mypage">마이페이지</a>
-              </label>
-            </MenuItem>
-            <MenuItem>
-              <label htmlFor="menuCheckbox">
-                <a href="/login">로그인</a>
-              </label>
-            </MenuItem>
-          </div>
+          {loginState.memberId ? (
+            <div className="MenuItemRight">
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="/cart">장바구니</a>
+                </label>
+              </MenuItem>
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="/mypage">마이페이지</a>
+                </label>
+              </MenuItem>
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="#" onClick={() => doLogout()}>로그아웃</a>
+                </label>
+              </MenuItem>
+            </div>
+          ) : (
+            <>
+              <MenuItem>
+                <label htmlFor="menuCheckbox">
+                  <a href="/login">로그인</a>
+                </label>
+              </MenuItem>
+            </>
+          )}
         </Menu>
       )}
     </Nav>
