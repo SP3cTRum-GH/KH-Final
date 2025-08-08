@@ -2,10 +2,7 @@ package com.kh.finalProject.tables.member.entity;
 
 import com.kh.finalProject.tables.member.MemberRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -17,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @SequenceGenerator(name = "member_seq_gen",
         sequenceName = "member_seq",
         allocationSize = 1,
@@ -57,14 +55,20 @@ public class Member {
     @Column
     private Character grade = 'F'; // 사용자 등급
 
+    @Column
+    private String memberAddress;
+
+    @Column
     private String OAuth; // 사용자 권한
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private List<MemberRole> memberRoleList = new ArrayList<>();
-    
+
+
     public void addRole(MemberRole memberRole) {
-		memberRoleList.add(memberRole);
-	}
+        memberRoleList.add(memberRole);
+    }
+
 }
