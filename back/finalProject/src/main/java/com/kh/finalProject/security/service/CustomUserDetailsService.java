@@ -1,6 +1,5 @@
 package com.kh.finalProject.security.service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,9 +7,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.kh.finalProject.enity.Member;
-import com.kh.finalProject.repository.MemberRepository;
 import com.kh.finalProject.security.domain.CustomUser;
+import com.kh.finalProject.tables.member.enity.Member;
+import com.kh.finalProject.tables.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
