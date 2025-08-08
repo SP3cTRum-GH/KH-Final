@@ -10,9 +10,9 @@ export const FooterInfo = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin: 0 20px 30px 20px;
 
-  @media (max-width: 480px) {
+  @media (max-width: 500px) {
     div {
       margin: 0 auto;
     }
