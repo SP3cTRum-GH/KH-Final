@@ -32,6 +32,7 @@ export const MenuToggle = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  cursor: pointer;
 
   a {
     text-decoration: none;
