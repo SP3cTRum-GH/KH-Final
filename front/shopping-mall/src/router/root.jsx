@@ -29,6 +29,9 @@ const MyPage = lazy(() => import("../pages/member/MyPage"));
 // 로그인 페이지
 const LoginPage = lazy(() => import("../pages/member/LoginPage"));
 
+// review 페이지
+const ReviewPage = lazy(() => import("../pages/member/ReviewPage"));
+
 const root = createBrowserRouter([
   {
     path: "/",
@@ -99,6 +102,14 @@ const root = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <LoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/review",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ReviewPage />
       </Suspense>
     ),
   },
