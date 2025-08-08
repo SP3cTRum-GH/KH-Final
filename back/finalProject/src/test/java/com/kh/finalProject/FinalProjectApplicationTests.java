@@ -1,7 +1,9 @@
 package com.kh.finalProject;
 
-import com.kh.finalProject.tables.member.entity.Member;
-import com.kh.finalProject.tables.member.repository.MemberRepository;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,9 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.kh.finalProject.tables.member.MemberRole;
 
-import java.util.List;
+import com.kh.finalProject.tables.member.entity.Member;
+import com.kh.finalProject.tables.member.repository.MemberRepository;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class FinalProjectApplicationTests {
@@ -70,7 +72,9 @@ class FinalProjectApplicationTests {
 				.memberGender(true)
 				.build(); // 비번 없음
 
-		db.save(m);
+
+			db.save(m);
+
 	}
 
 	@Test

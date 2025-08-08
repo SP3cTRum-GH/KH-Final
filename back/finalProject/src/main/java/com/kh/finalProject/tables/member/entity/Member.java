@@ -66,7 +66,9 @@ public class Member {
     @Builder.Default
     private List<MemberRole> memberRoleList = new ArrayList<>();
 
+
     public void addRole(MemberRole memberRole) {
         memberRoleList.add(memberRole);
     }
+
 }
