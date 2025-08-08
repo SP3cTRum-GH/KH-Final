@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.kh.finalProject.security.domain.CustomUser;
-import com.kh.finalProject.tables.member.enity.Member;
+import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;

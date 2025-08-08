@@ -1,14 +1,17 @@
 package com.kh.finalProject;
 
-import com.kh.finalProject.tables.member.entity.Member;
-import com.kh.finalProject.tables.member.repository.MemberRepository;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.kh.finalProject.tables.member.MemberRole;
-import com.kh.finalProject.tables.member.enity.Member;
+import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.member.repository.MemberRepository;
 
 @SpringBootTest
@@ -50,11 +53,11 @@ class FinalProjectApplicationTests {
 						.memberGender(true)
 						.build()
 		);
-		memberRepository.saveAll(memberList);
+		db.saveAll(memberList);
 
-		List<Member> savedList = memberRepository.saveAll(memberList);
+		List<Member> savedList = db.saveAll(memberList);
 		Long id = savedList.get(0).getMemberNo();
-		Member getback = memberRepository.findById(id).orElseThrow();
+		Member getback = db.findById(id).orElseThrow();
 		System.out.println("조회된 멤버 이름: " + getback.getMemberName());
 	}
 	//@Test
@@ -67,7 +70,7 @@ class FinalProjectApplicationTests {
 				.memberGender(true)
 				.build(); // 비번 없음
 
-			memberRepository.save(m);
+			db.save(m);
 	}
 
 	@Test
@@ -90,10 +93,10 @@ class FinalProjectApplicationTests {
 				.memberGender(false)
 				.build();
 
-		memberRepository.save(m1);
+		db.save(m1);
 
 		assertThrows(DataIntegrityViolationException.class, () -> {
-			memberRepository.save(m2); // 여기서 예외 터져야 성공!
+			db.save(m2); // 여기서 예외 터져야 성공!
 		});
 	}
 

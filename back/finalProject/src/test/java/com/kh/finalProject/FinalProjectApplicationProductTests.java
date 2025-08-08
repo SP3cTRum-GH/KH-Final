@@ -53,7 +53,7 @@ class FinalProjectApplicationProductTests {
 				.type(true)
 				.dealCurrent(new BigDecimal("500"))
 				.dealCount(5L)
-				.productInfoList(new ArrayList<>())
+				.productsizeList(new ArrayList<>())
 				.productImagesList(new ArrayList<>())
 				.build();
 		ProductImages productImages = ProductImages.builder()

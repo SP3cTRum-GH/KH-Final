@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.kh.finalProject.tables.member.enity.Member;
+import com.kh.finalProject.tables.member.entity.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 	@EntityGraph(attributePaths = { "memberRoleList" })
