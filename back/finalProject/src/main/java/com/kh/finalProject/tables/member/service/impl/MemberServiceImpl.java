@@ -18,9 +18,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
-    @Autowired
     private MemberRepository memberRepository;
-    @Autowired
+
     private MemberConvertor memberConvertor;
 
     @Override
