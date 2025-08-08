@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.kh.finalProject.enity.Member;
-import com.kh.finalProject.enity.MemberRole;
-import com.kh.finalProject.repository.MemberRepository;
+import com.kh.finalProject.tables.member.MemberRole;
+import com.kh.finalProject.tables.member.enity.Member;
+import com.kh.finalProject.tables.member.repository.MemberRepository;
 
 @SpringBootTest
 class FinalProjectApplicationTests {
