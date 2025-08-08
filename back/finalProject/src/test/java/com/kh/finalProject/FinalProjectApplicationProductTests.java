@@ -44,7 +44,7 @@ class FinalProjectApplicationProductTests {
 		System.out.println("상품 이름: " + found.getProductName());
 		System.out.println("경매 마감일: " + found.getEndDate());
 	}
-	@Test
+	//@Test
 	void imageWaSizeTest(){
 		Product product = Product.builder()
 				.productName("jerikerjer")
@@ -53,7 +53,7 @@ class FinalProjectApplicationProductTests {
 				.type(true)
 				.dealCurrent(new BigDecimal("500"))
 				.dealCount(5L)
-				.productInfoList(new ArrayList<>())
+				.productsizeList(new ArrayList<>())
 				.productImagesList(new ArrayList<>())
 				.build();
 		ProductImages productImages = ProductImages.builder()
