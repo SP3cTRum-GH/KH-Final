@@ -30,13 +30,13 @@ const Footer = () => {
             <List>
               <SectionTitle>Team Members</SectionTitle>
               <ListItem>
-                <a href="#">
+                <a href="https://github.com/SP3cTRum-GH/" target="_blank">
                   <img src={logo} alt="github-icon" />
                   김민우 (BE)
                 </a>
               </ListItem>
               <ListItem>
-                <a href="#">
+                <a href="https://github.com/KANGJIHYEON1121" target="_blank">
                   <img src={logo} alt="github-icon" />
                   강지현 (FE)
                 </a>
@@ -48,13 +48,13 @@ const Footer = () => {
                 </a>
               </ListItem>
               <ListItem>
-                <a href="#">
+                <a href="https://github.com/SuhyunYun950812" target="_blank">
                   <img src={logo} alt="github-icon" />
                   윤수현 (BE)
                 </a>
               </ListItem>
               <ListItem>
-                <a href="#">
+                <a href="https://github.com/Winmin3658" target="_blank">
                   <img src={logo} alt="github-icon" />
                   이승민 (FE)
                 </a>
@@ -64,11 +64,11 @@ const Footer = () => {
         </FooterInfo>
 
         <FooterBottom>
-          <Paragraph>개발 기간: 2025.07.01 ~ 2025.08.15</Paragraph>
+          <Paragraph>개발 기간: 2025.08.04 ~ 2025.08.27</Paragraph>
           <Paragraph>
             배포 주소:{" "}
-            <a href="https://team-project.netlify.app">
-              https://team-project.netlify.app
+            <a href="https://github.com/SP3cTRum-GH/KH-Final">
+              https://github.com/SP3cTRum-GH/KH-Final
             </a>
           </Paragraph>
           <hr />

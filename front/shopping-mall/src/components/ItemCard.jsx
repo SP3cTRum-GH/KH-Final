@@ -123,7 +123,7 @@ const ItemCard = ({ page }) => {
               <Wrap>
                 <div>
                   <p>{product.productName + i}</p>
-                  <h4>{product.price}원</h4>
+                  <h4>{Number(product.price).toLocaleString()}원</h4>
                 </div>
                 <div>
                   <button>수정</button>

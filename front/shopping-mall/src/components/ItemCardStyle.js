@@ -92,4 +92,10 @@ export const Wrap = styled.div`
         margin-left: 5px;
         cursor: pointer;
     }
+
+    h4 {
+    @media (max-width: 500px) {
+     font-size : 14px;
+    }
+    }
 `

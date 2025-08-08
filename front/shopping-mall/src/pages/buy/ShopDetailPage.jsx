@@ -1,17 +1,14 @@
-import React from "react";
-import Carousel from "../../components/Carousel";
-import SelectOption from "../../components/SelectOption";
 import { Container } from "../../components/Container";
 import Header from "../../include/Header";
 import Footer from "../../include/Footer";
+import ShopDetailComponent from "../../components/detailpage/ShopDetailComponent";
 
 const ShopDetailPage = () => {
   return (
     <div>
       <Header />
       <Container>
-        <Carousel listLength={1200} imgLength={4} />
-        <SelectOption />
+        <ShopDetailComponent />
       </Container>
       <Footer />
     </div>
