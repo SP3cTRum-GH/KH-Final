@@ -29,6 +29,7 @@ const MyPage = lazy(() => import("../pages/member/MyPage"));
 // 로그인 페이지
 const LoginPage = lazy(() => import("../pages/member/LoginPage"));
 
+
 // 회원가입 페이지
 const SignUp = lazy(() => import("../pages/member/SignUp"));
 
