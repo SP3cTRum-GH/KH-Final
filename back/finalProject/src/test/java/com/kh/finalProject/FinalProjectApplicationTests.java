@@ -12,9 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.kh.finalProject.tables.member.MemberRole;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.util.List;
+import com.kh.finalProject.tables.member.entity.Member;
+import com.kh.finalProject.tables.member.repository.MemberRepository;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class FinalProjectApplicationTests {
@@ -37,6 +37,7 @@ class FinalProjectApplicationTests {
 				.memberPoint(0)
 				.enable(true)
 				.grade('F')
+				.memberAddress("니맘속")
 				.build(); 
 		member.addRole(MemberRole.USER);
 		member.addRole(MemberRole.ADMIN);
@@ -72,7 +73,9 @@ class FinalProjectApplicationTests {
 				.memberGender(true)
 				.build(); // 비번 없음
 
-		db.save(m);
+
+			db.save(m);
+
 	}
 
 	//@Test

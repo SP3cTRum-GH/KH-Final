@@ -1,8 +1,9 @@
 package com.kh.finalProject.tables.member.component;
 
+import org.springframework.stereotype.Component;
+
 import com.kh.finalProject.tables.member.dto.MemberResponseDTO;
 import com.kh.finalProject.tables.member.entity.Member;
-import org.springframework.stereotype.Component;
 
 @Component
 public class MemberConvertor {
@@ -13,6 +14,7 @@ public class MemberConvertor {
                 .memberName(member.getMemberName())
                 .memberEmail(member.getMemberEmail())
                 .memberPhone(member.getMemberPhone())
+                .memberAddress(member.getMemberAddress())
                 .memberGender(member.getMemberGender())
                 .OAuth(member.getOAuth())
                 .build();

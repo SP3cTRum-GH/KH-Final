@@ -26,7 +26,7 @@ class FinalProjectApplicationProductTests {
 	@Autowired
 	ProductSizeRepository productSizeRepository;
 
-	//@Test
+	@Test
 	void ProductCreateAndGetTest() {
 		Product product = Product.builder()
 				.productName("김치")
@@ -44,7 +44,7 @@ class FinalProjectApplicationProductTests {
 		System.out.println("상품 이름: " + found.getProductName());
 		System.out.println("경매 마감일: " + found.getEndDate());
 	}
-	//@Test
+//	@Test
 	void imageWaSizeTest(){
 		Product product = Product.builder()
 				.productName("jerikerjer")

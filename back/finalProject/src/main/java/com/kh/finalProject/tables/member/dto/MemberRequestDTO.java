@@ -16,6 +16,6 @@ public class MemberRequestDTO {
     private String memberName;
     private String memberEmail;
     private String memberPhone;
+    private String memberAddress;
     private Boolean memberGender;
-    private String OAuth;
 }

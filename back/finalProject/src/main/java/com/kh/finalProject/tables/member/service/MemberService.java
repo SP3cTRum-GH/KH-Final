@@ -5,4 +5,6 @@ import com.kh.finalProject.tables.member.dto.MemberResponseDTO;
 
 public interface MemberService {
     MemberResponseDTO memberSignUp(MemberRequestDTO memberRequestDTO);
+    
+    MemberResponseDTO memberUpdate(Long membrNo, MemberRequestDTO memberRequestDTO);
 }
