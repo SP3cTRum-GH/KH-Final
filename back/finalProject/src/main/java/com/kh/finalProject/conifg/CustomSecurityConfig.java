@@ -43,7 +43,8 @@ public class CustomSecurityConfig {
 				}).addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class)
 				.exceptionHandling(config -> {
 					config.accessDeniedHandler(new CustomAccessDeniedHandler());
-				});
+				})
+				.authorizeHttpRequests(auth->auth.anyRequest().permitAll());
 		return http.build();
 	}
 

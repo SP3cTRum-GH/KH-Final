@@ -79,6 +79,6 @@ public class JWTCheckFilter extends OncePerRequestFilter { // http 통신 요청
 		if (path.startsWith("/api/products/view/")) {
 			return true;
 		}
-		return false;
+		return true;
 	}
 }
