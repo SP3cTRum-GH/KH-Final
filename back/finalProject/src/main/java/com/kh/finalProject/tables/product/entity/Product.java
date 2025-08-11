@@ -49,13 +49,13 @@ public class Product {
     private LocalDateTime endDate; // 경매 마감일
 
     @Column(nullable = false)
-    private BigDecimal price; // 상품 가격
+    private int price; // 상품 가격
 
     @Column(nullable = false)
     private Long dealCount; // 경매 입찰수
 
     @Column(nullable = false)
-    private BigDecimal dealCurrent; // 경매 입찰가
+    private int dealCurrent; // 경매 입찰가
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImages> productImagesList = new ArrayList<>();

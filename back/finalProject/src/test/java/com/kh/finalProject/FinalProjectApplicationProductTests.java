@@ -29,13 +29,13 @@ class FinalProjectApplicationProductTests {
 	//@Test
 	void ProductCreateAndGetTest() {
 		Product product = Product.builder()
-				.productName("내 똥")
-				.category("변기")
-				.price(new BigDecimal("0"))
+				.productName("김치")
+				.category("애국")
+				.price(500)
 				.type(true)
 				.endDate(LocalDateTime.now().plusDays(5))
 				.dealCount(5L)
-				.dealCurrent(new BigDecimal("500"))
+				.dealCurrent(500)
 				.build();
 
 		productRepository.save(product);
@@ -49,9 +49,9 @@ class FinalProjectApplicationProductTests {
 		Product product = Product.builder()
 				.productName("jerikerjer")
 				.category("bingsina")
-				.price(new BigDecimal("0"))
+				.price(300)
 				.type(true)
-				.dealCurrent(new BigDecimal("500"))
+				.dealCurrent(400)
 				.dealCount(5L)
 				.productsizeList(new ArrayList<>())
 				.productImagesList(new ArrayList<>())

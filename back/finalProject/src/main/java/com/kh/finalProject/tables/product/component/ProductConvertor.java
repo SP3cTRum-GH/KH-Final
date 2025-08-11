@@ -7,6 +7,8 @@ import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 import com.kh.finalProject.tables.product.entity.Product;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
 public class ProductConvertor {
 
@@ -20,6 +22,8 @@ public class ProductConvertor {
                 .endDate(dto.getEndDate())
                 .dealCount(dto.getDealCount() == null ? 0L : dto.getDealCount())
                 .dealCurrent(dto.getDealCurrent() == null ? dto.getPrice() : dto.getDealCurrent())
+                .productImagesList(new ArrayList<>())
+                .productsizeList(new ArrayList<>())
                 .build();
     }
 
@@ -32,6 +36,8 @@ public class ProductConvertor {
                 .endDate(null)
                 .dealCount(0L)               // NOT NULL 기본값
                 .dealCurrent(dto.getPrice()) // NOT NULL 기본값
+                .productImagesList(new ArrayList<>())
+                .productsizeList(new ArrayList<>())
                 .build();
     }
 

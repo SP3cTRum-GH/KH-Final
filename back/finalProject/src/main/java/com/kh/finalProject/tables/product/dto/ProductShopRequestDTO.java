@@ -18,7 +18,7 @@ import java.util.List;
 public class ProductShopRequestDTO {
     private String productName;
     private String category;
-    private BigDecimal price;
+    private Integer price;
     private Boolean type;
     private LocalDateTime regDate;
     private List<ProductImagesDTO> images;
