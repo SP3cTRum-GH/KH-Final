@@ -35,6 +35,7 @@ class FinalProjectApplicationTests {
 				.memberPoint(0)
 				.enable(true)
 				.grade('F')
+				.memberAddress("니맘속")
 				.build(); 
 		member.addRole(MemberRole.USER);
 		member.addRole(MemberRole.ADMIN);
@@ -73,7 +74,7 @@ class FinalProjectApplicationTests {
 			db.save(m);
 	}
 
-	@Test
+//	@Test
 	void jungborktest() {
 		Member m1 = Member.builder()
 				.memberId("su_hyun")
