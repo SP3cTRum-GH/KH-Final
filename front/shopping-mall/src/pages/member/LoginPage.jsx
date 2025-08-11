@@ -129,6 +129,15 @@ const LoginPage = () => {
                 로그인
               </Button>
             </form>
+            <SocialButton
+              style={{
+                backgroundColor: "#fff",
+                color: "#000",
+                border: "1px solid #dadce0",
+              }}
+            >
+              구글 로그인
+            </SocialButton>
             <SocialButton style={{ backgroundColor: "#03C75A" }}>
               네이버 로그인
             </SocialButton>
