@@ -26,16 +26,16 @@ class FinalProjectApplicationProductTests {
 	@Autowired
 	ProductSizeRepository productSizeRepository;
 
-	//@Test
+	@Test
 	void ProductCreateAndGetTest() {
 		Product product = Product.builder()
-				.productName("내 똥")
-				.category("변기")
-				.price(new BigDecimal("0"))
-				.type(true)
+				.productName("카레")
+				.category("라이스")
+				.price(new BigDecimal("1000"))
+				.type(false)
 				.endDate(LocalDateTime.now().plusDays(5))
 				.dealCount(5L)
-				.dealCurrent(new BigDecimal("500"))
+				.dealCurrent(new BigDecimal("0"))
 				.build();
 
 		productRepository.save(product);
@@ -44,7 +44,7 @@ class FinalProjectApplicationProductTests {
 		System.out.println("상품 이름: " + found.getProductName());
 		System.out.println("경매 마감일: " + found.getEndDate());
 	}
-	//@Test
+//	@Test
 	void imageWaSizeTest(){
 		Product product = Product.builder()
 				.productName("jerikerjer")
