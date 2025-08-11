@@ -129,15 +129,15 @@ const LoginPage = () => {
                 로그인
               </Button>
             </form>
-            <SignUpLink as={Link} to="/signup">
-              회원가입
-            </SignUpLink>
             <SocialButton style={{ backgroundColor: "#03C75A" }}>
               네이버 로그인
             </SocialButton>
             <SocialButton style={{ backgroundColor: "#FEE500", color: "#000" }}>
               카카오 로그인
             </SocialButton>
+            <SignUpLink as={Link} to="/signup">
+              회원가입
+            </SignUpLink>
           </LoginBox>
         </LoginWrapper>
       </Container>
