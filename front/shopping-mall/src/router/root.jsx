@@ -31,7 +31,7 @@ const LoginPage = lazy(() => import("../pages/member/LoginPage"));
 
 
 // 회원가입 페이지
-const SignUp = lazy(() => import("../pages/member/SignUp"));
+const SignUpPage = lazy(() => import("../pages/member/SignUpPage"));
 
 // review 페이지
 const ReviewPage = lazy(() => import("../pages/member/ReviewPage"));
@@ -113,7 +113,7 @@ const root = createBrowserRouter([
     path: "/signup",
     element: (
       <Suspense fallback={<Loading />}>
-        <SignUp />
+        <SignUpPage />
       </Suspense>
     ),
   },
