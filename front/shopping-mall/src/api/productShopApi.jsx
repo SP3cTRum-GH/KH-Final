@@ -4,8 +4,8 @@ import { API_SERVER_HOST } from "./HostUrl";
 const prefix = `${API_SERVER_HOST}/api/product/shop`;
 
 // 상품 1개 가져오기
-export const getShopOne = async (pno) => {
-  const res = await axios.get(`${prefix}/${pno}`);
+export const getShopOne = async (productNo) => {
+  const res = await axios.get(`${prefix}/${productNo}`);
   return res.data;
 };
 

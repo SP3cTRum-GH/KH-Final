@@ -1,10 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DetailCarousel from "./DetailCarousel";
 import SelectOption from "./SelectOption";
 import ProductImageList from "./ProductImageList";
 import Review from "./Review";
 import styled from "styled-components";
 import DealModal from "./DealModal";
+import { getDealOne } from "../../api/productDealApi";
+import { useParams } from "react-router-dom";
 
 const Div = styled.div`
   width: 100%;
@@ -26,8 +28,16 @@ const hrStyle = {
 };
 
 const DealDetailComponent = () => {
+  const [dealProductData, setDealProductData] = useState();
   const reviewRef = useRef(null);
   const [result, setResult] = useState(false); // 모달 창
+  const param = useParams();
+
+  useEffect(() => {
+    getDealOne(param.productNo).then((data) => {
+      setDealProductData(data);
+    });
+  }, [param.productNo]);
 
   const scrollToReview = () => {
     if (reviewRef.current) {
@@ -61,10 +71,15 @@ const DealDetailComponent = () => {
     <>
       <Div>
         <DetailCarousel listLength={1200} imgLength={5} />
-        <SelectOption
-          scrollToReview={scrollToReview}
-          handleOpenModal={handleOpenModal}
-        />
+        {dealProductData ? (
+          <SelectOption
+            productData={dealProductData}
+            scrollToReview={scrollToReview}
+            handleOpenModal={handleOpenModal}
+          />
+        ) : (
+          <>Loading...</>
+        )}
       </Div>
       <hr style={hrStyle} />
       <div>
@@ -77,7 +92,7 @@ const DealDetailComponent = () => {
 
       {result && (
         <DealModal
-          currentPrice={47200}
+          currentPrice={dealProductData.price}
           onConfirm={handleConfirmBid}
           onCancel={handleCloseModal}
         />

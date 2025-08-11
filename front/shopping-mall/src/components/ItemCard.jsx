@@ -14,6 +14,7 @@ const ItemCard = ({ page, dtoList }) => {
               key={i}
               onClick={() => {
                 navigate(`/${page}/${product.productNo}`);
+                window.scrollTo(0, 0);
               }}
             >
               <img src={product.img} alt="" />
