@@ -3,8 +3,75 @@ import { Container } from "../../components/Container";
 import Header from "../../include/Header";
 import Footer from "../../include/Footer";
 import useCustomLogin from "../../hooks/useCustomLogin";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 const initState = { memberId: "", pw: "" };
+
+// Styled Components
+const LoginWrapper = styled.div`
+  margin: 100px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const LoginBox = styled.div`
+  background: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 10px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 16px;
+`;
+
+const SocialButton = styled(Button)`
+  background: ${(props) => props.bgcolor || "#eee"};
+  color: ${(props) => props.color || "#fff"};
+  margin-top: 10px;
+  font-weight: 600;
+`;
+
+const SignUpLink = styled(Link)`
+  margin-top: 15px;
+  display: block;
+  text-align: center;
+  color: blue;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 15px;
+`;
 
 const LoginPage = () => {
   const [loginParam, setLoginParam] = useState({ ...initState });
@@ -38,29 +105,41 @@ const LoginPage = () => {
     <div>
       <Header />
       <Container>
-        <h2>로그인</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="아이디"
-            name="memberId"
-            value={loginParam.memberId}
-            onChange={handleChange}
-            required
-          />
-          <br />
-          <input
-            type="password"
-            name="pw"
-            placeholder="비밀번호"
-            value={loginParam.pw}
-            onChange={handleChange}
-            required
-          />
-          <button type="submit" onClick={handleClickLogin}>
-            로그인
-          </button>
-        </form>
+        <LoginWrapper>
+          <LoginBox>
+            <Title>로그인</Title>
+            <form onSubmit={handleSubmit}>
+              <Input
+                type="text"
+                placeholder="아이디"
+                name="memberId"
+                value={loginParam.memberId}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                type="password"
+                name="pw"
+                placeholder="비밀번호"
+                value={loginParam.pw}
+                onChange={handleChange}
+                required
+              />
+              <Button type="submit" onClick={handleClickLogin}>
+                로그인
+              </Button>
+            </form>
+            <SignUpLink as={Link} to="/signup">
+              회원가입
+            </SignUpLink>
+            <SocialButton style={{ backgroundColor: "#03C75A" }}>
+              네이버 로그인
+            </SocialButton>
+            <SocialButton style={{ backgroundColor: "#FEE500", color: "#000" }}>
+              카카오 로그인
+            </SocialButton>
+          </LoginBox>
+        </LoginWrapper>
       </Container>
       <Footer />
     </div>
