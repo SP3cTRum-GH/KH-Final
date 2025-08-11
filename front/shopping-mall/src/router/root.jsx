@@ -29,7 +29,6 @@ const MyPage = lazy(() => import("../pages/member/MyPage"));
 // 로그인 페이지
 const LoginPage = lazy(() => import("../pages/member/LoginPage"));
 
-
 // 회원가입 페이지
 const SignUpPage = lazy(() => import("../pages/member/SignUpPage"));
 
@@ -54,7 +53,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/shopdetail",
+    path: "/shopdetail/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ShopDetailPage />
@@ -70,7 +69,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/dealdetail",
+    path: "/dealdetail/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <DealDetailPage />
