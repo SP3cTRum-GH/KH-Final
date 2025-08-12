@@ -25,7 +25,7 @@ const CartPage = lazy(() => import("../pages/member/CartPage"));
 
 // my 페이지
 const MyPage = lazy(() => import("../pages/member/MyPage"));
-const ModifyMyPage = lazy(() => import("../pages/member/ModifyMyPage"))
+const ModifyMyPage = lazy(() => import("../pages/member/ModifyMyPage"));
 
 // 로그인 페이지
 const LoginPage = lazy(() => import("../pages/member/LoginPage"));
@@ -121,12 +121,14 @@ const root = createBrowserRouter([
     ),
   },
   {
-
     path: "/modify",
     element: (
       <Suspense fallback={<Loading />}>
         <ModifyPage />
-
+      </Suspense>
+    ),
+  },
+  {
     path: "/signup",
     element: (
       <Suspense fallback={<Loading />}>
@@ -139,7 +141,6 @@ const root = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <ReviewPage />
-
       </Suspense>
     ),
   },
