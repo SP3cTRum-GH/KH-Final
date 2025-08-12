@@ -5,12 +5,17 @@ import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 import com.kh.finalProject.tables.product.entity.Product;
+import com.kh.finalProject.tables.productImages.component.ProductImagesConverter;
+import com.kh.finalProject.tables.productsize.component.ProductSizeConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
 @Component
-public class ProductConvertor {
+public class ProductConverter {
+    ProductImagesConverter pic = new  ProductImagesConverter();
+    ProductSizeConverter psc = new  ProductSizeConverter();
 
     // ---------- CREATE ----------
     public Product toEntityFromDeal(ProductDealRequestDTO dto) {
@@ -84,6 +89,8 @@ public class ProductConvertor {
                 .endDate(p.getEndDate())
                 .dealCount(p.getDealCount())
                 .dealCurrent(p.getDealCurrent())
+                .images(pic.toProductImagesDTOFromProductImages(p.getProductImagesList()))
+                .sizes(psc.toProductSizesDTOFromProductSizes(p.getProductsizeList()))
                 .build();
     }
 
@@ -95,6 +102,8 @@ public class ProductConvertor {
                 .price(p.getPrice())
                 .type(p.getType())
                 .updDate(p.getUpdDate())
+                .images(pic.toProductImagesDTOFromProductImages(p.getProductImagesList()))
+                .sizes(psc.toProductSizesDTOFromProductSizes(p.getProductsizeList()))
                 .build();
     }
 

@@ -49,8 +49,9 @@ public class CartServiceImpl implements CartService {
                             .productNo(cartItem.getProduct().getProductNo())
                             .productName(cartItem.getProduct().getProductName())
                             .quantity(cartItem.getQuantity())
-                            .price(cartItem.getProduct().getPrice().intValue())
-                            .imgUrl(imageUrl)
+                            .price(cartItem.getProduct().getPrice())
+                            //.imgUrl(imageUrl)
+                            // 내일할 것. cartItem에다 쓸건가 아니면 Product에 연결된 productImage를 끌어다 쓸건가
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -85,7 +86,7 @@ public class CartServiceImpl implements CartService {
                     .cart(cart)
                     .product(product)
                     .quantity(cartItemAddDto.getQuantity())
-                    .price(product.getPrice().intValue())
+                    .price(product.getPrice())
                     .build();
             cartItemRepository.save(newCartItem);
         }

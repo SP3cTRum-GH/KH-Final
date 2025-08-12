@@ -15,6 +15,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.member.repository.MemberRepository;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @SpringBootTest
 class FinalProjectApplicationTests {

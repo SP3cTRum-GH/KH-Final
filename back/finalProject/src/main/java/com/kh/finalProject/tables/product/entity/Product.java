@@ -3,10 +3,7 @@ package com.kh.finalProject.tables.product.entity;
 import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import com.kh.finalProject.tables.productsize.entity.Productsize;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -22,6 +19,7 @@ import java.util.List;
         initialValue = 1
 )
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -62,4 +60,13 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Productsize> productsizeList = new ArrayList<>();
+
+    public void addImages (ProductImages productImages) {
+        productImagesList.add(productImages);
+        productImages.setProduct(this);
+    }
+    public void addSize(Productsize productsize) {
+        productsizeList.add(productsize);
+        productsize.setProduct(this);
+    }
 }

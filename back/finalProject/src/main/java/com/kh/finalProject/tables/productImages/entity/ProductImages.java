@@ -2,10 +2,7 @@ package com.kh.finalProject.tables.productImages.entity;
 
 import com.kh.finalProject.tables.product.entity.Product;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @SequenceGenerator(name = "product_image_seq_gen",
@@ -13,6 +10,7 @@ import lombok.NoArgsConstructor;
         allocationSize = 1,
         initialValue = 1)
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
