@@ -11,11 +11,13 @@ import {
   PriceContainer,
   OptionBox,
 } from "./SelectOptionStyle";
+import { useNavigate } from "react-router-dom";
 
 const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
   const name = productData?.productName ?? "";
   const price = productData?.price ?? 0;
   const sizes = productData?.sizes ?? [];
+  const navigate = useNavigate();
 
   const [selectedSize, setSelectedSize] = useState("");
   const [stock, setStock] = useState(0);
@@ -56,6 +58,34 @@ const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
     }
 
     alert(`사이즈 : ${selectedSize} 수량 : ${qty}개`);
+  };
+
+  const handleCartClick = () => {
+    if (!selectedSize) {
+      alert("사이즈를 선택해주세요.");
+      return;
+    }
+
+    if (stock === 0) {
+      alert("해당 사이즈는 품절입니다.");
+      return;
+    }
+
+    if (qty < 1 || qty > stock) {
+      alert(`수량은 1 ~ ${stock} 사이로 선택해주세요.`);
+      return;
+    }
+
+    const selectCart = confirm(
+      `장바구니 페이지로 이동하시겠습니까? 
+      사이즈 : ${selectedSize} 수량 : ${qty}개`
+    );
+
+    if (selectCart) {
+      navigate("/cart");
+    } else {
+      alert("감사합니다.");
+    }
   };
 
   return (
@@ -142,7 +172,7 @@ const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
           구매하기
         </BuyButton>
 
-        <InterestBox>장바구니</InterestBox>
+        <InterestBox onClick={handleCartClick}>장바구니</InterestBox>
       </OptionBox>
     </OptionContainer>
   );
