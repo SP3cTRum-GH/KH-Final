@@ -35,7 +35,6 @@ const ShopDetailCompont = () => {
   const param = useParams();
   const [reviewList, setReviewList] = useState({});
   const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
-  const navigate = useNavigate();
 
   useEffect(() => {
     getShopOne(param.productNo).then((data) => {
