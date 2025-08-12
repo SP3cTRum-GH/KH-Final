@@ -203,17 +203,19 @@ export const ModalContent = styled.div`
   }
 
   ul {
+    align-items: center;
     li {
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.75rem;
+      font-size: medium;
+      margin: 0.75rem;
+      color: gray;
       label {
-        width: 80px; /* 라벨의 고정 너비 */
-        font-weight: 500;
+        /* width: 80px; */
       }
       input {
+        width: 90%;
         flex: 1;
         padding: 0.5rem;
+        margin-top: 15px;
         border: 1px solid #d1d5db;
         border-radius: 4px;
       }
