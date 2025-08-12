@@ -15,6 +15,7 @@ public class MemberResponseDTO {
     private String memberName;
     private String memberEmail;
     private String memberPhone;
+    private String memberAddress;
     private int memberPoint;
     private Boolean memberGender;
     private Boolean enable;

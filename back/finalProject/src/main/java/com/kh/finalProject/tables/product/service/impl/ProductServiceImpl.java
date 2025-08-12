@@ -2,7 +2,7 @@ package com.kh.finalProject.tables.product.service.impl;
 
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
-import com.kh.finalProject.tables.product.component.ProductConvertor;
+import com.kh.finalProject.tables.product.component.ProductConverter;
 import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
@@ -10,6 +10,14 @@ import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 import com.kh.finalProject.tables.product.entity.Product;
 import com.kh.finalProject.tables.product.repository.ProductRepository;
 import com.kh.finalProject.tables.product.service.ProductService;
+import com.kh.finalProject.tables.productImages.component.ProductImagesConverter;
+import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
+import com.kh.finalProject.tables.productImages.entity.ProductImages;
+import com.kh.finalProject.tables.productImages.repository.ProductImagesRepository;
+import com.kh.finalProject.tables.productsize.component.ProductSizeConverter;
+import com.kh.finalProject.tables.productsize.dto.ProductSizeDTO;
+import com.kh.finalProject.tables.productsize.entity.Productsize;
+import com.kh.finalProject.tables.productsize.repository.ProductSizeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +38,10 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
-    private final ProductConvertor productConvertor;
+    private final ProductConverter productConverter;
+
+    private final ProductImagesConverter productImagesConverter;
+    private final ProductSizeConverter  productSizeConverter;
 
     // Paging
     @Override
@@ -40,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> page = productRepository.findByType(true, pageable);
 
         List<ProductDealResponseDTO> list = page.getContent().stream()
-                .map(productConvertor::toDealResponse)
+                .map(productConverter::toDealResponse)
                 .toList();
 
         return PageResponseDTO.<ProductDealResponseDTO>withAll()
@@ -57,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> page = productRepository.findByType(false, pageable);
 
         List<ProductShopResponseDTO> list = page.getContent().stream()
-                .map(productConvertor::toShopResponse)
+                .map(productConverter::toShopResponse)
                 .toList();
 
         return PageResponseDTO.<ProductShopResponseDTO>withAll()
@@ -71,14 +82,38 @@ public class ProductServiceImpl implements ProductService {
     // CREATE
     @Override
     public ProductDealResponseDTO createDeal(ProductDealRequestDTO dto) {
-        Product saved = productRepository.save(productConvertor.toEntityFromDeal(dto));
-        return productConvertor.toDealResponse(saved);
+        Product saved = productConverter.toEntityFromDeal(dto);
+        if(dto.getImages() != null && !dto.getImages().isEmpty()) {
+            for(ProductImagesDTO i : dto.getImages()){
+                ProductImages productImages = productImagesConverter.toEntityFromProductImages(i,saved);
+                saved.getProductImagesList().add(productImages);
+            }
+        }
+        if(dto.getSizes() != null && !dto.getSizes().isEmpty()) {
+            for(ProductSizeDTO i : dto.getSizes()){
+                Productsize productsize = productSizeConverter.toEntityFromProductSize(i,saved);
+                saved.getProductsizeList().add(productsize);
+            }
+        }
+        return productConverter.toDealResponse(productRepository.save(saved));
     }
 
     @Override
     public ProductShopResponseDTO createShop(ProductShopRequestDTO dto) {
-        Product saved = productRepository.save(productConvertor.toEntityFromShop(dto));
-        return productConvertor.toShopResponse(saved);
+        Product saved = productConverter.toEntityFromShop(dto);
+        if(dto.getImages() != null && !dto.getImages().isEmpty()) {
+            for(ProductImagesDTO i : dto.getImages()){
+                ProductImages productImages = productImagesConverter.toEntityFromProductImages(i,saved);
+                saved.getProductImagesList().add(productImages);
+            }
+        }
+        if(dto.getSizes() != null && !dto.getSizes().isEmpty()) {
+            for(ProductSizeDTO i : dto.getSizes()){
+                Productsize productsize = productSizeConverter.toEntityFromProductSize(i,saved);
+                saved.getProductsizeList().add(productsize);
+            }
+        }
+        return productConverter.toShopResponse(productRepository.save(saved));
     }
 
     // READ
@@ -87,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
         Product p = productRepository.findById(productNo)
                 .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
         if (!Boolean.TRUE.equals(p.getType())) throw new EntityNotFoundException("경매 상품 아님");
-        return productConvertor.toDealResponse(p);
+        return productConverter.toDealResponse(p);
     }
 
     @Override
@@ -95,14 +130,14 @@ public class ProductServiceImpl implements ProductService {
         Product p = productRepository.findById(productNo)
                 .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
         if (Boolean.TRUE.equals(p.getType())) throw new EntityNotFoundException("일반 상품 아님");
-        return productConvertor.toShopResponse(p);
+        return productConverter.toShopResponse(p);
     }
 
     @Override
     public List<ProductDealResponseDTO> listDeals() {
         return productRepository.findAll().stream()
                 .filter(p -> Boolean.TRUE.equals(p.getType()))
-                .map(productConvertor::toDealResponse)
+                .map(productConverter::toDealResponse)
                 .toList();
     }
 
@@ -110,7 +145,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductShopResponseDTO> listShops() {
         return productRepository.findAll().stream()
                 .filter(p -> !Boolean.TRUE.equals(p.getType()))
-                .map(productConvertor::toShopResponse)
+                .map(productConverter::toShopResponse)
                 .toList();
     }
 
@@ -120,8 +155,8 @@ public class ProductServiceImpl implements ProductService {
         Product existing = productRepository.findById(productNo)
                 .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
         if (!Boolean.TRUE.equals(existing.getType())) throw new EntityNotFoundException("경매 상품 아님");
-        Product saved = productRepository.save(productConvertor.rebuildForDealUpdate(existing, dto));
-        return productConvertor.toDealResponse(saved);
+        Product saved = productRepository.save(productConverter.rebuildForDealUpdate(existing, dto));
+        return productConverter.toDealResponse(saved);
     }
 
     @Override
@@ -129,8 +164,8 @@ public class ProductServiceImpl implements ProductService {
         Product existing = productRepository.findById(productNo)
                 .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
         if (Boolean.TRUE.equals(existing.getType())) throw new EntityNotFoundException("일반 상품 아님");
-        Product saved = productRepository.save(productConvertor.rebuildForShopUpdate(existing, dto));
-        return productConvertor.toShopResponse(saved);
+        Product saved = productRepository.save(productConverter.rebuildForShopUpdate(existing, dto));
+        return productConverter.toShopResponse(saved);
     }
 
     // DELETE

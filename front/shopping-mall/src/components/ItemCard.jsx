@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { Container, Wrap, ProductContainer, Wrapper } from "./ItemCardStyle";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const ItemCard = ({ page, dtoList }) => {
   const navigate = useNavigate();
+  const loginState = useSelector((state) => state.loginSlice);
+  const isAdmin =
+    loginState.roleNames && loginState.roleNames.includes("ADMIN");
 
   return (
     <Wrapper>
@@ -27,10 +31,12 @@ const ItemCard = ({ page, dtoList }) => {
                   </p>
                   <h4>{Number(product.price).toLocaleString()}원</h4>
                 </div>
-                <div>
-                  <button>수정</button>
-                  <button>삭제</button>
-                </div>
+                {isAdmin && (
+                  <div>
+                    <button>수정</button>
+                    <button>삭제</button>
+                  </div>
+                )}
               </Wrap>
             </ProductContainer>
           );

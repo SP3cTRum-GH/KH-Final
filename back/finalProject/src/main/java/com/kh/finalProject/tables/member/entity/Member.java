@@ -1,13 +1,28 @@
 package com.kh.finalProject.tables.member.entity;
 
-import com.kh.finalProject.tables.member.MemberRole;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.kh.finalProject.tables.member.MemberRole;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Builder
@@ -54,9 +69,9 @@ public class Member {
 
     @Column
     private Character grade = 'F'; // 사용자 등급
-
-    @Column
-    private String memberAddress;
+    
+    @Column(nullable = false)
+    private String memberAddress; //사용자 주소 
 
     @Column
     private String OAuth; // 사용자 권한

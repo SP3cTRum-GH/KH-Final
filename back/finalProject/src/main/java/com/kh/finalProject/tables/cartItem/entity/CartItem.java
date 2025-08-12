@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
         ,initialValue = 1
 )
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -29,7 +31,7 @@ public class CartItem {
     private int quantity; // 장바구니 수량
 
     @Column
-    private BigDecimal totalPrice; // 장바구니 총 금액
+    private int price; // 장바구니 총 금액
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_no", nullable = false)
