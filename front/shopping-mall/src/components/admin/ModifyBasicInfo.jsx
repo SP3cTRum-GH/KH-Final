@@ -41,6 +41,7 @@ export default function ProductBasicInfo({ product, setProduct }) {
                             value={product.dealCount}
                             onChange={handleChange}
                             placeholder="입찰 횟수"
+                            disabled
                         />
                     </Label>
                     <Label>
@@ -51,6 +52,7 @@ export default function ProductBasicInfo({ product, setProduct }) {
                             value={product.dealCurrent}
                             onChange={handleChange}
                             placeholder="경매 시작가"
+                            disabled
                         />
                     </Label>
                     <Label>

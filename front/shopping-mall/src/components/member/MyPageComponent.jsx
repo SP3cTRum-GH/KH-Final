@@ -112,7 +112,7 @@ const MyPageComponent = () => {
                             <p>{user.name}</p>
                         </div>
                     </Profile>
-                    <Button onClick={() => setIsProfileModalOpen(true)}>프로필 수정</Button>
+                    <Button onClick={() => setIsProfileModalOpen(true)}>설정</Button>
                 </Header>
 
                 <InfoBox onClick={() => setIsModalOpen(true)}>

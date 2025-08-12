@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { PageWrapper, ButtonGroup, Button } from "./ModifyPageStyle";
-import ProductBasicInfo from "./ProductBasicInfo";
+import ModifyBasicInfo from "./ProductBasicInfo";
 import CategorySizeManager from "./CategorySizeManager";
 import ImageUploader from "./ImageUploader";
 
@@ -48,7 +48,7 @@ export default function ModifyPageComponent() {
         <PageWrapper>
             <form onSubmit={handleSubmit}>
                 {/* 기본 정보 */}
-                <ProductBasicInfo product={product} setProduct={setProduct} />
+                <ModifyBasicInfo product={product} setProduct={setProduct} />
 
                 {/* 카테고리 선택 */}
                 <CategorySizeManager
