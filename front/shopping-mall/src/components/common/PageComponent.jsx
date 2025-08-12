@@ -25,7 +25,14 @@ const PageButton = styled.button`
 `;
 
 const PageComponent = ({ type, listData, moveToProductList }) => {
-  const { prev, next, pageNumList, current, prevPage, nextPage } = listData;
+  const {
+    prev = false,
+    next = false,
+    pageNumList = [],
+    current = 1,
+    prevPage = 1,
+    nextPage = 1,
+  } = listData || {};
 
   return (
     <div
@@ -43,15 +50,19 @@ const PageComponent = ({ type, listData, moveToProductList }) => {
       )}
 
       {/* 페이지 번호 */}
-      {pageNumList.map((pageNum) => (
-        <PageButton
-          key={pageNum}
-          className={pageNum === current ? "active" : ""}
-          onClick={() => moveToProductList({ page: pageNum }, type)}
-        >
-          {pageNum}
-        </PageButton>
-      ))}
+      {Array.isArray(pageNumList) &&
+        pageNumList.length > 0 &&
+        pageNumList.map((pageNum) => (
+          <PageButton
+            key={pageNum}
+            className={pageNum === current ? "active" : ""}
+            onClick={() =>
+              moveToProductList && moveToProductList({ page: pageNum }, type)
+            }
+          >
+            {pageNum}
+          </PageButton>
+        ))}
 
       {/* 다음 버튼 */}
       {next && (
