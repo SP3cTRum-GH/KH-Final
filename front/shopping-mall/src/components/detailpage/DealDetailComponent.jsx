@@ -7,6 +7,9 @@ import styled from "styled-components";
 import DealModal from "./DealModal";
 import { getDealOne } from "../../api/productDealApi";
 import { useParams } from "react-router-dom";
+import { getReviewList } from "../../api/reviewApi";
+import useCustomMove from "../../hooks/useCustomMove";
+import PageComponent from "../common/PageComponent";
 
 const Div = styled.div`
   width: 100%;
@@ -32,12 +35,20 @@ const DealDetailComponent = () => {
   const reviewRef = useRef(null);
   const [result, setResult] = useState(false); // 모달 창
   const param = useParams();
+  const [reviewList, setReviewList] = useState({});
+  const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
 
   useEffect(() => {
     getDealOne(param.productNo).then((data) => {
       setDealProductData(data);
     });
-  }, [param.productNo]);
+
+    getReviewList({ page: reviewPage, size: reviewSize }, param.productNo).then(
+      (data) => {
+        setReviewList(data);
+      }
+    );
+  }, [reviewPage, reviewSize, param.productNo]);
 
   const scrollToReview = () => {
     if (reviewRef.current) {
@@ -87,7 +98,14 @@ const DealDetailComponent = () => {
       </div>
       <hr style={hrStyle} />
       <div ref={reviewRef} id="review">
-        <Review />
+        <Review reviewList={reviewList} />
+        <PageComponent
+          type={"dealdetail"}
+          listData={reviewList}
+          moveToProductList={(pageParam) =>
+            moveToReviewList(pageParam, `/dealdetail/${param.productNo}`)
+          }
+        />
       </div>
 
       {result && (
