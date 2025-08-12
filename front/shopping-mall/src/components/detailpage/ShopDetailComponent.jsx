@@ -1,9 +1,11 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DetailCarousel from "./DetailCarousel";
 import SelectOption from "./SelectOption";
 import ProductImageList from "./ProductImageList";
 import Review from "./Review";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import { getShopOne } from "../../api/productShopApi";
 
 const Div = styled.div`
   width: 100%;
@@ -25,7 +27,15 @@ const hrStyle = {
 };
 
 const ShopDetailCompont = () => {
+  const [shopProductData, setShopProductData] = useState({});
   const reviewRef = useRef(null);
+  const param = useParams();
+
+  useEffect(() => {
+    getShopOne(param.productNo).then((data) => {
+      setShopProductData(data);
+    });
+  }, []);
 
   const scrollToReview = () => {
     if (reviewRef.current) {
@@ -40,7 +50,10 @@ const ShopDetailCompont = () => {
     <>
       <Div>
         <DetailCarousel listLength={1200} imgLength={5} />
-        <SelectOption scrollToReview={scrollToReview} />
+        <SelectOption
+          productData={shopProductData}
+          scrollToReview={scrollToReview}
+        />
       </Div>
       <hr style={hrStyle} />
       <div>

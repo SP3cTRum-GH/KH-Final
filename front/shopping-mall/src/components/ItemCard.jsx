@@ -1,112 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, Wrap, ProductContainer, Wrapper } from "./ItemCardStyle";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const initData = [
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-  {
-    img: "https://s3.marpple.co/f1/2022/6/1330618_1655959465368_49189.png",
-    productName: "white t-shirt",
-    price: "140000",
-  },
-];
-
-const ItemCard = ({ page }) => {
+const ItemCard = ({ page, dtoList }) => {
   const navigate = useNavigate();
   const loginState = useSelector((state) => state.loginSlice);
   const isAdmin =
@@ -115,18 +12,23 @@ const ItemCard = ({ page }) => {
   return (
     <Wrapper>
       <Container>
-        {initData.map((product, i) => {
+        {dtoList.map((product, i) => {
           return (
             <ProductContainer
               key={i}
               onClick={() => {
-                navigate(`/${page}`);
+                navigate(`/${page}/${product.productNo}`);
+                window.scrollTo(0, 0);
               }}
             >
-              <img src={product.img} alt="흰색 반팔 티셔츠" />
+              <img src={product.img} alt="" />
               <Wrap>
                 <div>
-                  <p>{product.productName + i}</p>
+                  <p>
+                    {product.productName?.length < 8
+                      ? product.productName
+                      : product.productName?.slice(0, 7) + "..."}
+                  </p>
                   <h4>{Number(product.price).toLocaleString()}원</h4>
                 </div>
                 {isAdmin && (

@@ -44,6 +44,7 @@ class FinalProjectApplicationProductTests {
 		System.out.println("상품 이름: " + found.getProductName());
 		System.out.println("경매 마감일: " + found.getEndDate());
 	}
+
 //	@Test
 	void imageWaSizeTest(){
 		Product product = Product.builder()
