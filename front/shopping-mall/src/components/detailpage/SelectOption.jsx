@@ -12,18 +12,29 @@ import {
   OptionBox,
 } from "./SelectOptionStyle";
 
-const SelectOption = ({ scrollToReview, handleOpenModal }) => {
+const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
+  const name = productData?.productName ?? "";
+  const price = productData?.price ?? 0;
+
   return (
     <OptionContainer>
-      <ProductTitle>Suade Baggy Denim Black</ProductTitle>
+      <ProductTitle>{name}</ProductTitle>
 
       <PriceContainer>
         <PriceBox>
-          <SalePrice>47,200원</SalePrice>
+          <SalePrice>{Number(price).toLocaleString()} 원</SalePrice>
         </PriceBox>
 
         <ReviewBox>
-          <a onClick={scrollToReview}>리뷰 347</a>
+          <a
+            href="#review"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToReview();
+            }}
+          >
+            리뷰 347
+          </a>
         </ReviewBox>
       </PriceContainer>
 

@@ -3,10 +3,7 @@ package com.kh.finalProject.tables.review.entity;
 import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.product.entity.Product;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @SequenceGenerator(name = "review_seq_gen",
         sequenceName = "review_seq",
         allocationSize = 1,
