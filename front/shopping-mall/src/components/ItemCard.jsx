@@ -21,9 +21,9 @@ const ItemCard = ({ page, dtoList }) => {
               <Wrap>
                 <div>
                   <p>
-                    {product.productName.lengtth > 8
+                    {product.productName?.length < 8
                       ? product.productName
-                      : product.productName.slice(0, 7) + "..."}
+                      : product.productName?.slice(0, 7) + "..."}
                   </p>
                   <h4>{Number(product.price).toLocaleString()}원</h4>
                 </div>
