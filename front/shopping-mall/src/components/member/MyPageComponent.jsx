@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
     ProfileBox,
     Header,
@@ -37,6 +38,7 @@ import {
 
 
 const MyPageComponent = () => {
+    const navigate = useNavigate();
     const [showAll, setShowAll] = useState(false);
     const [purchaseHistory, setPurchaseHistory] = useState([
         { id: 1, name: "Adidas Superstar Core Black White", size: "260", date: "25/03/22", status: "결제 완료", reviewed: false },
@@ -81,10 +83,7 @@ const MyPageComponent = () => {
 
     const handleProfileUpdate = (e) => {
         e.preventDefault();
-        const newEmail = e.target.email.value;
-        const newName = e.target.name.value;
-        setUser({ email: newEmail, name: newName });
-        setIsProfileModalOpen(false);
+        navigate("/modifymypage");
     };
 
     const paymentCompletedCount = purchaseHistory.filter(item => item.status === "결제 완료").length;
@@ -201,27 +200,15 @@ const MyPageComponent = () => {
             {isProfileModalOpen && (
                 <ModalOverlay onClick={() => setIsProfileModalOpen(false)}>
                     <ModalContent as="form" onSubmit={handleProfileUpdate} onClick={(e) => e.stopPropagation()}>
-                        <h3>프로필 수정</h3>
+                        <h3>비밀번호 확인</h3>
                         <ul>
                             <li>
-                                <label>이름</label>
-                                <input type="text" name="name" defaultValue={user.name} placeholder="이름을 입력하세요" />
-                            </li>
-                            <li>
-                                <label>이메일</label>
-                                <input type="email" name="email" defaultValue={user.email} placeholder="이메일을 입력하세요" />
-                            </li>
-                            <li>
-                                <label>연락처</label>
-                                <input type="text" name="tel" defaultValue={user.tel} placeholder="연락처를 입력하세요" />
-                            </li>
-                            <li>
-                                <label>주소</label>
-                                <input type="address" name="addr" defaultValue={user.addr} placeholder="주소를 입력하세요" />
+                                <label>정보를 보호하기 위해 비밀번호를 다시 한 번 입력해주세요</label>
+                                <input type="password" name="password" defaultValue={user.password} placeholder="비밀번호 입력" />
                             </li>
                         </ul>
                         <ProfileBtnWrapper>
-                            <CloseBtn type="submit">수정</CloseBtn>
+                            <CloseBtn type="submit">입력</CloseBtn>
                             <CloseBtn onClick={() => setIsProfileModalOpen(false)}>닫기</CloseBtn>
                         </ProfileBtnWrapper>
                     </ModalContent>
