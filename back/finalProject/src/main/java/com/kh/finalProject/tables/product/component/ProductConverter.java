@@ -5,10 +5,17 @@ import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 import com.kh.finalProject.tables.product.entity.Product;
+import com.kh.finalProject.tables.productImages.component.ProductImagesConverter;
+import com.kh.finalProject.tables.productsize.component.ProductSizeConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
-public class ProductConvertor {
+public class ProductConverter {
+    ProductImagesConverter pic = new  ProductImagesConverter();
+    ProductSizeConverter psc = new  ProductSizeConverter();
 
     // ---------- CREATE ----------
     public Product toEntityFromDeal(ProductDealRequestDTO dto) {
@@ -20,6 +27,8 @@ public class ProductConvertor {
                 .endDate(dto.getEndDate())
                 .dealCount(dto.getDealCount() == null ? 0L : dto.getDealCount())
                 .dealCurrent(dto.getDealCurrent() == null ? dto.getPrice() : dto.getDealCurrent())
+                .productImagesList(new ArrayList<>())
+                .productsizeList(new ArrayList<>())
                 .build();
     }
 
@@ -32,6 +41,8 @@ public class ProductConvertor {
                 .endDate(null)
                 .dealCount(0L)               // NOT NULL 기본값
                 .dealCurrent(dto.getPrice()) // NOT NULL 기본값
+                .productImagesList(new ArrayList<>())
+                .productsizeList(new ArrayList<>())
                 .build();
     }
 
@@ -78,6 +89,8 @@ public class ProductConvertor {
                 .endDate(p.getEndDate())
                 .dealCount(p.getDealCount())
                 .dealCurrent(p.getDealCurrent())
+                .images(pic.toProductImagesDTOFromProductImages(p.getProductImagesList()))
+                .sizes(psc.toProductSizesDTOFromProductSizes(p.getProductsizeList()))
                 .build();
     }
 
@@ -89,6 +102,8 @@ public class ProductConvertor {
                 .price(p.getPrice())
                 .type(p.getType())
                 .updDate(p.getUpdDate())
+                .images(pic.toProductImagesDTOFromProductImages(p.getProductImagesList()))
+                .sizes(psc.toProductSizesDTOFromProductSizes(p.getProductsizeList()))
                 .build();
     }
 

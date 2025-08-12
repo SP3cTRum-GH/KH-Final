@@ -3,10 +3,7 @@ package com.kh.finalProject.tables.product.entity;
 import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import com.kh.finalProject.tables.productsize.entity.Productsize;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -22,6 +19,7 @@ import java.util.List;
         initialValue = 1
 )
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -49,17 +47,26 @@ public class Product {
     private LocalDateTime endDate; // 경매 마감일
 
     @Column(nullable = false)
-    private BigDecimal price; // 상품 가격
+    private int price; // 상품 가격
 
     @Column(nullable = false)
     private Long dealCount; // 경매 입찰수
 
     @Column(nullable = false)
-    private BigDecimal dealCurrent; // 경매 입찰가
+    private int dealCurrent; // 경매 입찰가
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImages> productImagesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Productsize> productsizeList = new ArrayList<>();
+
+    public void addImages (ProductImages productImages) {
+        productImagesList.add(productImages);
+        productImages.setProduct(this);
+    }
+    public void addSize(Productsize productsize) {
+        productsizeList.add(productsize);
+        productsize.setProduct(this);
+    }
 }

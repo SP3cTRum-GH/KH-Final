@@ -26,9 +26,6 @@ public class purchaseLog {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_log_seq_gen")
     private Long logNo;
 
-    @Column
-    private Boolean isReviewed = false; // 중복 리뷰 방지
-
     @CreationTimestamp
     private LocalDateTime regDate;
 
