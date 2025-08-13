@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Wrap, ProductContainer, Wrapper } from "./ItemCardStyle";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { deleteProductItem } from "../api/productShopApi";
 
 const ItemCard = ({ page, dtoList }) => {
   const navigate = useNavigate();
@@ -9,23 +10,49 @@ const ItemCard = ({ page, dtoList }) => {
   const isAdmin =
     loginState.roleNames && loginState.roleNames.includes("ADMIN");
 
-  console.log(dtoList);
+  const [items, setItems] = useState(dtoList || []);
+
+  useEffect(() => {
+    setItems(dtoList || []);
+  }, [dtoList]);
+
+  const handleDelete = async (productNo) => {
+    try {
+      const result = confirm(`${productNo}번 상품을 삭제 하시겠습니까?`);
+      if (result) {
+        await deleteProductItem(productNo);
+      } else {
+        return;
+      }
+      // Optimistic UI update: remove the item locally
+      setItems((prev) => prev.filter((p) => p.productNo !== productNo));
+    } catch (err) {
+      console.error("Delete failed", err);
+      // Optional: show toast/alert
+    }
+  };
 
   return (
     <Wrapper>
       <Container>
-        {dtoList.map((product, i) => {
+        {items.map((product, i) => {
           return (
-            <ProductContainer
-              key={i}
-              onClick={() => {
-                navigate(`/${page}/${product.productNo}`);
-                window.scrollTo(0, 0);
-              }}
-            >
-              <img src={product.img} alt="" />
+            <ProductContainer key={product.productNo}>
+              <img
+                src={product.img}
+                alt=""
+                onClick={() => {
+                  navigate(`/${page}/${product.productNo}`);
+                  window.scrollTo(0, 0);
+                }}
+              />
               <Wrap>
-                <div>
+                <div
+                  onClick={() => {
+                    navigate(`/${page}/${product.productNo}`);
+                    window.scrollTo(0, 0);
+                  }}
+                >
                   <p>
                     {product.productName?.length < 8
                       ? product.productName
@@ -36,7 +63,9 @@ const ItemCard = ({ page, dtoList }) => {
                 {isAdmin && (
                   <div>
                     <button>수정</button>
-                    <button>삭제</button>
+                    <button onClick={() => handleDelete(product.productNo)}>
+                      삭제
+                    </button>
                   </div>
                 )}
               </Wrap>
