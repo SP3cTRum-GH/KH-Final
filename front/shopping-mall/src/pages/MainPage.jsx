@@ -1,6 +1,6 @@
 import React from "react";
 import ItemCard from "../components/ItemCard";
-import Carousel from "../components/Carousel";
+import Carousel from "../components/mainpage/Carousel";
 import Header from "../include/Header";
 import { Container } from "../components/Container";
 import Footer from "../include/Footer";
@@ -10,8 +10,8 @@ const MainPage = () => {
     <>
       <Header />
       <Container>
-        <Carousel listLength={1200} imgLength={4} />
-        <ItemCard />
+        <Carousel listLength={1200} imgLength={5} />
+        {/* <ItemCard /> */}
       </Container>
       <Footer />
     </>

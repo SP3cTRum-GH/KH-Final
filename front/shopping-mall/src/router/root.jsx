@@ -25,9 +25,19 @@ const CartPage = lazy(() => import("../pages/member/CartPage"));
 
 // my 페이지
 const MyPage = lazy(() => import("../pages/member/MyPage"));
+const ModifyMyPage = lazy(() => import("../pages/member/ModifyMyPage"));
 
 // 로그인 페이지
 const LoginPage = lazy(() => import("../pages/member/LoginPage"));
+
+// admin 페이지
+const ModifyPage = lazy(() => import("../pages/admin/ModifyPage"));
+
+// 회원가입 페이지
+const SignUpPage = lazy(() => import("../pages/member/SignUpPage"));
+
+// review 페이지
+const ReviewPage = lazy(() => import("../pages/member/ReviewPage"));
 
 const root = createBrowserRouter([
   {
@@ -47,7 +57,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/shopdetail",
+    path: "/shopdetail/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ShopDetailPage />
@@ -63,7 +73,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/dealdetail",
+    path: "/dealdetail/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <DealDetailPage />
@@ -87,6 +97,14 @@ const root = createBrowserRouter([
     ),
   },
   {
+    path: "/modifymypage",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ModifyMyPage />
+      </Suspense>
+    ),
+  },
+  {
     path: "/cart",
     element: (
       <Suspense fallback={<Loading />}>
@@ -99,6 +117,30 @@ const root = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <LoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/modify",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ModifyPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/signup",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <SignUpPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/review",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ReviewPage />
       </Suspense>
     ),
   },
