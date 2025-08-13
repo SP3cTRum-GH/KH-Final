@@ -32,6 +32,9 @@ const LoginPage = lazy(() => import("../pages/member/LoginPage"));
 
 // admin 페이지
 const ModifyPage = lazy(() => import("../pages/admin/ModifyPage"));
+const UploadPage = lazy(() => import("../pages/admin/UploadPage"));
+const MemberListPage = lazy(() => import("../pages/admin/MemberListPage"));
+const SalesChartPage = lazy(() => import("../pages/admin/SalesChartPage"));
 
 // 회원가입 페이지
 const SignUpPage = lazy(() => import("../pages/member/SignUpPage"));
@@ -121,7 +124,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/modify",
+    path: "/admin/modify",
     element: (
       <Suspense fallback={<Loading />}>
         <ModifyPage />
@@ -129,6 +132,31 @@ const root = createBrowserRouter([
     ),
   },
   {
+    path: "/admin/upload",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <UploadPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/admin/memberlist",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <MemberListPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/admin/saleschart",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <SalesChartPage />
+      </Suspense>
+    ),
+  },
+  {
+
     path: "/signup",
     element: (
       <Suspense fallback={<Loading />}>

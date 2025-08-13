@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { PageWrapper, ButtonGroup, Button } from "./ModifyPageStyle";
-import ModifyBasicInfo from "./ProductBasicInfo";
+import ProductBasicInfo from "./ProductBasicInfo";
 import CategorySizeManager from "./CategorySizeManager";
 import ImageUploader from "./ImageUploader";
 
-export default function ModifyPageComponent() {
+export default function UploadPageComponent() {
     const [product, setProduct] = useState({
         name: "",
         salesType: "",
@@ -48,7 +48,7 @@ export default function ModifyPageComponent() {
         <PageWrapper>
             <form onSubmit={handleSubmit}>
                 {/* 기본 정보 */}
-                <ModifyBasicInfo product={product} setProduct={setProduct} />
+                <ProductBasicInfo product={product} setProduct={setProduct} />
 
                 {/* 카테고리 선택 */}
                 <CategorySizeManager
@@ -70,5 +70,5 @@ export default function ModifyPageComponent() {
                 </ButtonGroup>
             </form>
         </PageWrapper>
-    );
+    )
 }
