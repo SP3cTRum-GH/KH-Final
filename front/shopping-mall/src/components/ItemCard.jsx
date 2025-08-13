@@ -9,6 +9,8 @@ const ItemCard = ({ page, dtoList }) => {
   const isAdmin =
     loginState.roleNames && loginState.roleNames.includes("ADMIN");
 
+  console.log(dtoList);
+
   return (
     <Wrapper>
       <Container>
