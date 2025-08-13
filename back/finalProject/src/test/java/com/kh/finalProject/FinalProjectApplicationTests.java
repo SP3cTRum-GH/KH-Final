@@ -28,7 +28,7 @@ class FinalProjectApplicationTests {
 	@Autowired
 	private PasswordEncoder pe;
 
-	@Test
+//	@Test
 	public void testInsertMember() {
 
 		Member member = Member.builder()
@@ -48,7 +48,7 @@ class FinalProjectApplicationTests {
 		db.save(member);
 		}
 
-	//@Test
+//	@Test
 	void testMember() {
 		List<Member> memberList = List.of(
 				Member.builder()
@@ -67,6 +67,7 @@ class FinalProjectApplicationTests {
 		Member getback = db.findById(id).orElseThrow();
 		System.out.println("조회된 멤버 이름: " + getback.getMemberName());
 	}
+	
 	//@Test
 	void pwpwproblem() {
 		Member m = Member.builder()

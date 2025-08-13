@@ -1,11 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Children, useEffect, useRef, useState } from "react";
 import DetailCarousel from "./DetailCarousel";
 import SelectOption from "./SelectOption";
 import ProductImageList from "./ProductImageList";
 import Review from "./Review";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, createSearchParams } from "react-router-dom";
 import { getShopOne } from "../../api/productShopApi";
+import { getReviewList } from "../../api/reviewApi";
+import useCustomMove from "../../hooks/useCustomMove";
+import PageComponent from "../common/PageComponent";
 
 const Div = styled.div`
   width: 100%;
@@ -30,12 +33,21 @@ const ShopDetailCompont = () => {
   const [shopProductData, setShopProductData] = useState({});
   const reviewRef = useRef(null);
   const param = useParams();
+  const [reviewList, setReviewList] = useState({});
+  const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getShopOne(param.productNo).then((data) => {
       setShopProductData(data);
     });
-  }, []);
+
+    getReviewList({ page: reviewPage, size: reviewSize }, param.productNo).then(
+      (data) => {
+        setReviewList(data);
+      }
+    );
+  }, [reviewPage, reviewSize, param.productNo]);
 
   const scrollToReview = () => {
     if (reviewRef.current) {
@@ -61,7 +73,14 @@ const ShopDetailCompont = () => {
       </div>
       <hr style={hrStyle} />
       <div ref={reviewRef} id="review">
-        <Review />
+        <Review reviewList={reviewList} />
+        <PageComponent
+          type={"shopdetail"}
+          listData={reviewList}
+          moveToProductList={(pageParam) =>
+            moveToReviewList(pageParam, `/shopdetail/${param.productNo}`)
+          }
+        />
       </div>
     </>
   );

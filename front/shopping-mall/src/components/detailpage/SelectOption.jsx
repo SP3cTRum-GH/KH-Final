@@ -12,6 +12,7 @@ import {
   OptionBox,
 } from "./SelectOptionStyle";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../../util/cookieUtil";
 
 const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
   const name = productData?.productName ?? "";
@@ -57,6 +58,12 @@ const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
       return;
     }
 
+    if (getCookie("member") === undefined) {
+      alert("로그인 해주세요.");
+      navigate("/login");
+      return;
+    }
+
     alert(`사이즈 : ${selectedSize} 수량 : ${qty}개`);
   };
 
@@ -81,12 +88,20 @@ const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
       사이즈 : ${selectedSize} 수량 : ${qty}개`
     );
 
+    if (getCookie("member" === undefined)) {
+      alert("로그인 해주세요.");
+      navigate("/login");
+      return;
+    }
+
     if (selectCart) {
       navigate("/cart");
     } else {
       alert("감사합니다.");
     }
   };
+
+  console.log(getCookie("member"));
 
   return (
     <OptionContainer>
