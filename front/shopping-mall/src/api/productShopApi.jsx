@@ -16,3 +16,9 @@ export const getShopProductList = async (pageParam) => {
 
   return res.data;
 };
+
+// shop 상품 등록
+export const postShopProductItem = async (product) => {
+  const res = await axios.post(`${prefix}`, product);
+  return res.data;
+};
