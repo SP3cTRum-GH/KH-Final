@@ -40,6 +40,36 @@ export default function UploadPageComponent() {
     return input;
   };
 
+  // Extract filename from various preview item shapes (URL string, File object, or object with url-like fields)
+  const extractFileName = (item) => {
+    if (!item) return null;
+
+    // If File or Blob-like with a name
+    if (typeof item === "object" && item.name) return item.name;
+    if (typeof item === "object" && item.file && item.file.name)
+      return item.file.name;
+
+    // If string URL or dataURL
+    const pickFromUrlString = (str) => {
+      if (typeof str !== "string") return null;
+      // remove query/hash, then take last path segment
+      const base = str.split(/[?#]/)[0];
+      const last = base.split("/").pop();
+      return last && last.length ? last : null;
+    };
+
+    if (typeof item === "string") return pickFromUrlString(item);
+
+    // If object with known url-ish fields
+    if (typeof item === "object") {
+      const cand = item.url || item.previewUrl || item.dataUrl || item.src;
+      const byUrl = pickFromUrlString(cand);
+      if (byUrl) return byUrl;
+    }
+
+    return null; // could not determine
+  };
+
   // 사이즈, 재고 상태
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [stockBySize, setStockBySize] = useState({});
@@ -71,12 +101,23 @@ export default function UploadPageComponent() {
       stock: Number(stockBySize?.[size] ?? 0),
     }));
 
+    // images: build from previewImages by extracting filename only
+    const images = (previewImages || [])
+      .map((it) => ({ img: extractFileName(it) }))
+      .filter((o) => !!o.img);
+
+    if (images.length === 0) {
+      errors.push(
+        "이미지 파일명을 확인할 수 없습니다. 원본 파일을 다시 선택해 주세요."
+      );
+    }
+
     const submitData = {
       productName: product.name,
       category: product.category,
       price: priceNum,
       type: product.salesType === "true",
-      images: previewImages.map(() => ({ img: null })),
+      images,
       sizes,
       ...(isAuction && {
         dealCount: Number(product.dealCount) || 0,
