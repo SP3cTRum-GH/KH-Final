@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @GetMapping("/list")
+    @GetMapping("/list")//전체 리뷰개수 count를 주거나 전체리스트를 다주거
     public PageResponseDTO<ReviewResponseDTO> list(PageRequestDTO pageRequestDTO,
                                                    @RequestParam(required = false) Long productNo,
                                                    @RequestParam(required = false) Long memberNo) {

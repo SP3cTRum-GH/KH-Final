@@ -10,7 +10,7 @@ public class MemberConvertor {
     public MemberResponseDTO toEntity(Member member){
         return MemberResponseDTO.builder()
                 .memberId(member.getMemberId())
-                //.memberPw(member.getMemberPw()) // 민감정보 제외
+                .memberPw(member.getMemberPw()) 
                 .memberName(member.getMemberName())
                 .memberEmail(member.getMemberEmail())
                 .memberPhone(member.getMemberPhone())

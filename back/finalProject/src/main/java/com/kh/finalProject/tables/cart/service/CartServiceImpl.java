@@ -50,8 +50,6 @@ public class CartServiceImpl implements CartService {
                             .productName(cartItem.getProduct().getProductName())
                             .quantity(cartItem.getQuantity())
                             .price(cartItem.getProduct().getPrice())
-                            //.imgUrl(imageUrl)
-                            // 내일할 것. cartItem에다 쓸건가 아니면 Product에 연결된 productImage를 끌어다 쓸건가
                             .build();
                 })
                 .collect(Collectors.toList());

@@ -159,6 +159,7 @@ public class ProductServiceImpl implements ProductService {
         return productConverter.toDealResponse(saved);
     }
 
+    
     @Override
     public ProductShopResponseDTO updateShop(Long productNo, ProductShopRequestDTO dto) {
         Product existing = productRepository.findById(productNo)

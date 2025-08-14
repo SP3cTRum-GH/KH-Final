@@ -87,5 +87,4 @@ public class ProductController {
         productService.delete(id);
         return Map.of("RESULT", "SUCCESS");
     }
-    // image & Size test
 }
