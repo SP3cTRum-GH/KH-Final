@@ -62,7 +62,13 @@ const ItemCard = ({ page, dtoList }) => {
                 </div>
                 {isAdmin && (
                   <div>
-                    <button>수정</button>
+                    <button
+                      onClick={() => {
+                        navigate(`/admin/modify/${product.productNo}`);
+                      }}
+                    >
+                      수정
+                    </button>
                     <button onClick={() => handleDelete(product.productNo)}>
                       삭제
                     </button>

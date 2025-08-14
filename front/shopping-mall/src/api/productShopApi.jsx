@@ -29,3 +29,10 @@ export const deleteProductItem = async (productNo) => {
   const res = await axios.delete(`${delfix}/${productNo}`);
   return res.data;
 };
+
+// shop 상품 수정
+export const updateShopProduct = async (product, productNo) => {
+  console.log(product);
+  const res = await axios.put(`${prefix}/${productNo}`, product);
+  return res.data;
+};

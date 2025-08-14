@@ -129,7 +129,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/modify",
+    path: "/admin/modify/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ModifyPage />
