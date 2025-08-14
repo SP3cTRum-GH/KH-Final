@@ -14,7 +14,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../util/cookieUtil";
 
-const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
+const SelectOption = ({
+  productData,
+  scrollToReview,
+  handleOpenModal,
+  reviewListCount,
+}) => {
   const name = productData?.productName ?? "";
   const price = productData?.price ?? 0;
   const sizes = productData?.sizes ?? [];
@@ -120,7 +125,7 @@ const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
               scrollToReview();
             }}
           >
-            리뷰 347
+            리뷰 {reviewListCount}
           </a>
         </ReviewBox>
       </PriceContainer>

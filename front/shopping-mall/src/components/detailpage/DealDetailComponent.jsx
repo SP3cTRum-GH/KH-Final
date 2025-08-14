@@ -87,6 +87,7 @@ const DealDetailComponent = () => {
             productData={dealProductData}
             scrollToReview={scrollToReview}
             handleOpenModal={handleOpenModal}
+            reviewListCount={reviewList.totalCount}
           />
         ) : (
           <>Loading...</>
