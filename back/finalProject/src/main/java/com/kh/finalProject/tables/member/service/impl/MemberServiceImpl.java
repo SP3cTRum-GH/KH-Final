@@ -57,7 +57,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Member member = memberRepository.findById(memberNo)
 				.orElseThrow(() -> new NoSuchElementException("failed search user"));
-		member.setMemberPw(memberRequestDTO.getMemberPw());
+		member.setMemberPw(passwordEncoder.encode(memberRequestDTO.getMemberPw()));
 		member.setMemberName(memberRequestDTO.getMemberName());
 		member.setMemberEmail(memberRequestDTO.getMemberEmail());
 		member.setMemberPhone(memberRequestDTO.getMemberPhone());
@@ -66,14 +66,13 @@ public class MemberServiceImpl implements MemberService {
 		return memberConvertor.toEntity(memberRepository.save(member));
 	}
 
-	
 	@Override
 	public CustomUser getKakaoMember(String accessToken) {
 		String email = getEmailFromKakaoAccessToken(accessToken);
 		log.info("email: " + email);
 		Optional<Member> result = memberRepository.findByEmail(email);
 
-		// todo. 찾은 회원의 oauth값 체크 
+		// todo. 찾은 회원의 oauth값 체크
 		// 기존의 회원
 		if (result.isPresent()) {
 			CustomUser user = entityToDTO(result.get());
@@ -135,16 +134,9 @@ public class MemberServiceImpl implements MemberService {
 		log.info("tempPassword: " + tempPassword);
 
 		String nickname = "소셜회원";
-		Member member = Member.builder()
-				.memberId(makeTempPassword())
-				.memberEmail(email)
-				.memberPw(passwordEncoder.encode(tempPassword))
-				.memberName(nickname)
-				.memberAddress(nickname)
-				.memberGender(true)
-				.memberPhone(makeTempPassword())
-				.OAuth("Kakao")
-				.build();
+		Member member = Member.builder().memberId(makeTempPassword()).memberEmail(email)
+				.memberPw(passwordEncoder.encode(tempPassword)).memberName(nickname).memberAddress(nickname)
+				.memberGender(true).memberPhone(makeTempPassword()).OAuth("Kakao").build();
 		member.addRole(MemberRole.USER);
 		return member;
 
@@ -175,8 +167,24 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public MemberResponseDTO getLoginedMember(UserDetails userDetails) {
-		Member member = new Member();
-		return null;
+	public MemberResponseDTO socialMemberUpdate(MemberRequestDTO memberRequestDTO) {
+		Member member = memberRepository.findByEmail(memberRequestDTO.getMemberEmail())
+				.orElseThrow(() -> new NoSuchElementException("failed search user"));
+
+		member.setMemberId(memberRequestDTO.getMemberId());
+		member.setMemberPw(passwordEncoder.encode(memberRequestDTO.getMemberPw()));
+		member.setMemberName(memberRequestDTO.getMemberName());
+		member.setMemberGender(memberRequestDTO.getMemberGender());
+		member.setMemberPhone(memberRequestDTO.getMemberPhone());
+		member.setMemberAddress(memberRequestDTO.getMemberAddress());
+		return memberConvertor.toEntity(memberRepository.save(member));
 	}
+
+	@Override
+	public MemberResponseDTO getWithRoles(String memberId) {
+		Member member = memberRepository.getWithRoles(memberId);
+		
+		return memberConvertor.toEntity(member);
+	}
+
 }

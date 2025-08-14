@@ -13,12 +13,14 @@ public interface MemberService {
 	MemberResponseDTO memberSignUp(MemberRequestDTO memberRequestDTO);
 
 	MemberResponseDTO memberUpdate(Long membrNo, MemberRequestDTO memberRequestDTO);
+	
+	MemberResponseDTO socialMemberUpdate(MemberRequestDTO memberRequestDTO);
 
 	CustomUser getKakaoMember(String accessToken);
 
 	default CustomUser entityToDTO(Member member) {
 		CustomUser dto = new CustomUser(member.getMemberId(), member.getMemberPw(),member.getMemberName(), member.getMemberEmail(),
-				member.getMemberPhone(), member.getMemberGender(), member.getOAuth(),
+				member.getMemberPhone(), member.getMemberGender(),member.getMemberAddress(),member.getGrade(),member.getMemberPoint(), member.getOAuth(),
 				member.getMemberRoleList().stream().map(memberRole -> memberRole.name()).collect(Collectors.toList()));
 		return dto;
 	}
@@ -27,6 +29,6 @@ public interface MemberService {
 	
 	MemberResponseDTO getOneMember(Long memberNo);
 	
-	MemberResponseDTO getLoginedMember(UserDetails userDetails);
+	MemberResponseDTO getWithRoles(String memberId);
 	
 }

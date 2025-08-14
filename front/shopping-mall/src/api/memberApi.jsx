@@ -1,4 +1,5 @@
 import axios from "axios";
+import jwtAxios from "../util/jwtUtil";
 import { API_SERVER_HOST } from "./HostUrl";
 
 const host = `${API_SERVER_HOST}/api/member`;
@@ -13,5 +14,10 @@ export const loginPost = async (loginParam) => {
 
   const res = await axios.post(`${host}/login`, form, header);
 
+  return res.data;
+};
+
+export const modifySocialMember = async (member) => {
+  const res = await jwtAxios.put(`${host}/social`, member);
   return res.data;
 };
