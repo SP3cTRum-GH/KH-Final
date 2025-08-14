@@ -20,8 +20,6 @@ public class ProductShopRequestDTO {
     private String category;
     private Integer price;
     private Boolean type;
-    private LocalDateTime regDate;
     private List<ProductImagesDTO> images;
     private List<ProductSizeDTO> sizes;
-
 }

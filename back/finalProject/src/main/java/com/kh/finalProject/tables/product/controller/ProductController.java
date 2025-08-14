@@ -6,7 +6,6 @@ import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
-import com.kh.finalProject.tables.product.repository.ProductRepository;
 import com.kh.finalProject.tables.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -87,5 +86,4 @@ public class ProductController {
         productService.delete(id);
         return Map.of("RESULT", "SUCCESS");
     }
-    // image & Size test
 }
