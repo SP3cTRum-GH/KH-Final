@@ -18,7 +18,7 @@ public interface MemberService {
 
 	default CustomUser entityToDTO(Member member) {
 		CustomUser dto = new CustomUser(member.getMemberId(), member.getMemberPw(),member.getMemberName(), member.getMemberEmail(),
-				member.getMemberPhone(), member.getMemberGender(), member.getOAuth(),
+				member.getMemberPhone(), member.getMemberGender(),member.getMemberAddress(),member.getGrade(),member.getMemberPoint(), member.getOAuth(),
 				member.getMemberRoleList().stream().map(memberRole -> memberRole.name()).collect(Collectors.toList()));
 		return dto;
 	}
@@ -26,7 +26,5 @@ public interface MemberService {
 	void memberDelete(Long memberNo);
 	
 	MemberResponseDTO getOneMember(Long memberNo);
-	
-	MemberResponseDTO getLoginedMember(UserDetails userDetails);
 	
 }

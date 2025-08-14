@@ -50,8 +50,8 @@ public class MemberController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<MemberResponseDTO> getLoginedMember(@AuthenticationPrincipal UserDetails userDetails){
-		return ResponseEntity.ok(memberService.getLoginedMember(userDetails));
+	public ResponseEntity<CustomUser> getLoginedMember(@AuthenticationPrincipal CustomUser user){
+		return ResponseEntity.ok(user);
 	}
 
 	@GetMapping("/kakao")

@@ -174,9 +174,4 @@ public class MemberServiceImpl implements MemberService {
 		return memberConvertor.toEntity(member);
 	}
 
-	@Override
-	public MemberResponseDTO getLoginedMember(UserDetails userDetails) {
-		Member member = new Member();
-		return null;
-	}
 }

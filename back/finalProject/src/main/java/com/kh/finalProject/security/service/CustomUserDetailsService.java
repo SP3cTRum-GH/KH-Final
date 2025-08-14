@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		CustomUser customUser = new
 
 		CustomUser(member.getMemberId(), member.getMemberPw(), member.getMemberName(), member.getMemberEmail(),member.getMemberPhone(),
-				member.getMemberGender(),member.getOAuth(),
+				member.getMemberGender(),member.getMemberAddress(),member.getGrade(),member.getMemberPoint(), member.getOAuth(),
 				member.getMemberRoleList().stream().map(memberRole -> memberRole.name()).collect(Collectors.toList()));
 
 		log.info(customUser);

@@ -37,11 +37,14 @@ public class JWTCheckFilter extends OncePerRequestFilter { // http 통신 요청
 			String memberName = (String) claims.get("memberName");
 			String memberEmail = (String) claims.get("memberEmail");
 			String memberPhone = (String) claims.get("memberPhone");
+			String memberAddress = (String) claims.get("memberAddress");
 			Boolean memberGender = (Boolean) claims.get("memberGender");
+			Character grade = (Character) claims.get("grade");
+			int point = (int) claims.get("point");
 			String OAuth = (String) claims.get("OAuth");
 			List<String> roleNames = (List<String>) claims.get("roleNames");
 			CustomUser customUser = new CustomUser(memberId, memberPw, memberName, memberEmail, memberPhone,
-					memberGender, OAuth, roleNames);
+					memberGender,memberAddress,grade,point, OAuth, roleNames);
 			log.info(" ----------------------------------------------------------------- ");
 			log.info(customUser);
 			log.info(customUser.getAuthorities());
