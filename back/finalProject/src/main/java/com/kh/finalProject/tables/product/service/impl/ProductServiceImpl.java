@@ -170,7 +170,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 2) 스칼라 필드 갱신 (이미지/사이즈 제외)
         // rebuildForDealUpdate는 existing의 필드만 수정하도록 구현되어 있어야 함.
-        productConverter.rebuildForDealUpdate(existing, dto);
+        existing = productConverter.rebuildForDealUpdate(existing, dto);
 
         // 3) 이미지 컬렉션 갈아끼우기
         existing.getProductImagesList().clear();
@@ -213,13 +213,21 @@ public class ProductServiceImpl implements ProductService {
                 .filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
         var toDelete = oldNames.stream().filter(n -> !newNames.contains(n)).toList();
 
-        productConverter.rebuildForShopUpdate(existing, dto);
+        existing = productConverter.rebuildForShopUpdate(existing, dto);
 
         existing.getProductImagesList().clear();
         if (dto.getImages() != null) {
             for (ProductImagesDTO i : dto.getImages()) {
                 existing.getProductImagesList()
                         .add(productImagesConverter.toEntityFromProductImages(i, existing));
+            }
+        }
+
+        existing.getProductsizeList().clear();
+        if (dto.getSizes() != null) {
+            for (ProductSizeDTO i : dto.getSizes()) {
+                existing.getProductsizeList()
+                        .add(productSizeConverter.toEntityFromProductSize(i, existing));
             }
         }
 

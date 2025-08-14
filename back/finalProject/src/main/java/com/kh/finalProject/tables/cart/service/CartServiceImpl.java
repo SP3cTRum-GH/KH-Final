@@ -1,6 +1,6 @@
 package com.kh.finalProject.tables.cart.service;
 
-import com.kh.finalProject.tables.cart.dto.CartItemAddDto;
+import com.kh.finalProject.tables.cart.dto.CartItemAddDTO;
 import com.kh.finalProject.tables.cart.entity.Cart;
 import com.kh.finalProject.tables.cart.repository.CartRepository;
 import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
@@ -57,7 +57,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addCart(CartItemAddDto cartItemAddDto) {
+    public void addCart(CartItemAddDTO cartItemAddDto) {
         Member member = memberRepository.getWithRoles(cartItemAddDto.getMemberId());
         if (member == null) {
             throw new RuntimeException("Member not found");
