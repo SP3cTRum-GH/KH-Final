@@ -97,7 +97,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/mypage",
+    path: "/mypage/:memberNo",
     element: (
       <Suspense fallback={<Loading />}>
         <MyPage />

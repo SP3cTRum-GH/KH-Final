@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from 'react-redux';
 import {
     ProfileBox,
     Header,
@@ -37,7 +39,8 @@ import {
 } from "./MyPageStyle";
 
 const MyPageComponent = () => {
-
+    const { memberNo } = useParams(); // URL에서 memberNo 가져오기
+    const loginState = useSelector((state) => state.loginSlice);
     const navigate = useNavigate();
     const [showAll, setShowAll] = useState(false);
     const [purchaseHistory, setPurchaseHistory] = useState([
@@ -51,9 +54,61 @@ const MyPageComponent = () => {
     ]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-    const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
+    const [user, setUser] = useState(null);
     const [filterType, setFilterType] = useState('all'); // 'all', 'toReview', 'reviewed'
     const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
+    const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
+
+    console.log(loginState);
+    // 로그인 정보 기반으로 사용자 세팅
+        // useEffect(() => {
+        //     if (loginState && loginState.memberId) {
+        //         setUser({
+        //             memberNo: loginState.memberNo,
+        //             id: loginState.memberId,
+        //             name: loginState.memberName,
+        //             roleNames: loginState.roleNames || []
+        //         });
+        //     }
+        // }, [loginState]);
+
+// 로그인된 회원 정보 가져오기 (memberNo 기반)
+    // useEffect(() => {
+    //     if (!loginState?.memberNo) return;
+
+    //     axios.get(`http://localhost:8080/api/member/${loginState.memberNo}`, { withCredentials: true })
+    //         .then(res => {
+    //             console.log("✅ 회원 정보:", res.data);
+    //             setUser(res.data);
+    //             setEditForm({
+    //                 memberName: res.data.memberName || "",
+    //                 memberEmail: res.data.memberEmail || ""
+    //             });
+    //         })
+    //         .catch(err => {
+    //             console.error("❌ 회원 정보 불러오기 실패:", err);
+    //         });
+    // }, [loginState?.memberNo]);
+
+// memberNo 기반으로 사용자 정보 가져오기
+    useEffect(() => {
+        if (!memberNo) return; // params가 없으면 실행 X
+
+        axios.get(`http://localhost:8080/api/member/${memberNo}`, { withCredentials: true })
+            .then(res => {
+                console.log("✅ 회원 정보:", res.data);
+                setUser(res.data);
+                setEditForm({
+                    memberName: res.data.memberName || "",
+                    memberEmail: res.data.memberEmail || ""
+                });
+            })
+            .catch(err => {
+                console.error("❌ 회원 정보 불러오기 실패:", err);
+            });
+    }, [memberNo]);
+
+    if (!user) return <div>로딩 중...</div>;
 
     const levelInfo = [
         { level: 1, name: '브론즈', min: 0, max: 9 },
@@ -109,8 +164,8 @@ const MyPageComponent = () => {
                 <Header>
                     <Profile>
                         <div>
-                            <p>{user.email}</p>
-                            <p>{user.name}</p>
+                            <p>ID {user.memberId}</p>
+                            <p>이름 {user.memberName}</p>
                         </div>
                     </Profile>
                     <Button onClick={() => setIsProfileModalOpen(true)}>설정</Button>

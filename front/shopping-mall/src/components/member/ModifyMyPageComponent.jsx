@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 import {
     PageContainer,
     ProfileSection,
@@ -17,16 +19,37 @@ import {
 } from './ModifyMyPageStyle';
 import { useNavigate } from 'react-router-dom';
 
-const ModifyMyPageComponent = ({ user }) => {
+const ModifyMyPageComponent = () => {
+    const loginState = useSelector((state) => state.loginSlice);
+    const [user, setUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null); // 'info' | 'password'
     const [form, setForm] = useState({});
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+
+    // 로그인된 회원 정보 가져오기
+    useEffect(() => {
+        axios.get('http://localhost:8080/api/member', { withCredentials: true })
+            .then(res => {
+                console.log('✅ 전체 응답:', res);       // Axios Response 전체
+            console.log('✅ 회원 데이터:', res.data); // 실제 회원 데이터
+                setUser(res.data);
+                setForm({
+                    memberName: res.data.memberName || '',
+                    memberEmail: res.data.memberEmail || '',
+                    memberPhone: res.data.memberPhone || '',
+                    memberAddress: res.data.memberAddress || ''
+                });
+            })
+            .catch(err => {
+                console.error('로그인된 회원 정보 불러오기 실패:', err);
+            });
+    }, []);
+
     const openModal = (type) => {
         setModalType(type);
-        setForm({});
         setError('');
         setIsModalOpen(true);
     };
@@ -44,12 +67,12 @@ const ModifyMyPageComponent = ({ user }) => {
 
     // 회원정보 유효성 검사
     const validateInfo = () => {
-        const { name, phone, address, email } = form;
-        if (!name || !phone || !address || !email) {
+        const { memberName, memberPhone, memberAddress, memberEmail } = form;
+        if (!memberName || !memberPhone || !memberAddress || !memberEmail) {
             return '모든 항목을 입력해주세요.';
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(memberEmail)) {
             return '올바른 이메일 형식을 입력해주세요.';
         }
         return '';
@@ -71,29 +94,40 @@ const ModifyMyPageComponent = ({ user }) => {
     };
 
     // 저장 처리
-    const handleSave = () => {
-        const validationMessage =
-            modalType === 'info' ? validateInfo() : validatePassword();
-
+    const handleSave = async () => {
+        const validationMessage = modalType === 'info' ? validateInfo() : validatePassword();
         if (validationMessage) {
             setError(validationMessage);
             return;
         }
 
-        // 실제 저장 처리 (mock)
-        console.log('저장된 데이터:', form);
-
-        // 저장 후 모달 닫기
-        closeModal();
+        try {
+            if (modalType === 'info') {
+                const res = await axios.put('http://localhost:8080/api/member', form, { withCredentials: true });
+                setUser(res.data);
+            } else if (modalType === 'password') {
+                await axios.put('http://localhost:8080/api/member', form, { withCredentials: true });
+            }
+            closeModal();
+        } catch (err) {
+            console.error('저장 실패:', err);
+            setError(err.response?.data?.error || '저장 중 오류 발생');
+        }
     };
+
+    if (!user) {
+        return <div>로딩 중...</div>;
+    }
+
+    const isAdmin = loginState.roleNames?.includes('ADMIN');
 
     return (
         <PageContainer>
             {/* 프로필 영역 */}
             <ProfileSection>
                 <div>
-                    <Username>{user.name}</Username>
-                    <UserId>ID: {user.id}</UserId>
+                    <Username>{user.memberName}</Username>
+                    <UserId>ID: {user.memberId}</UserId>
                 </div>
             </ProfileSection>
 
@@ -108,7 +142,7 @@ const ModifyMyPageComponent = ({ user }) => {
                 </MenuItem>
 
                 {/* 관리자 전용 메뉴 */}
-                {user.memberRole === 'admin' && (
+                {isAdmin && (
                     <>
                         <MenuItem onClick={() => navigate('/admin/memberlist')}>
                             회원 관리
@@ -135,26 +169,30 @@ const ModifyMyPageComponent = ({ user }) => {
                             <>
                                 <ModalInput
                                     type="text"
-                                    name="name"
+                                    name="memberName"
                                     placeholder="이름"
+                                    value={form.memberName}
                                     onChange={handleInputChange}
                                 />
                                 <ModalInput
                                     type="text"
-                                    name="phone"
+                                    name="memberPhone"
                                     placeholder="연락처"
+                                    value={form.memberPhone}
                                     onChange={handleInputChange}
                                 />
                                 <ModalInput
                                     type="text"
-                                    name="address"
+                                    name="memberAddress"
                                     placeholder="주소"
+                                    value={form.memberAddress}
                                     onChange={handleInputChange}
                                 />
                                 <ModalInput
                                     type="email"
-                                    name="email"
+                                    name="memberEmail"
                                     placeholder="이메일"
+                                    value={form.memberEmail}
                                     onChange={handleInputChange}
                                 />
                             </>

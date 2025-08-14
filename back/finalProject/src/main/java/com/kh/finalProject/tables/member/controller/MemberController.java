@@ -38,25 +38,26 @@ public class MemberController {
 			@RequestBody MemberRequestDTO dto) {
 		return ResponseEntity.ok(memberService.memberUpdate(memberNo, dto));
 	}
-	
+
 	@PutMapping("/social")
 	public ResponseEntity<MemberResponseDTO> updateSocialMember(@RequestBody MemberRequestDTO dto) {
 		return ResponseEntity.ok(memberService.socialMemberUpdate(dto));
 	}
-	
+
 	@DeleteMapping("/{memberNo}")
 	public void deleteMember(@PathVariable Long memberNo) {
 		memberService.memberDelete(memberNo);
 	}
-	
+
 	@GetMapping("/{memberNo}")
 	public ResponseEntity<MemberResponseDTO> getOneMember(@PathVariable Long memberNo) {
 		return ResponseEntity.ok(memberService.getOneMember(memberNo));
 	}
-	
+
 	@GetMapping
-	public ResponseEntity<MemberResponseDTO> getLoginedMember(@AuthenticationPrincipal UserDetails user){
+	public ResponseEntity<MemberResponseDTO> getLoginedMember(@AuthenticationPrincipal UserDetails user) {
 		return ResponseEntity.ok(memberService.getWithRoles(user.getUsername()));
+
 	}
 
 	@GetMapping("/kakao")

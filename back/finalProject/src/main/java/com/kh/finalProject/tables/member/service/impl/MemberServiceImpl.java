@@ -8,7 +8,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -183,7 +182,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public MemberResponseDTO getWithRoles(String memberId) {
 		Member member = memberRepository.getWithRoles(memberId);
-		
+
 		return memberConvertor.toEntity(member);
 	}
 
