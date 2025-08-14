@@ -20,7 +20,7 @@ public class ProductImagesConverter {
     public List<ProductImagesDTO> toProductImagesDTOFromProductImages(List<ProductImages> images){
         List<ProductImagesDTO> dtos = new ArrayList<>();
         for(ProductImages i :  images){
-            ProductImagesDTO dto = new ProductImagesDTO(i.getProductImageNo(),i.getImg());
+            ProductImagesDTO dto = new ProductImagesDTO(i.getProductImageNo(),"/api/image/" + i.getImg());
             dtos.add(dto);
         }
         return dtos;

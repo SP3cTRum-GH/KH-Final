@@ -20,7 +20,6 @@ public class ProductDealRequestDTO {
     private String category;
     private Integer price;
     private Boolean type;
-    private LocalDateTime regDate;
     private LocalDateTime endDate; // 경매 마감일
     private Long dealCount; // 경매 입찰수
     private Integer dealCurrent; // 경매 입찰가

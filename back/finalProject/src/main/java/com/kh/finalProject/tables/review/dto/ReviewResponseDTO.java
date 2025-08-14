@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,4 +18,6 @@ public class ReviewResponseDTO {
     private String content;
     private Long productNo;
     private Long memberNo;
+    private String memberId;
+    private LocalDateTime regDate;
 }

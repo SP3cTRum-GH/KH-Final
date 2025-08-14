@@ -3,7 +3,7 @@ package com.kh.finalProject.tables.cart.service;
 import com.kh.finalProject.tables.cart.dto.CartItemAddDto;
 import com.kh.finalProject.tables.cart.entity.Cart;
 import com.kh.finalProject.tables.cart.repository.CartRepository;
-import com.kh.finalProject.tables.cartItem.dto.CartItemDTO;
+import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
 import com.kh.finalProject.tables.cartItem.entity.CartItem;
 import com.kh.finalProject.tables.cartItem.repository.CartItemRepository;
 import com.kh.finalProject.tables.member.entity.Member;
@@ -31,7 +31,7 @@ public class CartServiceImpl implements CartService {
 
 
     @Override
-    public List<CartItemDTO> getCartList(String memberId) {
+    public List<CartItemResponseDTO> getCartList(String memberId) {
         Cart cart = cartRepository.findByMember_MemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -44,14 +44,13 @@ public class CartServiceImpl implements CartService {
                             .findFirst()
                             .orElse("");
 
-                    return CartItemDTO.builder()
+                    return CartItemResponseDTO.builder()
                             .cartItemNo(cartItem.getCartItemNo())
                             .productNo(cartItem.getProduct().getProductNo())
                             .productName(cartItem.getProduct().getProductName())
                             .quantity(cartItem.getQuantity())
                             .price(cartItem.getProduct().getPrice())
-                            //.imgUrl(imageUrl)
-                            // 내일할 것. cartItem에다 쓸건가 아니면 Product에 연결된 productImage를 끌어다 쓸건가
+                            .imgUrl(imageUrl)
                             .build();
                 })
                 .collect(Collectors.toList());
