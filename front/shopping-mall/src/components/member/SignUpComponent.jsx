@@ -167,7 +167,7 @@ const SignUpComponent = () => {
         <FormGroup>
           <Label>성별</Label>
           <RadioGroup>
-            <input type="radio" id="male" name="member_gender" value="male" />
+            <input type="radio" id="male" name="member_gender" value="mail" />
             <label
               htmlFor="male"
               style={{ marginBottom: 0, fontWeight: "normal" }}
@@ -178,7 +178,7 @@ const SignUpComponent = () => {
               type="radio"
               id="female"
               name="member_gender"
-              value="female"
+              value="femail"
             />
             <label
               htmlFor="female"

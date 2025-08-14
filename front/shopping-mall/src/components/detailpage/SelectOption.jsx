@@ -93,7 +93,7 @@ const SelectOption = ({
       사이즈 : ${selectedSize} 수량 : ${qty}개`
     );
 
-    if (getCookie("member" === undefined)) {
+    if (getCookie("member") === undefined) {
       alert("로그인 해주세요.");
       navigate("/login");
       return;

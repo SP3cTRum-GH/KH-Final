@@ -3,6 +3,14 @@ import { API_SERVER_HOST } from "./HostUrl";
 
 const prefix = `${API_SERVER_HOST}/api/review`;
 
+// 리뷰 등록
+export const postReview = async (product) => {
+  console.log(product);
+  const res = await axios.post(`${prefix}`, product);
+  console.log(res);
+  return res.data;
+};
+
 // 상품 1개 가져오기
 export const getReviewOne = async (productNo) => {
   const res = await axios.get(`${prefix}/${productNo}`);
