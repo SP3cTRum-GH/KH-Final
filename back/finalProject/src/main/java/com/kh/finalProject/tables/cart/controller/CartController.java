@@ -3,7 +3,7 @@ package com.kh.finalProject.tables.cart.controller;
 import com.kh.finalProject.tables.cart.dto.CartItemAddDto;
 import com.kh.finalProject.tables.cart.dto.CartRequest;
 import com.kh.finalProject.tables.cart.service.CartService;
-import com.kh.finalProject.tables.cartItem.dto.CartItemDTO;
+import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,8 +20,8 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping
-    public ResponseEntity<List<CartItemDTO>> getCartItems(@AuthenticationPrincipal UserDetails userDetails) {
-        List<CartItemDTO> cartItems = cartService.getCartList(userDetails.getUsername());
+    public ResponseEntity<List<CartItemResponseDTO>> getCartItems(@AuthenticationPrincipal UserDetails userDetails) {
+        List<CartItemResponseDTO> cartItems = cartService.getCartList(userDetails.getUsername());
         return ResponseEntity.ok(cartItems);
     }
 

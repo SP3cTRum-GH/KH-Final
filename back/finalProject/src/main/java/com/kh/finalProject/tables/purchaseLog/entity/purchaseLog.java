@@ -1,5 +1,6 @@
-package com.kh.finalProject.tables.purchase.entity;
+package com.kh.finalProject.tables.purchaseLog.entity;
 
+import com.kh.finalProject.tables.cart.entity.Cart;
 import com.kh.finalProject.tables.cartItem.entity.CartItem;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,8 +30,17 @@ public class purchaseLog {
     @CreationTimestamp
     private LocalDateTime regDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cartItem_no", nullable = false)
-    private CartItem cartItem;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "cartItem_no", nullable = false)
+    // private CartItem cartItem;
 
+    // ⬇️ 결제 당시 스냅샷 값으로 저장
+    @Column(nullable = false)
+    private Long productNo;   // i.getProduct().getProductNo()
+
+    @Column (nullable = false)
+    private int quantity; // 장바구니 수량
+
+    @Column
+    private int price; // 장바구니 총 금액
 }

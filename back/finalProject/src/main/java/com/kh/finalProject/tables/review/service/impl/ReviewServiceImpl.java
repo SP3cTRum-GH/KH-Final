@@ -1,5 +1,6 @@
 package com.kh.finalProject.tables.review.service.impl;
 
+import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.member.entity.Member;
@@ -31,8 +32,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     public final ReviewRepository reviewRepository;
     public final ProductRepository productRepository;
-    public final MemberRepository  memberRepository;
+    public final MemberRepository memberRepository;
     private final ReviewConverter reviewConverter;
+    private final CustomFileUtil fileUtil;
 
     // review list (paging)
     @Override
@@ -49,11 +51,13 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewResponseDTO> list = page.getContent().stream()
                 .map(r -> ReviewResponseDTO.builder()
                         .reviewNo(r.getReviewNo())
-                        .reviewImg(r.getReviewImg())
+                        .reviewImg(toUrl(r.getReviewImg()))
                         .rating(r.getRating())
                         .content(r.getContent())
                         .productNo(r.getProduct().getProductNo())
                         .memberNo(r.getMember().getMemberNo())
+                        .memberId(r.getMember().getMemberId())
+                        .regDate(r.getRegDate())
                         .build())
                 .toList();
 
@@ -87,16 +91,32 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ReviewResponseDTO update(Long reviewNo, ReviewRequestDTO dto) {
         Review review = reviewRepository.findById(reviewNo)
-                .orElseThrow(()->new IllegalArgumentException("Review Not Found"));
-        review.setReviewImg(dto.getReviewImg());
+                .orElseThrow(() -> new IllegalArgumentException("Review Not Found"));
+
+        String oldFile = review.getReviewImg();      // 기존 파일명
+        String newFile = dto.getReviewImg();         // 새 파일명(없으면 null 가능)
+
+        review.setReviewImg(newFile);
         review.setRating(dto.getRating());
         review.setContent(dto.getContent());
 
+        // 파일이 변경되었으면 디스크에서 삭제
+        if (oldFile != null && !oldFile.equals(newFile)) {
+            fileUtil.deleteFiles(java.util.List.of(oldFile)); // 썸네일까지 같이 지움
+        }
         return reviewConverter.toDto(review);
     }
 
     @Override
     public void delete(Long reviewNo) {
-        reviewRepository.deleteById(reviewNo);
+        Review r = reviewRepository.findById(reviewNo)
+                .orElseThrow(() -> new IllegalArgumentException("review not found"));
+        String name = r.getReviewImg();
+        reviewRepository.delete(r);
+        if (name != null && !name.isBlank()) fileUtil.deleteFiles(java.util.List.of(name));
+    }
+
+    private String toUrl(String fileName) {
+        return (fileName == null || fileName.isBlank()) ? null : "/api/image/" + fileName;
     }
 }

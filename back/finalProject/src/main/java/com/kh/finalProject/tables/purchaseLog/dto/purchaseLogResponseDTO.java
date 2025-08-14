@@ -1,6 +1,6 @@
-package com.kh.finalProject.tables.purchase.dto;
+package com.kh.finalProject.tables.purchaseLog.dto;
 
-import com.kh.finalProject.tables.cartItem.dto.CartItemDTO;
+import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,5 +16,5 @@ public class purchaseLogResponseDTO {
     private Long logNo;
     private Boolean isReviewed = false; // 중복 리뷰 방지
     private LocalDateTime regDate;
-    private CartItemDTO cartItem;
+    private CartItemResponseDTO cartItem;
 }
