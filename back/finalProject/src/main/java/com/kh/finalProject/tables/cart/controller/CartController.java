@@ -1,7 +1,7 @@
 package com.kh.finalProject.tables.cart.controller;
 
-import com.kh.finalProject.tables.cart.dto.CartItemAddDto;
-import com.kh.finalProject.tables.cart.dto.CartRequest;
+import com.kh.finalProject.tables.cart.dto.CartItemAddDTO;
+import com.kh.finalProject.tables.cart.dto.CartRequestDTO;
 import com.kh.finalProject.tables.cart.service.CartService;
 import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +25,17 @@ public class CartController {
         return ResponseEntity.ok(cartItems);
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<List<CartItemResponseDTO>> getCartItemsTest(@RequestParam String memberId) {
+        return ResponseEntity.ok(cartService.getCartList(memberId));
+    }
+
     @PostMapping
-    public ResponseEntity<Void> addToCart(@RequestBody CartRequest cartRequest, @AuthenticationPrincipal UserDetails userDetails) {
-        CartItemAddDto cartItemAddDto = CartItemAddDto.builder()
+    public ResponseEntity<Void> addToCart(@RequestBody CartRequestDTO cartRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
+        CartItemAddDTO cartItemAddDto = CartItemAddDTO.builder()
                 .memberId(userDetails.getUsername())
-                .productId(cartRequest.getProductId())
-                .quantity(cartRequest.getQuantity())
+                .productId(cartRequestDTO.getProductId())
+                .quantity(cartRequestDTO.getQuantity())
                 .build();
         cartService.addCart(cartItemAddDto);
         return ResponseEntity.ok().build();
