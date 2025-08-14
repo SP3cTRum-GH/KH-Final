@@ -12,11 +12,15 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.11.0",
+    "dayjs": "^1.11.13",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
+    "react-datepicker": "^8.4.0",
     "react-dom": "^19.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.7.1",
+    "rechart": "^0.0.1",
+    "recharts": "^3.1.2",
     "reset-css": "^5.0.2",
     "styled-components": "^6.1.19"
   },

@@ -22,11 +22,15 @@ public class ReviewConverter {
     public ReviewResponseDTO toDto(Review review) {
         return ReviewResponseDTO.builder()
                 .reviewNo(review.getReviewNo())
-                .reviewImg(review.getReviewImg())
+                .reviewImg(toUrl(review.getReviewImg()))
                 .rating(review.getRating())
                 .content(review.getContent())
                 .productNo(review.getProduct().getProductNo())
                 .memberNo(review.getMember().getMemberNo())
                 .build();
+    }
+
+    private String toUrl(String fileName) {
+        return (fileName == null || fileName.isBlank()) ? null : "/api/image/" + fileName;
     }
 }

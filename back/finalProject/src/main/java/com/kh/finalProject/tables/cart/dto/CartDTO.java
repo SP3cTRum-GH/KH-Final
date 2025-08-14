@@ -1,6 +1,6 @@
 package com.kh.finalProject.tables.cart.dto;
 
-import com.kh.finalProject.tables.cartItem.dto.CartItemDTO;
+import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +15,5 @@ import java.util.List;
 public class CartDTO {
     private Long cartNo;
     private Long memberNo;
-    private List<CartItemDTO> cartItems;
+    private List<CartItemResponseDTO> cartItems;
 }

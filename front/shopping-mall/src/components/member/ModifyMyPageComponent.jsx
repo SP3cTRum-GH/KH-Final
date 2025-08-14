@@ -15,12 +15,14 @@ import {
     ModalActions,
     ErrorText
 } from './ModifyMyPageStyle';
+import { useNavigate } from 'react-router-dom';
 
 const ModifyMyPageComponent = ({ user }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null); // 'info' | 'password'
     const [form, setForm] = useState({});
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const openModal = (type) => {
         setModalType(type);
@@ -40,6 +42,7 @@ const ModifyMyPageComponent = ({ user }) => {
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
+    // 회원정보 유효성 검사
     const validateInfo = () => {
         const { name, phone, address, email } = form;
         if (!name || !phone || !address || !email) {
@@ -52,6 +55,7 @@ const ModifyMyPageComponent = ({ user }) => {
         return '';
     };
 
+    // 비밀번호 유효성 검사
     const validatePassword = () => {
         const { currentPassword, newPassword, confirmPassword } = form;
         if (!currentPassword || !newPassword || !confirmPassword) {
@@ -66,6 +70,7 @@ const ModifyMyPageComponent = ({ user }) => {
         return '';
     };
 
+    // 저장 처리
     const handleSave = () => {
         const validationMessage =
             modalType === 'info' ? validateInfo() : validatePassword();
@@ -84,6 +89,7 @@ const ModifyMyPageComponent = ({ user }) => {
 
     return (
         <PageContainer>
+            {/* 프로필 영역 */}
             <ProfileSection>
                 <div>
                     <Username>{user.name}</Username>
@@ -91,6 +97,7 @@ const ModifyMyPageComponent = ({ user }) => {
                 </div>
             </ProfileSection>
 
+            {/* 메뉴 리스트 */}
             <MenuList>
                 <MenuItem onClick={() => openModal('info')}>
                     회원정보 변경
@@ -99,8 +106,23 @@ const ModifyMyPageComponent = ({ user }) => {
                 <MenuItem onClick={() => openModal('password')}>
                     비밀번호 변경
                 </MenuItem>
+
+                {/* 관리자 전용 메뉴 */}
+                {user.memberRole === 'admin' && (
+                    <>
+                        <MenuItem onClick={() => navigate('/admin/memberlist')}>
+                            회원 관리
+                            <MenuDescription>회원 목록 및 권한 관리</MenuDescription>
+                        </MenuItem>
+                        <MenuItem onClick={() => navigate('/admin/saleschart')}>
+                            매출 관리
+                            <MenuDescription>매출 통계 및 보고서</MenuDescription>
+                        </MenuItem>
+                    </>
+                )}
             </MenuList>
 
+            {/* 모달 */}
             {isModalOpen && (
                 <ModalOverlay>
                     <ModalContent>
@@ -108,6 +130,7 @@ const ModifyMyPageComponent = ({ user }) => {
                             {modalType === 'info' ? '회원정보 변경' : '비밀번호 변경'}
                         </ModalHeader>
 
+                        {/* 회원정보 변경 */}
                         {modalType === 'info' && (
                             <>
                                 <ModalInput

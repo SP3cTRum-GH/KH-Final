@@ -1,4 +1,4 @@
-package com.kh.finalProject.tables.cart.dto;
+package com.kh.finalProject.tables.cartItem.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class CartItemAddDto {
-    private String memberId;
-    private Long productId;
+@AllArgsConstructor
+@Builder
+public class CartItemRequestDTO {
+    private Long productNo;
     private int quantity;
+    private int price;
 }

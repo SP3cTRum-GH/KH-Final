@@ -1,5 +1,6 @@
 package com.kh.finalProject.tables.product.service.impl;
 
+import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.product.component.ProductConverter;
@@ -42,6 +43,8 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductImagesConverter productImagesConverter;
     private final ProductSizeConverter  productSizeConverter;
+
+    private final CustomFileUtil fileUtil;
 
     // Paging
     @Override
@@ -151,28 +154,103 @@ public class ProductServiceImpl implements ProductService {
 
     // UPDATE
     @Override
+    @Transactional
     public ProductDealResponseDTO updateDeal(Long productNo, ProductDealRequestDTO dto) {
         Product existing = productRepository.findById(productNo)
                 .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
         if (!Boolean.TRUE.equals(existing.getType())) throw new EntityNotFoundException("경매 상품 아님");
-        Product saved = productRepository.save(productConverter.rebuildForDealUpdate(existing, dto));
+
+        // 1) 기존/신규 파일명 집합
+        var oldNames = existing.getProductImagesList().stream()
+                .map(ProductImages::getImg).collect(java.util.stream.Collectors.toSet());
+        var newNames = (dto.getImages() == null) ? java.util.Set.<String>of()
+                : dto.getImages().stream().map(ProductImagesDTO::getImg)
+                .filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
+        var toDelete = oldNames.stream().filter(n -> !newNames.contains(n)).toList();
+
+        // 2) 스칼라 필드 갱신 (이미지/사이즈 제외)
+        // rebuildForDealUpdate는 existing의 필드만 수정하도록 구현되어 있어야 함.
+        existing = productConverter.rebuildForDealUpdate(existing, dto);
+
+        // 3) 이미지 컬렉션 갈아끼우기
+        existing.getProductImagesList().clear();
+        if (dto.getImages() != null) {
+            for (ProductImagesDTO i : dto.getImages()) {
+                existing.getProductImagesList()
+                        .add(productImagesConverter.toEntityFromProductImages(i, existing));
+            }
+        }
+
+        // 4) 사이즈 컬렉션 갈아끼우기
+        existing.getProductsizeList().clear();
+        if (dto.getSizes() != null) {
+            for (ProductSizeDTO i : dto.getSizes()) {
+                existing.getProductsizeList()
+                        .add(productSizeConverter.toEntityFromProductSize(i, existing));
+            }
+        }
+
+        // 5) 저장
+        Product saved = productRepository.save(existing);
+
+        // 6) 디스크에서 더 이상 쓰지 않는 파일 삭제
+        if (!toDelete.isEmpty()) fileUtil.deleteFiles(toDelete);
+
         return productConverter.toDealResponse(saved);
     }
 
     
     @Override
+    @Transactional
     public ProductShopResponseDTO updateShop(Long productNo, ProductShopRequestDTO dto) {
         Product existing = productRepository.findById(productNo)
                 .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
         if (Boolean.TRUE.equals(existing.getType())) throw new EntityNotFoundException("일반 상품 아님");
-        Product saved = productRepository.save(productConverter.rebuildForShopUpdate(existing, dto));
+
+        var oldNames = existing.getProductImagesList().stream()
+                .map(ProductImages::getImg).collect(java.util.stream.Collectors.toSet());
+        var newNames = (dto.getImages() == null) ? java.util.Set.<String>of()
+                : dto.getImages().stream().map(ProductImagesDTO::getImg)
+                .filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
+        var toDelete = oldNames.stream().filter(n -> !newNames.contains(n)).toList();
+
+        existing = productConverter.rebuildForShopUpdate(existing, dto);
+
+        existing.getProductImagesList().clear();
+        if (dto.getImages() != null) {
+            for (ProductImagesDTO i : dto.getImages()) {
+                existing.getProductImagesList()
+                        .add(productImagesConverter.toEntityFromProductImages(i, existing));
+            }
+        }
+
+        existing.getProductsizeList().clear();
+        if (dto.getSizes() != null) {
+            for (ProductSizeDTO i : dto.getSizes()) {
+                existing.getProductsizeList()
+                        .add(productSizeConverter.toEntityFromProductSize(i, existing));
+            }
+        }
+
+        Product saved = productRepository.save(existing);
+
+        if (!toDelete.isEmpty()) fileUtil.deleteFiles(toDelete);
+
         return productConverter.toShopResponse(saved);
     }
 
     // DELETE
     @Override
     public void delete(Long productNo) {
-        productRepository.deleteById(productNo);
+
+        Product p = productRepository.findById(productNo)
+                .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
+
+        var names = p.getProductImagesList().stream()
+                .map(ProductImages::getImg).toList();
+
+        productRepository.deleteById(productNo);           // orphanRemoval로 이미지 row 삭제
+        if (!names.isEmpty()) fileUtil.deleteFiles(names); // 디스크 파일 삭제(썸네일 포함)
     }
 
 }

@@ -61,6 +61,9 @@ export const ReviewBox = styled.div`
 export const SelectWrapper = styled.div`
   margin-bottom: 15px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
   select {
     width: 100%;
@@ -68,6 +71,45 @@ export const SelectWrapper = styled.div`
     font-size: 14px;
     border-radius: 5px;
     border: 1px solid #ccc;
+  }
+
+  p {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+  }
+
+  input {
+    width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  div > button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  div > button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  input {
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
   }
 
   @media (max-width: 500px) {
@@ -114,7 +156,7 @@ export const InterestBox = styled.button`
 export const OptionBox = styled.div`
   display: flex;
   flex-direction: column;
-  text-align: center;
+  
   align-items: center;
 
   @media (max-width: 500px) {
