@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container, Wrap, ProductContainer, Wrapper } from "./ItemCardStyle";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { deleteProductItem } from "../api/productShopApi";
 
@@ -24,6 +24,7 @@ const ItemCard = ({ page, dtoList }) => {
       } else {
         return;
       }
+
       // Optimistic UI update: remove the item locally
       setItems((prev) => prev.filter((p) => p.productNo !== productNo));
     } catch (err) {
@@ -62,13 +63,12 @@ const ItemCard = ({ page, dtoList }) => {
                 </div>
                 {isAdmin && (
                   <div>
-                    <button
-                      onClick={() => {
-                        navigate(`/admin/modify/${product.productNo}`);
-                      }}
+                    <Link
+                      to={`/admin/modify/${product.productNo}`}
+                      state={{ type: product.type }}
                     >
                       수정
-                    </button>
+                    </Link>
                     <button onClick={() => handleDelete(product.productNo)}>
                       삭제
                     </button>

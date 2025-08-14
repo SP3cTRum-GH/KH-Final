@@ -35,9 +35,12 @@ const ShopPage = () => {
       <Header />
       <Container>
         <SortButton menu={"판매순"} />
-        <ItemCard page={"shopdetail"} dtoList={listData.dtoList} />
+        <ItemCard
+          page={"shopdetail"}
+          dtoList={listData.dtoList}
+          pageType="shop"
+        />
         <PageComponent
-          type={"shop"}
           listData={listData}
           moveToProductList={moveToProductList}
         />

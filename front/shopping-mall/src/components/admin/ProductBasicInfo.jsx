@@ -30,7 +30,6 @@ export default function ProductBasicInfo({ product, setProduct }) {
             name="salesType"
             value={product.salesType}
             onChange={handleChange}
-            disabled
           >
             <option value="">선택</option>
             <option value="false">일반 판매</option>
