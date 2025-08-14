@@ -13,6 +13,8 @@ public interface MemberService {
 	MemberResponseDTO memberSignUp(MemberRequestDTO memberRequestDTO);
 
 	MemberResponseDTO memberUpdate(Long membrNo, MemberRequestDTO memberRequestDTO);
+	
+	MemberResponseDTO socialMemberUpdate(MemberRequestDTO memberRequestDTO);
 
 	CustomUser getKakaoMember(String accessToken);
 
@@ -26,5 +28,7 @@ public interface MemberService {
 	void memberDelete(Long memberNo);
 	
 	MemberResponseDTO getOneMember(Long memberNo);
+	
+	MemberResponseDTO getWithRoles(String memberId);
 	
 }
