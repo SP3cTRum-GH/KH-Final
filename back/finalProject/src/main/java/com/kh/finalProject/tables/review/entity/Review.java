@@ -24,6 +24,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "review_seq_gen")
     private Long reviewNo;
 
+
     @Column
     private String reviewImg; // 리뷰 이미지
 

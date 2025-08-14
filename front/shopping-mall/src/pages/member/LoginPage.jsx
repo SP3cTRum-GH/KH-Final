@@ -5,6 +5,7 @@ import Footer from "../../include/Footer";
 import useCustomLogin from "../../hooks/useCustomLogin";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { getKakaoLoginLink } from "../../api/social/KakaoApi";
 
 const initState = { memberId: "", pw: "" };
 
@@ -76,6 +77,7 @@ const SignUpLink = styled(Link)`
 const LoginPage = () => {
   const [loginParam, setLoginParam] = useState({ ...initState });
   const { doLogin, moveToPath } = useCustomLogin();
+  const kakaoLink = getKakaoLoginLink();
 
   const handleChange = (e) => {
     loginParam[e.target.name] = e.target.value;
@@ -142,7 +144,12 @@ const LoginPage = () => {
               네이버 로그인
             </SocialButton>
             <SocialButton style={{ backgroundColor: "#FEE500", color: "#000" }}>
-              카카오 로그인
+              <Link
+                to={kakaoLink}
+                style={{ textDecoration: "none", color: "black" }}
+              >
+                카카오 로그인
+              </Link>
             </SocialButton>
             <SignUpLink as={Link} to="/signup">
               회원가입

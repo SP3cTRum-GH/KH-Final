@@ -37,6 +37,7 @@ import {
 } from "./MyPageStyle";
 
 const MyPageComponent = () => {
+
     const navigate = useNavigate();
     const [showAll, setShowAll] = useState(false);
     const [purchaseHistory, setPurchaseHistory] = useState([

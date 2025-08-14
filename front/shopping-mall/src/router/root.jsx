@@ -42,6 +42,11 @@ const SignUpPage = lazy(() => import("../pages/member/SignUpPage"));
 // review 페이지
 const ReviewPage = lazy(() => import("../pages/member/ReviewPage"));
 
+// 카카오 리다이렉트 페이지
+const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"));
+
+const SocialSignUp = lazy(() => import("../pages/member/SocialSignUpPage"));
+
 const root = createBrowserRouter([
   {
     path: "/",
@@ -132,6 +137,8 @@ const root = createBrowserRouter([
     ),
   },
   {
+
+
     path: "/admin/upload",
     element: (
       <Suspense fallback={<Loading />}>
@@ -156,7 +163,6 @@ const root = createBrowserRouter([
     ),
   },
   {
-
     path: "/signup",
     element: (
       <Suspense fallback={<Loading />}>
@@ -169,6 +175,22 @@ const root = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <ReviewPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/member/kakao",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <KakaoRedirect />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/social/signup",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <SocialSignUp />
       </Suspense>
     ),
   },

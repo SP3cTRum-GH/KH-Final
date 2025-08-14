@@ -1,5 +1,7 @@
 package com.kh.finalProject.tables.member.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,5 +14,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	@Query("select m from Member m where m.memberId = :memberId")
 	Member getWithRoles(@Param("memberId") String memberId);
 
+	@Query("select m from Member m where m.memberEmail =:memberEmail")
+	Optional<Member> findByEmail(@Param("memberEmail") String memberEmail);
 }
 
