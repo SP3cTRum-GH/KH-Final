@@ -32,3 +32,9 @@ export const updateReview = async (reviewNo, data) => {
   const res = await axios.put(`${prefix}/${reviewNo}`, data);
   return res.data;
 };
+
+// 리뷰 삭제
+export const deleteReview = async (reviewNo) => {
+  const res = await axios.delete(`${prefix}/${reviewNo}`);
+  return res.data;
+};

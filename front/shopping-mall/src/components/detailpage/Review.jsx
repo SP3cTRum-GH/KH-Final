@@ -11,7 +11,7 @@ import {
 } from "./ReviewStyle";
 import StarRating from "../reviewpage/StarRating";
 import { Input } from "./DealModalStyle";
-import { updateReview } from "../../api/reviewApi";
+import { deleteReview, updateReview } from "../../api/reviewApi";
 
 const Review = ({ reviewList }) => {
   // 1) 부모 prop을 표시용 로컬 상태로 복사
@@ -19,6 +19,7 @@ const Review = ({ reviewList }) => {
   const [rows, setRows] = useState(initialItems);
   useEffect(() => {
     setRows(reviewList?.dtoList ?? []);
+    setCount(reviewList?.totalCount ?? 0);
   }, [reviewList]);
 
   const [editingId, setEditingId] = useState(null);
@@ -26,6 +27,7 @@ const Review = ({ reviewList }) => {
   const [draftRating, setDraftRating] = useState(0);
   const [draftImage, setDraftImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [count, setCount] = useState(reviewList?.totalCount ?? 0);
 
   const startEdit = (review) => {
     setEditingId(review.reviewNo ?? review.id ?? null);
@@ -69,7 +71,6 @@ const Review = ({ reviewList }) => {
 
     try {
       await updateReview(reviewNo, payload); // axios.put(JSON)
-      // 3) 낙관적 업데이트(로컬 rows 갱신)
       setRows((prev) =>
         prev.map((r) =>
           (r.reviewNo ?? r.id) === reviewNo
@@ -89,10 +90,29 @@ const Review = ({ reviewList }) => {
     }
   };
 
+  // 삭제 함수
+  const handleDelete = async (reviewNo) => {
+    const prev = [...rows];
+    if (editingId === reviewNo) {
+      cancelEdit();
+    }
+
+    setRows((cur) => cur.filter((r) => (r.reviewNo ?? r.id) !== reviewNo));
+    setCount((c) => Math.max(0, c - 1));
+
+    try {
+      await deleteReview(reviewNo); // 서버 삭제
+    } catch (err) {
+      console.error("delete failed:", err);
+      setRows(prev); // 실패 시 롤백
+      alert("리뷰 삭제에 실패했어요.");
+    }
+  };
+
   return (
     <>
       <ReviewTitle>
-        리뷰 <span>({reviewList?.totalCount ?? rows.length})</span>
+        리뷰 <span>({count})</span>
       </ReviewTitle>
 
       <ReviewWrap>
@@ -172,7 +192,7 @@ const Review = ({ reviewList }) => {
                 ) : (
                   <ActionBtnBox>
                     <p onClick={() => startEdit(review)}>수정</p>
-                    <p onClick={() => {}}>삭제</p>
+                    <p onClick={() => handleDelete(review.reviewNo)}>삭제</p>
                   </ActionBtnBox>
                 )}
               </ReviewContainer>
