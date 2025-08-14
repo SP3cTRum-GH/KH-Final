@@ -16,3 +16,9 @@ export const getDealProductList = async (pageParam) => {
 
   return res.data;
 };
+
+// deal 상품 등록
+export const postDealProductItem = async (product) => {
+  const res = await axios.post(`${prefix}`, product);
+  return res.data;
+};
