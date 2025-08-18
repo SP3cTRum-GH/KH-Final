@@ -5,7 +5,6 @@ import {
   ReviewContainer,
   ReviewHeader,
   ReviewRating,
-  ReviewInfo,
   ReviewImage,
   ReviewText,
   ActionBtnBox,
@@ -15,12 +14,11 @@ import StarRating from "../reviewpage/StarRating";
 const Review = ({ reviewList }) => {
   // 안전 가드
   const items = reviewList?.dtoList ?? [];
-  const total = reviewList?.total ?? items.length ?? 0;
 
   return (
     <>
       <ReviewTitle>
-        리뷰 <span>({total})</span>
+        리뷰 <span>({reviewList.totalCount})</span>
       </ReviewTitle>
 
       <ReviewWrap>
@@ -32,8 +30,8 @@ const Review = ({ reviewList }) => {
           items.map((review, idx) => (
             <ReviewContainer key={review.reviewNo ?? idx}>
               <ReviewHeader>
-                <span>{review.nickName ?? "nickName"}</span>
-                <span>{review.createdAt ?? "25.06.18"}</span>
+                <span>{review.memberId ?? "nickName"}</span>
+                <span>{review.regDate.slice(0, 10) ?? "25.06.18"}</span>
               </ReviewHeader>
 
               <ReviewRating>
@@ -45,8 +43,6 @@ const Review = ({ reviewList }) => {
                   read={"none"}
                 />
               </ReviewRating>
-
-              <ReviewInfo>{review.meta ?? "남성 · M 구매"}</ReviewInfo>
 
               {review.reviewImg ? (
                 <ReviewImage src={review.reviewImg} alt="제품 리뷰 사진" />

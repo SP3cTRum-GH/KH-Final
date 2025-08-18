@@ -22,3 +22,9 @@ export const postDealProductItem = async (product) => {
   const res = await axios.post(`${prefix}`, product);
   return res.data;
 };
+
+// deal 상품 수정
+export const updateDealProduct = async (product, productNo) => {
+  const res = await axios.put(`${prefix}/${productNo}`, product);
+  return res.data;
+};

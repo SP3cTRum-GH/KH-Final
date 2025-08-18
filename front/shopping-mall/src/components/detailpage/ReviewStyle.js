@@ -40,10 +40,6 @@ export const ReviewRating = styled.div`
   color: #f59e0b;
 `;
 
-export const ReviewInfo = styled.div`
-  font-size: 13px;
-  color: #666;
-`;
 
 export const ReviewImage = styled.img`
   width: 200px;

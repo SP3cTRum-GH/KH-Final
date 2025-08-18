@@ -129,7 +129,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/modify",
+    path: "/admin/modify/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ModifyPage />
@@ -137,8 +137,6 @@ const root = createBrowserRouter([
     ),
   },
   {
-
-
     path: "/admin/upload",
     element: (
       <Suspense fallback={<Loading />}>
@@ -171,7 +169,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/review",
+    path: "/review/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ReviewPage />
