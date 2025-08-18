@@ -258,3 +258,33 @@ export const ModalActions = styled.div`
     color: white;
   }
 `;
+
+export const FilterBar = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0 16px;
+  flex-wrap: wrap;
+`;
+
+export const FilterButton = styled.button`
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+
+  &[data-active='true'] {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+  }
+`;
+
+export const SectionHeader = styled.h3`
+  margin: 16px 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+`;

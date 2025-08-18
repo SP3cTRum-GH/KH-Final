@@ -11,8 +11,9 @@ import {
   PriceContainer,
   OptionBox,
 } from "./SelectOptionStyle";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getCookie } from "../../util/cookieUtil";
+import { addCart } from "../../api/cartApi";
 
 const SelectOption = ({
   productData,
@@ -24,6 +25,7 @@ const SelectOption = ({
   const price = productData?.price ?? 0;
   const sizes = productData?.sizes ?? [];
   const navigate = useNavigate();
+  const param = useParams();
 
   const [selectedSize, setSelectedSize] = useState("");
   const [stock, setStock] = useState(0);
@@ -98,6 +100,18 @@ const SelectOption = ({
       navigate("/login");
       return;
     }
+
+    const fd = {
+      productNo: param.productNo,
+      sizes: selectedSize,
+      quantity: qty,
+    };
+
+    console.log(fd);
+
+    addCart(getCookie("member").memberId, fd).then((data) => {
+      console.log(data);
+    });
 
     if (selectCart) {
       navigate("/cart");

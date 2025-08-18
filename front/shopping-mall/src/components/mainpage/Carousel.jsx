@@ -73,17 +73,14 @@ const Carousel = ({ listLength, imgLength }) => {
       <div ref={carouselRef}>
         <Cell>
           <img
-            src="https://mblogthumb-phinf.pstatic.net/MjAyMzA0MThfMjUg/MDAxNjgxNzgxMDc4Mzc1.WdguDbRJMAP4wH19nHIP-xqTggUOgFaQj6aZGs95NmEg.xK8jrlesjKMQvmq5q6OYCk6je71xTZUWBPe6G1_v8uAg.GIF.loveydeeply/IMG%EF%BC%BF8303.GIF?type=w800"
+            src="https://blog.kakaocdn.net/dna/byMrtS/btsHcsUUbeT/AAAAAAAAAAAAAAAAAAAAAHzJXc6ayW-geNyH-iFTZznJB6lw8iyGa8eGp8x8TU70/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=VjPahY9jZGblii5TDRstr0ymzBE%3D"
             alt="장원영"
           />
           <h3>아이브</h3>
           <p>장원영</p>
         </Cell>
         <Cell>
-          <img
-            src="https://blog.kakaocdn.net/dna/yCDUW/btsIAP9U39A/AAAAAAAAAAAAAAAAAAAAAIRtAlCtQh2wp-Zn3OBTxjfY1vnBnIQDESXGOdMPpumu/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=7no%2Fb%2BAt6ia6XbPwZS8%2BwC%2BgUZE%3D"
-            alt="카리나"
-          />
+          <img src="https://media.nudge-community.com/8168135" alt="카리나" />
           <h3>에스파</h3>
           <p>카리나</p>
         </Cell>

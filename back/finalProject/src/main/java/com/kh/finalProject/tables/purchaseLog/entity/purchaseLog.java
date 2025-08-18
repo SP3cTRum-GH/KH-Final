@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
     ,allocationSize = 1
     ,initialValue = 1
 )
-@SequenceGenerator(name = "purchase_group_log_seq_gen"
-        ,sequenceName = "purchase_group_log_seq"
-        ,allocationSize = 1
-        ,initialValue = 1
-)
+//@SequenceGenerator(name = "purchase_group_log_seq_gen"
+//        ,sequenceName = "purchase_group_log_seq"
+//        ,allocationSize = 1
+//        ,initialValue = 1
+//)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,9 +32,9 @@ public class purchaseLog {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_log_seq_gen")
     private Long logNo;
 
-    @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_group_log_seq_gen")
-    private Long groupLogNo;
+//    @Column(nullable = false)
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_group_log_seq_gen")
+//    private Long groupLogNo;
 
     @CreationTimestamp
     private LocalDateTime regDate;
