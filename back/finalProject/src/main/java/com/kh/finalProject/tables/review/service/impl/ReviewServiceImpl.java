@@ -55,6 +55,7 @@ public class ReviewServiceImpl implements ReviewService {
                         .rating(r.getRating())
                         .content(r.getContent())
                         .productNo(r.getProduct().getProductNo())
+                        .type(r.getProduct().getType())
                         .memberNo(r.getMember().getMemberNo())
                         .memberId(r.getMember().getMemberId())
                         .regDate(r.getRegDate())
