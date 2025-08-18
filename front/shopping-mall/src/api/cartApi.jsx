@@ -11,7 +11,7 @@ export const getCart = async (productNo) => {
 
 // 장바구니 추가
 export const addCart = async () => {
-  const res = await axios.get(`${prefix}/list`, { params: { page, size } });
+  const res = await axios.get(`${prefix}/list`, {});
 
   return res.data;
 };
