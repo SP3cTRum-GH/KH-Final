@@ -19,6 +19,7 @@ export default function ModifyPageComponent() {
     dealCurrent: "",
     endDate: "",
   });
+
   const param = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
