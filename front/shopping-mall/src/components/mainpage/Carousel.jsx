@@ -73,7 +73,7 @@ const Carousel = ({ listLength, imgLength }) => {
       <div ref={carouselRef}>
         <Cell>
           <img
-            src="https://i.pinimg.com/originals/7c/9d/b1/7c9db1248225330a82c35080eda74eb0.gif"
+            src="https://mblogthumb-phinf.pstatic.net/MjAyMzA0MThfMjUg/MDAxNjgxNzgxMDc4Mzc1.WdguDbRJMAP4wH19nHIP-xqTggUOgFaQj6aZGs95NmEg.xK8jrlesjKMQvmq5q6OYCk6je71xTZUWBPe6G1_v8uAg.GIF.loveydeeply/IMG%EF%BC%BF8303.GIF?type=w800"
             alt="장원영"
           />
           <h3>아이브</h3>
@@ -81,7 +81,7 @@ const Carousel = ({ listLength, imgLength }) => {
         </Cell>
         <Cell>
           <img
-            src="https://image.baestmath.com/board-images/1624337b3c62d.gif"
+            src="https://blog.kakaocdn.net/dna/yCDUW/btsIAP9U39A/AAAAAAAAAAAAAAAAAAAAAIRtAlCtQh2wp-Zn3OBTxjfY1vnBnIQDESXGOdMPpumu/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=7no%2Fb%2BAt6ia6XbPwZS8%2BwC%2BgUZE%3D"
             alt="카리나"
           />
           <h3>에스파</h3>
@@ -89,7 +89,7 @@ const Carousel = ({ listLength, imgLength }) => {
         </Cell>
         <Cell>
           <img
-            src="https://archive.myvibrary.com/original/1679403221374_e0c3ebdcdd.gif"
+            src="https://i.namu.wiki/i/lJFkyGv458HQ5zxoEd1GCA-ZEoQXa99P1llXw-FlLwajvLdvcrvxjSI_MRqZN84n-MHwdSoc51C1bv9LU3IpOw.gif"
             alt="설윤"
           />
           <h3>엔믹스</h3>
@@ -97,7 +97,7 @@ const Carousel = ({ listLength, imgLength }) => {
         </Cell>
         <Cell>
           <img
-            src="https://i.namu.wiki/i/x2z_-qDM1bENMt2qrlAcONT13qnSNZRc-LNcm5G70dGj1kIhYnkFetgVvIgPRWY8r6tj0DTK3NeVjcppD5-JYg.gif"
+            src="https://i.namu.wiki/i/U7LmaE_y3-SOgBGus89SgTYcQ5iZwHMP3T4vDDCwjQ3Uwjvd01WN_hOSGNziNeDA5bl1D6Vzr-B-giHJ6xch6g.gif"
             alt="유나"
           />
           <h3>있지</h3>
@@ -105,7 +105,7 @@ const Carousel = ({ listLength, imgLength }) => {
         </Cell>
         <Cell>
           <img
-            src="https://i.namu.wiki/i/pK1bvyzYXWLuQozJoOre7DEdlVL8wJx4197EqGZPe2HN2KxTEwip50fVT2CFHG_5aDpsOpIdi9vXXmgo8_FLrA.gif"
+            src="https://i.namu.wiki/i/1dwopFuzij_ymDHRkH_w89nrCA0f6u5beJovCSUqCY5vFrIIuMgJqHggDg8_vJ-Kbp72nu5U_mhQ9MircVSaxg.gif"
             alt="이안"
           />
           <h3>하츠투하츠</h3>

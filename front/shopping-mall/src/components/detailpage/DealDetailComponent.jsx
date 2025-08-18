@@ -10,6 +10,8 @@ import { useParams } from "react-router-dom";
 import { getReviewList } from "../../api/reviewApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
+import { getCookie } from "../../util/cookieUtil";
+import { getCart } from "../../api/cartApi";
 
 const Div = styled.div`
   width: 100%;
@@ -77,6 +79,18 @@ const DealDetailComponent = () => {
   const handleCloseModal = () => {
     setResult(false);
   };
+
+  console.log(getCookie("member"));
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await getCart(); // jwtAxios가 Authorization 헤더 붙임
+        console.log("cart list", list);
+      } catch (e) {
+        console.error("cart load fail", e);
+      }
+    })();
+  }, []);
 
   return (
     <>
