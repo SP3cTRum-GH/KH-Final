@@ -17,6 +17,7 @@ import {
     ModalActions,
     ErrorText
 } from './ModifyMyPageStyle';
+import { getCookie } from "../../util/cookieUtil";
 import { useNavigate } from 'react-router-dom';
 
 const ModifyMyPageComponent = () => {
@@ -24,29 +25,35 @@ const ModifyMyPageComponent = () => {
     const [user, setUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState(null); // 'info' | 'password'
-    const [form, setForm] = useState({});
+    const [form, setForm] = useState({
+        memberName: '',
+        memberEmail: '',
+        memberPhone: '',
+        memberAddress: ''
+    });
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
 
-    // 로그인된 회원 정보 가져오기
     useEffect(() => {
-        axios.get('http://localhost:8080/api/member', { withCredentials: true })
-            .then(res => {
-                console.log('✅ 전체 응답:', res);       // Axios Response 전체
-            console.log('✅ 회원 데이터:', res.data); // 실제 회원 데이터
-                setUser(res.data);
-                setForm({
-                    memberName: res.data.memberName || '',
-                    memberEmail: res.data.memberEmail || '',
-                    memberPhone: res.data.memberPhone || '',
-                    memberAddress: res.data.memberAddress || ''
-                });
-            })
-            .catch(err => {
-                console.error('로그인된 회원 정보 불러오기 실패:', err);
-            });
-    }, []);
+    const member = getCookie("member"); 
+    console.log("🍪 쿠키 값:", member);
+
+    if (!member) {
+        console.error("❌ member 쿠키가 없습니다.");
+        return;
+    }
+
+    // ✅ 쿠키 데이터를 그대로 user에 세팅
+    setUser(member);
+    setForm({
+        memberName: member.memberName || '',
+        memberEmail: member.memberEmail || '',
+        memberPhone: member.memberPhone || '',
+        memberAddress: member.memberAddress || ''
+    });
+}, []);
+
 
     const openModal = (type) => {
         setModalType(type);

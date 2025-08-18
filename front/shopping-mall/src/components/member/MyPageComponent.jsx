@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from 'react-redux';
+import { getCookie } from "../../util/cookieUtil";
 import {
     ProfileBox,
     Header,
@@ -60,53 +61,23 @@ const MyPageComponent = () => {
     const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
 
     console.log(loginState);
-    // 로그인 정보 기반으로 사용자 세팅
-        // useEffect(() => {
-        //     if (loginState && loginState.memberId) {
-        //         setUser({
-        //             memberNo: loginState.memberNo,
-        //             id: loginState.memberId,
-        //             name: loginState.memberName,
-        //             roleNames: loginState.roleNames || []
-        //         });
-        //     }
-        // }, [loginState]);
 
-// 로그인된 회원 정보 가져오기 (memberNo 기반)
-    // useEffect(() => {
-    //     if (!loginState?.memberNo) return;
+// 쿠키 기반으로 사용자 정보 세팅
+useEffect(() => {
+    const member = getCookie("member");
+    console.log("🍪 쿠키 값:", member);
 
-    //     axios.get(`http://localhost:8080/api/member/${loginState.memberNo}`, { withCredentials: true })
-    //         .then(res => {
-    //             console.log("✅ 회원 정보:", res.data);
-    //             setUser(res.data);
-    //             setEditForm({
-    //                 memberName: res.data.memberName || "",
-    //                 memberEmail: res.data.memberEmail || ""
-    //             });
-    //         })
-    //         .catch(err => {
-    //             console.error("❌ 회원 정보 불러오기 실패:", err);
-    //         });
-    // }, [loginState?.memberNo]);
+    if (!member) {
+        console.error("❌ member 쿠키가 없습니다.");
+        return;
+    }
 
-// memberNo 기반으로 사용자 정보 가져오기
-    useEffect(() => {
-        if (!memberNo) return; // params가 없으면 실행 X
-
-        axios.get(`http://localhost:8080/api/member/${memberNo}`, { withCredentials: true })
-            .then(res => {
-                console.log("✅ 회원 정보:", res.data);
-                setUser(res.data);
-                setEditForm({
-                    memberName: res.data.memberName || "",
-                    memberEmail: res.data.memberEmail || ""
-                });
-            })
-            .catch(err => {
-                console.error("❌ 회원 정보 불러오기 실패:", err);
-            });
-    }, [memberNo]);
+    setUser(member);
+    setEditForm({
+        memberName: member.memberName || "",
+        memberEmail: member.memberEmail || ""
+    });
+}, []);
 
     if (!user) return <div>로딩 중...</div>;
 

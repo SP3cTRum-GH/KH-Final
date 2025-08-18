@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { getCookie } from "../util/cookieUtil";
 
 const Button = styled.button`
   position: fixed;
@@ -18,7 +19,6 @@ const Button = styled.button`
 
 const ScrollUpButton = () => {
   const [show, setShow] = useState(false);
-
   const handleScroll = () => {
     setShow(window.scrollY > 300);
   };
