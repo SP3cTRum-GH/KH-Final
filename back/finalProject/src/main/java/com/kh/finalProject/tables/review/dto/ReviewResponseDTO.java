@@ -17,6 +17,7 @@ public class ReviewResponseDTO {
     private double rating;
     private String content;
     private Long productNo;
+    private Boolean type;
     private Long memberNo;
     private String memberId;
     private LocalDateTime regDate;
