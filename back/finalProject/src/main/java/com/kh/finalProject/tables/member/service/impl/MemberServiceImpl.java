@@ -1,6 +1,7 @@
 package com.kh.finalProject.tables.member.service.impl;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -8,7 +9,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -185,6 +185,13 @@ public class MemberServiceImpl implements MemberService {
 		Member member = memberRepository.getWithRoles(memberId);
 		
 		return memberConvertor.toEntity(member);
+	}
+
+	@Override
+	public List<MemberResponseDTO> getAllMember() {
+		return memberRepository.findAll().stream()
+               .map(memberConvertor::toEntity)
+               .toList();
 	}
 
 }
