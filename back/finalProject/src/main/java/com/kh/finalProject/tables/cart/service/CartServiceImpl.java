@@ -71,7 +71,7 @@ public class CartServiceImpl implements CartService {
                     return cartRepository.save(newCart);
                 });
 
-        Product product = productRepository.findById(cartItemAddDto.getProductId())
+        Product product = productRepository.findById(cartItemAddDto.getProductNo())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         Optional<CartItem> cartItemOptional = cartItemRepository.findByCartAndProduct(cart, product);
@@ -89,5 +89,61 @@ public class CartServiceImpl implements CartService {
                     .build();
             cartItemRepository.save(newCartItem);
         }
+    }
+    //
+    @Override
+    public void changeQty(String memberId, Long cartItemId, int quantity) {
+        Cart cart = cartRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        CartItem item = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("CartItem not found"));
+
+        // 본인 카트 소유 검증
+        if (!item.getCart().getCartNo().equals(cart.getCartNo())) {
+            throw new RuntimeException("Forbidden cart item");
+        }
+
+        // 0 이하면 삭제
+        if (quantity <= 0) {
+            cartItemRepository.delete(item);
+            return;
+        }
+
+        item.setQuantity(quantity);
+        // 장바구니 총 금액을 CartItem.price에 저장한다면:
+        int unitPrice = item.getProduct().getPrice();
+        item.setPrice(unitPrice * quantity);
+
+        cartItemRepository.save(item);
+    }
+
+    @Override
+    public void removeItem(String memberId, Long cartItemId) {
+        Cart cart = cartRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        CartItem item = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("CartItem not found"));
+
+        if (!item.getCart().getCartNo().equals(cart.getCartNo())) {
+            throw new RuntimeException("Forbidden cart item");
+        }
+
+        cartItemRepository.delete(item);
+    }
+
+    @Override
+    @Transactional
+    public void clear(String memberId) {
+        Cart cart = cartRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        // 1. 카트 아이템 전부 조회
+        List<CartItem> items = cartItemRepository.findByCart_CartNo(cart.getCartNo());
+        if (items.isEmpty()) return;
+
+        // 2. 한 번에 삭제
+        cartItemRepository.deleteAll(items);
     }
 }
