@@ -288,3 +288,9 @@ export const SectionHeader = styled.h3`
   font-size: 18px;
   font-weight: 600;
 `;
+
+export const CartDeleteButton = styled.p`
+  font-size: 14px;
+  cursor: pointer;
+  color: rgb(136, 136, 136)
+`

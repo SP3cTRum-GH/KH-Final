@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import {
   CartContainer,
   LeftSection,
@@ -29,59 +28,28 @@ import {
   FilterBar,
   FilterButton,
   SectionHeader,
+  CartDeleteButton,
 } from "./CartPageStyle";
-import { getCart } from "../../api/cartApi";
+import { deleteCart, getCart, updateCart } from "../../api/cartApi";
 import { getCookie } from "../../util/cookieUtil";
+import { getDealOne } from "../../api/productDealApi";
+import { getShopOne } from "../../api/productShopApi";
 
 const initData = [
   // type === true : Deal 아이템 (예: 경매/딜)
   {
-    id: 1,
-    productName: "한정판 운동화",
-    price: 5000,
-    quantity: 1,
-    selectedSize: "270",
-    sizes: ["260", "270", "280"],
-    img: "/images/shoes.png",
-    type: true, // Deal
-    dealCurrent: 3, // 예: 현재 참여수/입찰수 등
-    endDate: "2025-08-20", // 딜 종료일
-  },
-  {
-    id: 3,
-    productName: "프로틴 패키지",
-    price: 19000,
-    quantity: 1,
-    selectedSize: "FREE",
-    sizes: ["FREE"],
-    img: "/images/cap.png",
-    type: true,
-    dealCurrent: 12,
-    endDate: "2025-08-25",
-  },
-
-  // type === false : Shop 아이템 (일반 구매)
-  {
-    id: 2,
-    productName: "청바지",
-    price: 3000,
-    quantity: 1,
-    selectedSize: "32",
-    sizes: ["30", "32", "34"],
-    img: "/images/jeans.png",
-    type: false, // Shop
-  },
-  {
-    id: 4,
-    productName: "후드티",
-    price: 2000,
-    quantity: 3,
-    selectedSize: "L",
-    sizes: ["M", "L", "XL"],
-    img: "/images/hoodie.png",
+    cartItemNo: 0,
+    productNo: 0,
+    productName: "",
+    quantity: 0,
+    price: 0,
     type: false,
+    size: null,
+    imgUrl: null,
   },
 ];
+
+const itemData = [{}];
 
 const CartPageComponent = () => {
   const [cartItems, setCartItems] = useState(initData);
@@ -96,39 +64,111 @@ const CartPageComponent = () => {
     setShopCart(cartItems.filter((item) => item.type === false));
   }, [cartItems]);
 
-  // 체크/합계
+  useEffect(() => {
+    getCart(getCookie("member").memberId).then((data) => {
+      setCartItems(data);
+    });
+  }, []);
+
+  // 체크/합계 - cartItemNo 기반으로 관리
   const [allChecked, setAllChecked] = useState(false);
-  const [checkedItems, setCheckedItems] = useState([]);
+  const [checkedMap, setCheckedMap] = useState({}); // { [cartItemNo]: boolean }
   const [totalPrice, setTotalPrice] = useState(0);
 
-  // 목록 길이 변화 시 체크 배열 리셋
+  // cartItems 변경 시 체크맵 초기화/동기화
   useEffect(() => {
-    setCheckedItems(new Array(cartItems.length).fill(false));
-    setAllChecked(false);
-  }, [cartItems.length]);
+    const next = {};
+    for (const it of cartItems) {
+      next[it.cartItemNo] = checkedMap[it.cartItemNo] ?? false;
+    }
+    setCheckedMap(next);
+    setAllChecked(
+      cartItems.length > 0 && cartItems.every((it) => next[it.cartItemNo])
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartItems]);
 
   // 선택 항목 합계
   useEffect(() => {
     let total = 0;
-    checkedItems.forEach((isChecked, idx) => {
-      if (!isChecked) return;
-      const item = cartItems[idx];
-      total += Number(item?.price ?? 0) * Number(item?.quantity ?? 0);
-    });
+    for (const it of cartItems) {
+      if (checkedMap[it.cartItemNo]) {
+        total += Number(it?.price ?? 0) * Number(it?.quantity ?? 0);
+      }
+    }
     setTotalPrice(total);
-  }, [checkedItems, cartItems]);
+  }, [checkedMap, cartItems]);
 
-  const handleAllCheck = () => {
-    const next = !allChecked;
-    setAllChecked(next);
-    setCheckedItems(new Array(cartItems.length).fill(next));
+  // --- sizes normalizer: unify to [{value,label,stock?,id?}] ---
+  const normalizeSizes = (raw) => {
+    const arr = Array.isArray(raw) ? raw : [];
+    const norm = arr
+      .filter((s) => s != null) // skip null/undefined
+      .map((s) => {
+        if (typeof s === "string" || typeof s === "number") {
+          return { value: String(s), label: String(s) };
+        }
+        return {
+          value: String(s.productSize ?? s.size ?? s.code ?? s.value ?? "FREE"),
+          label: String(
+            s.productSize ?? s.size ?? s.label ?? s.value ?? "FREE"
+          ),
+          stock: s.stock,
+          id: s.productSizeNo ?? s.id ?? undefined,
+        };
+      });
+    const seen = new Set();
+    return norm.filter((s) =>
+      seen.has(s.value) ? false : (seen.add(s.value), true)
+    );
   };
 
-  const handleSingleCheckByGlobalIndex = (globalIndex) => {
-    setCheckedItems((prev) => {
-      const next = [...prev];
-      next[globalIndex] = !next[globalIndex];
-      setAllChecked(next.every(Boolean));
+  const handleOpenOptions = async (item) => {
+    try {
+      const apiFn = item?.type ? getDealOne : getShopOne; // true => deal, false => shop
+      const res = await apiFn(item.productNo);
+
+      const rawSizes = res?.sizes ||
+        res?.sizeList ||
+        res?.data?.sizes ||
+        res?.product?.sizes || ["FREE"];
+
+      const sizes = normalizeSizes(rawSizes);
+
+      const currentSize =
+        item?.size && typeof item.size === "object"
+          ? String(
+              item.size?.productSize ?? item.size?.size ?? item.size?.value
+            )
+          : String(item?.size ?? "");
+
+      const initSize = currentSize || sizes?.[0]?.value || "FREE";
+      const initQty = Number(item?.quantity ?? 1);
+
+      setSelectedItem({ ...item, sizes });
+      setModalQuantity(initQty);
+      setModalSize(initSize);
+      setPrevValue({ size: initSize, quantity: initQty });
+      setIsModalOpen(true);
+    } catch (e) {
+      const sizes = normalizeSizes(item?.sizes ?? ["FREE"]);
+      const initQty = Number(item?.quantity ?? 1);
+      const initSize = sizes?.[0]?.value || "FREE";
+
+      setSelectedItem({ ...item, sizes });
+      setModalQuantity(initQty);
+      setModalSize(initSize);
+      setPrevValue({ size: initSize, quantity: initQty });
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleSingleCheck = (cartItemNo) => {
+    setCheckedMap((prev) => {
+      const next = { ...prev, [cartItemNo]: !prev[cartItemNo] };
+      setAllChecked(
+        cartItems.length > 0 && cartItems.every((it) => next[it.cartItemNo])
+      );
       return next;
     });
   };
@@ -141,52 +181,77 @@ const CartPageComponent = () => {
   const [prevValue, setPrevValue] = useState({ size: "", quantity: 0 });
 
   const openModal = (item) => {
-    setSelectedItem(item);
-    const initQty = item.quantity ?? 1;
-    const initSize = item.selectedSize ?? item.sizes?.[0] ?? "FREE";
-    setModalQuantity(initQty);
-    setModalSize(initSize);
-    setPrevValue({ size: initSize, quantity: initQty });
-    setIsModalOpen(true);
+    // 이전에는 즉시 모달을 열었지만, 이제는 상세 호출로 사이즈를 채운 뒤 오픈
+    handleOpenOptions(item);
   };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedItem(null);
   };
+
   const handleModalQuantityChange = (amount) => {
     setModalQuantity((prev) => Math.max(1, prev + amount));
   };
-  const handleOptionChange = () => {
-    // 서버 반영은 API로 대체, 현재는 클라이언트 상태만
-    setCartItems((prev) =>
-      prev.map((it) =>
-        it.id === selectedItem.id
-          ? { ...it, quantity: modalQuantity, selectedSize: modalSize }
-          : it
-      )
-    );
-    closeModal();
+
+  const handleOptionChange = async () => {
+    try {
+      // API 호출
+      await updateCart(getCookie("member").memberId, selectedItem.cartItemNo, {
+        quantity: modalQuantity,
+      });
+
+      // 클라이언트 상태 반영
+      setCartItems((prev) =>
+        prev.map((it) =>
+          it.cartItemNo === selectedItem.cartItemNo
+            ? { ...it, quantity: modalQuantity, size: modalSize }
+            : it
+        )
+      );
+    } catch (err) {
+      console.error("옵션 변경 실패:", err);
+    } finally {
+      closeModal();
+    }
   };
 
-  const checkedCount = checkedItems.filter(Boolean).length;
-  const expectedPoints = Math.floor(totalPrice * 0.01);
+  const handleDeleteCart = async (cartItemNo) => {
+    try {
+      const memberId = getCookie("member")?.memberId;
+      await deleteCart(memberId, cartItemNo);
 
-  // 전역 인덱스 계산 (deal 섹션 + shop 섹션 map에서 공통 체크배열을 쓰기 위해)
-  const findGlobalIndex = (item) =>
-    cartItems.findIndex(
-      (it) => (it.id ?? it.productNo) === (item.id ?? item.productNo)
-    );
+      // 클라이언트 상태에서 해당 아이템 제거
+      setCartItems((prev) => prev.filter((it) => it.cartItemNo !== cartItemNo));
+
+      // 체크맵 동기화
+      setCheckedMap((prev) => {
+        const { [cartItemNo]: _removed, ...rest } = prev;
+        return rest;
+      });
+
+      // 모달이 해당 아이템을 가리키고 있었다면 닫기
+      if (isModalOpen && selectedItem?.cartItemNo === cartItemNo) {
+        closeModal();
+      }
+    } catch (err) {
+      console.log("삭제 실패 : ", err);
+    }
+  };
+
+  const checkedCount = Object.values(checkedMap).filter(Boolean).length;
+  const expectedPoints = Math.floor(totalPrice * 0.01);
 
   // ====== type에 따라 카드 UI를 다르게 렌더링하는 함수 ======
   const renderDealCard = (item) => {
-    const globalIndex = findGlobalIndex(item);
     return (
-      <ItemBox key={`deal-${item.id ?? globalIndex}`}>
+      <ItemBox key={`deal-${item.cartItemNo}`}>
         <Checkbox
-          checked={!!checkedItems[globalIndex]}
-          onChange={() => handleSingleCheckByGlobalIndex(globalIndex)}
+          type="checkbox"
+          checked={!!checkedMap[item.cartItemNo]}
+          onChange={() => handleSingleCheck(item.cartItemNo)}
         />
-        <ItemImage src={item.img} alt={item.productName} />
+        <ItemImage src={item.img || item.imgUrl || ""} alt={item.productName} />
         <ItemInfo>
           <ItemName>
             {item.productName}{" "}
@@ -194,13 +259,20 @@ const CartPageComponent = () => {
               [DEAL]
             </span>
           </ItemName>
-          <p>
-            참여 {item.dealCurrent ?? 0}명 · 종료{" "}
-            {item.endDate ? item.endDate : "-"}
-          </p>
-          <p>
-            사이즈: {item.selectedSize ?? "-"} / 수량: {item.quantity ?? 0}개
-          </p>
+          {(() => {
+            const displaySize =
+              item?.size && typeof item.size === "object"
+                ? item.size.productSize ??
+                  item.size.size ??
+                  item.size.value ??
+                  "-"
+                : item?.size ?? "-";
+            return (
+              <p>
+                사이즈: {displaySize} / 수량: {item.quantity ?? 0}개
+              </p>
+            );
+          })()}
           <Price>
             {(
               Number(item.price ?? 0) * Number(item.quantity ?? 0)
@@ -213,19 +285,22 @@ const CartPageComponent = () => {
             </OptionButton>
           </ItemOptions>
         </ItemInfo>
+        <CartDeleteButton onClick={() => handleDeleteCart(item.cartItemNo)}>
+          삭제
+        </CartDeleteButton>
       </ItemBox>
     );
   };
 
   const renderShopCard = (item) => {
-    const globalIndex = findGlobalIndex(item);
     return (
-      <ItemBox key={`shop-${item.id ?? globalIndex}`}>
+      <ItemBox key={`shop-${item.cartItemNo}`}>
         <Checkbox
-          checked={!!checkedItems[globalIndex]}
-          onChange={() => handleSingleCheckByGlobalIndex(globalIndex)}
+          type="checkbox"
+          checked={!!checkedMap[item.cartItemNo]}
+          onChange={() => handleSingleCheck(item.cartItemNo)}
         />
-        <ItemImage src={item.img} alt={item.productName} />
+        <ItemImage src={item.img || item.imgUrl || ""} alt={item.productName} />
         <ItemInfo>
           <ItemName>
             {item.productName}{" "}
@@ -234,14 +309,25 @@ const CartPageComponent = () => {
             </span>
           </ItemName>
           <p>{item.deliveryMsg ?? "기본 배송"}</p>
-          <p>
-            사이즈: {item.selectedSize ?? "-"} / 수량: {item.quantity ?? 0}개
-          </p>
+          {(() => {
+            const displaySize =
+              item?.size && typeof item.size === "object"
+                ? item.size.productSize ??
+                  item.size.size ??
+                  item.size.value ??
+                  "-"
+                : item?.size ?? "-";
+            return (
+              <p>
+                사이즈: {displaySize} / 수량: {item.quantity ?? 0}개
+              </p>
+            );
+          })()}
           <Price>
-            {(
+            {/* {(
               Number(item.price ?? 0) * Number(item.quantity ?? 0)
-            ).toLocaleString()}
-            원
+            ).toLocaleString()} */}
+            {console.log(item)}원
           </Price>
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
@@ -249,6 +335,9 @@ const CartPageComponent = () => {
             </OptionButton>
           </ItemOptions>
         </ItemInfo>
+        <CartDeleteButton onClick={() => handleDeleteCart(item.cartItemNo)}>
+          삭제
+        </CartDeleteButton>
       </ItemBox>
     );
   };
@@ -331,12 +420,16 @@ const CartPageComponent = () => {
             <Dropdown
               value={modalSize}
               onChange={(e) => setModalSize(e.target.value)}
+              disabled
             >
-              {(selectedItem.sizes ?? ["FREE"]).map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
+              {(selectedItem.sizes ?? [{ value: "FREE", label: "FREE" }]).map(
+                (s) => (
+                  <option key={String(s.id ?? s.value)} value={s.value}>
+                    {s.label}
+                    {s.stock != null ? ` (재고 ${s.stock})` : ""}
+                  </option>
+                )
+              )}
             </Dropdown>
 
             <QuantityControl>

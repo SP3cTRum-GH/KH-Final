@@ -107,22 +107,18 @@ const SelectOption = ({
       size: selectedSize,
     };
 
-    console.log(fd);
-
     addCart(getCookie("member").memberId, fd).then((data) => {
-      console.log(data);
+      console.log("장바구니 추가 완료:", data);
+
+      if (selectCart) {
+        navigate("/cart", { replace: true }); // 완료 후 이동
+      } else {
+        alert("감사합니다.");
+        setQty(1);
+        setSelectedSize("");
+      }
     });
-
-    if (selectCart) {
-      navigate("/cart");
-    } else {
-      alert("감사합니다.");
-      setQty(1);
-      setSelectedSize("");
-    }
   };
-
-  console.log(getCookie("member"));
 
   return (
     <OptionContainer>

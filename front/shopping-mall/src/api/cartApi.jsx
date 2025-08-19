@@ -15,3 +15,22 @@ export const addCart = async (memberId, product) => {
   const res = await axios.post(`${prefix}/test?memberId=${memberId}`, product);
   return res.data;
 };
+
+// 장바구니 수량 수정
+export const updateCart = async (memberId, cartItemId, payload) => {
+  const res = await axios.patch(
+    `${prefix}/items/${cartItemId}?memberId=${memberId}`,
+    payload
+  );
+  return res.data;
+};
+
+// 장바구니 수량 삭제
+export const deleteCart = async (memberId, cartItemId) => {
+  console.log(memberId);
+  console.log(cartItemId);
+  const res = await axios.delete(
+    `${prefix}/items/${cartItemId}?memberId=${memberId}`
+  );
+  return res.data;
+};
