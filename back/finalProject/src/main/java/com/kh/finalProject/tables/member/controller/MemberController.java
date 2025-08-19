@@ -1,5 +1,6 @@
 package com.kh.finalProject.tables.member.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -68,5 +69,10 @@ public class MemberController {
 		claims.put("accessToken", jwtAccessToken);
 		claims.put("refreshToken", jwtRefreshToken);
 		return claims;
+	}
+	
+	@GetMapping("/all")
+	public ResponseEntity<List<MemberResponseDTO>> getAllMember(){
+		return ResponseEntity.ok(memberService.getAllMember());
 	}
 }

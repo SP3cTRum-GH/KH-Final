@@ -1,8 +1,7 @@
 package com.kh.finalProject.tables.member.service;
 
+import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.kh.finalProject.security.domain.CustomUser;
 import com.kh.finalProject.tables.member.dto.MemberRequestDTO;
@@ -30,5 +29,7 @@ public interface MemberService {
 	MemberResponseDTO getOneMember(Long memberNo);
 	
 	MemberResponseDTO getWithRoles(String memberId);
+	
+	List<MemberResponseDTO> getAllMember();
 	
 }
