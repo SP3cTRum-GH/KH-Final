@@ -62,7 +62,7 @@ public class MemberController {
 
 	@GetMapping("/kakao")
 	public Map<String, Object> getMemberFromKakao(String accessToken) {
-		CustomUser user = memberService.getKakaoMember(accessToken);
+		CustomUser user = memberService.getSocialMember(accessToken, 1);
 		Map<String, Object> claims = user.getClaims();
 		String jwtAccessToken = JWTUtil.generateToken(claims, 10);
 		String jwtRefreshToken = JWTUtil.generateToken(claims, 60 * 24);
@@ -71,6 +71,17 @@ public class MemberController {
 		return claims;
 	}
 	
+	@GetMapping("/google")
+	public Map<String, Object> getMemberFromGoogle(String accessToken) {
+		CustomUser user = memberService.getSocialMember(accessToken, 2);
+		Map<String, Object> claims = user.getClaims();
+		String jwtAccessToken = JWTUtil.generateToken(claims, 10);
+		String jwtRefreshToken = JWTUtil.generateToken(claims, 60 * 24);
+		claims.put("accessToken", jwtAccessToken);
+		claims.put("refreshToken", jwtRefreshToken);
+		return claims;
+	}
+	 
 	@GetMapping("/all")
 	public ResponseEntity<List<MemberResponseDTO>> getAllMember(){
 		return ResponseEntity.ok(memberService.getAllMember());
