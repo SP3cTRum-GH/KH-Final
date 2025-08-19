@@ -56,6 +56,22 @@ const useCustomMove = () => {
     navigate({ pathname, search: queryStr });
   };
 
+  const moveToEventList = () => {
+    navigate("/event");
+  };
+
+  const moveToEventRead = (no) => {
+    navigate({
+      pathname: `/event/${no}`,
+    });
+  };
+
+  const moveToEventModify = (no) => {
+    navigate({
+      pathname: `/event/modify/${no}`,
+    });
+  };
+
   return {
     // 일반 목록
     moveToProductList,
@@ -65,6 +81,10 @@ const useCustomMove = () => {
     moveToReviewList,
     reviewPage,
     reviewSize,
+    // 이벤트
+    moveToEventList,
+    moveToEventRead,
+    moveToEventModify,
   };
 };
 

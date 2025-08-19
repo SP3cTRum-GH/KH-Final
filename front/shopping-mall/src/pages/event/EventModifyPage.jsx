@@ -1,19 +1,21 @@
-import React from "react";
+import { useParams } from "react-router-dom";
+import ModifyComponent from "../../components/eventpage/ModifyComponent";
 import { Container } from "../../components/Container";
 import Header from "../../include/Header";
 import Footer from "../../include/Footer";
-import ListComponent from "../../components/eventpage/ListComponent";
 
-const EventPage = () => {
+const EventModifyPage = () => {
+  const { no } = useParams();
+
   return (
     <div>
       <Header />
       <Container>
-      <ListComponent />
+        <ModifyComponent no={no} />
       </Container>
       <Footer />
     </div>
   );
 };
 
-export default EventPage;
+export default EventModifyPage;

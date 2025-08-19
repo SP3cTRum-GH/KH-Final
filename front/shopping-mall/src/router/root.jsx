@@ -19,7 +19,9 @@ const DealDetailPage = lazy(() => import("../pages/buy/DealDetailPage"));
 
 // event 페이지
 const EventPage = lazy(() => import("../pages/event/EventPage"));
-
+const EventReadPage = lazy(() => import("../pages/event/EventReadPage"));
+const EventModifyPage = lazy(() => import("../pages/event/EventModifyPage"));
+const EventAddPage = lazy(() => import("../pages/event/EventAddPage"));
 // cart 페이지
 const CartPage = lazy(() => import("../pages/member/CartPage"));
 
@@ -97,6 +99,30 @@ const root = createBrowserRouter([
     ),
   },
   {
+    path: "/event/:no",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <EventReadPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/event/modify/:no",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <EventModifyPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/event/add",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <EventAddPage />
+      </Suspense>
+    ),
+  },
+  {
     path: "/mypage",
     element: (
       <Suspense fallback={<Loading />}>
@@ -137,8 +163,6 @@ const root = createBrowserRouter([
     ),
   },
   {
-
-
     path: "/admin/upload",
     element: (
       <Suspense fallback={<Loading />}>
