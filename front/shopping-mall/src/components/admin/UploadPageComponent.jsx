@@ -85,7 +85,7 @@ export default function UploadPageComponent() {
     if (Number.isNaN(priceNum) || priceNum < 0)
       errors.push("판매가는 0 이상 숫자여야 합니다.");
 
-    const isAuction = product.salesType === "false"; // 일반:true, 경매:false 라는 현재 구조 유지
+    const isAuction = product.salesType === "true"; // 일반:false, 경매:true 라는 현재 구조 유지
 
     if (isAuction) {
       if (!product.endDate) errors.push("경매 마감일을 입력해 주세요.");

@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from 'react-redux';
+import { getCookie } from "../../util/cookieUtil";
 import {
   ProfileBox,
   Header,
@@ -37,79 +40,46 @@ import {
 } from "./MyPageStyle";
 
 const MyPageComponent = () => {
-  const navigate = useNavigate();
-  const [showAll, setShowAll] = useState(false);
-  const [purchaseHistory, setPurchaseHistory] = useState([
-    {
-      id: 54,
-      name: "Adidas Superstar Core Black White",
-      size: "260",
-      date: "25/03/22",
-      status: "결제 완료",
-      reviewed: false,
-    },
-    {
-      id: 2,
-      name: "Nike Air Force 1",
-      size: "270",
-      date: "25/03/23",
-      status: "결제 완료",
-      reviewed: true,
-    },
-    {
-      id: 3,
-      name: "Converse Chuck 70",
-      size: "250",
-      date: "25/03/24",
-      status: "결제 완료",
-      reviewed: false,
-    },
-    {
-      id: 4,
-      name: "Vans Old Skool",
-      size: "280",
-      date: "25/03/25",
-      status: "결제 완료",
-      reviewed: false,
-    },
-    {
-      id: 5,
-      name: "New Balance 574",
-      size: "265",
-      date: "25/03/26",
-      status: "결제 완료",
-      reviewed: false,
-    },
-    {
-      id: 6,
-      name: "Puma Suede Classic",
-      size: "275",
-      date: "25/03/27",
-      status: "결제 완료",
-      reviewed: true,
-    },
-    {
-      id: 7,
-      name: "Reebok Club C 85",
-      size: "255",
-      date: "25/03/28",
-      status: "결제 완료",
-      reviewed: false,
-    },
-  ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
-  const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
-  const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
+    const { memberNo } = useParams(); // URL에서 memberNo 가져오기
+    const loginState = useSelector((state) => state.loginSlice);
+    const navigate = useNavigate();
+    const [showAll, setShowAll] = useState(false);
+    const [purchaseHistory, setPurchaseHistory] = useState([
+        { id: 1, name: "Adidas Superstar Core Black White", size: "260", date: "25/03/22", status: "결제 완료", reviewed: false },
+        { id: 2, name: "Nike Air Force 1", size: "270", date: "25/03/23", status: "결제 완료", reviewed: true },
+        { id: 3, name: "Converse Chuck 70", size: "250", date: "25/03/24", status: "결제 완료", reviewed: false },
+        { id: 4, name: "Vans Old Skool", size: "280", date: "25/03/25", status: "결제 완료", reviewed: false },
+        { id: 5, name: "New Balance 574", size: "265", date: "25/03/26", status: "결제 완료", reviewed: false },
+        { id: 6, name: "Puma Suede Classic", size: "275", date: "25/03/27", status: "결제 완료", reviewed: true },
+        { id: 7, name: "Reebok Club C 85", size: "255", date: "25/03/28", status: "결제 완료", reviewed: false },
+    ]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [user, setUser] = useState(null);
+    const [filterType, setFilterType] = useState('all'); // 'all', 'toReview', 'reviewed'
+    const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
+    const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
 
-  const levelInfo = [
-    { level: 1, name: "브론즈", min: 0, max: 9 },
-    { level: 2, name: "실버", min: 10, max: 19 },
-    { level: 3, name: "골드", min: 20, max: 29 },
-    { level: 4, name: "플래티넘", min: 30, max: 39 },
-    { level: 5, name: "다이아몬드", min: 40, max: Infinity },
-  ];
+    console.log(loginState);
+
+// 쿠키 기반으로 사용자 정보 세팅
+useEffect(() => {
+    const member = getCookie("member");
+    console.log("🍪 쿠키 값:", member);
+
+    if (!member) {
+        console.error("❌ member 쿠키가 없습니다.");
+        return;
+    }
+
+    setUser(member);
+    setEditForm({
+        memberName: member.memberName || "",
+        memberEmail: member.memberEmail || ""
+    });
+}, []);
+
+    if (!user) return <div>로딩 중...</div>;
 
   const currentLevel = levelInfo.find(
     (lvl) => purchaseCount >= lvl.min && purchaseCount <= lvl.max
@@ -181,8 +151,18 @@ const MyPageComponent = () => {
         </ReviewInfo>
       </ProfileBox>
 
-      <Section>
-        <Title>구매 내역 ({purchaseHistory.length})</Title>
+    return (
+        <>
+            <ProfileBox>
+                <Header>
+                    <Profile>
+                        <div>
+                            <p>ID {user.memberId}</p>
+                            <p>이름 {user.memberName}</p>
+                        </div>
+                    </Profile>
+                    <Button onClick={() => setIsProfileModalOpen(true)}>설정</Button>
+                </Header>
 
         <StatusBox>
           <StatusItem
