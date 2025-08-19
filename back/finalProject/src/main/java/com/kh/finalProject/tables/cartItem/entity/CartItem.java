@@ -33,6 +33,9 @@ public class CartItem {
     @Column
     private int price; // 장바구니 총 금액
 
+    @Column(name = "product_size")
+    private String size; // 상품 사이즈
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_no", nullable = false)
     private Cart cart;

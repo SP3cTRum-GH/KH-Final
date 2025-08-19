@@ -45,7 +45,7 @@ const initData = [
     img: "/images/shoes.png",
     type: true, // Deal
     dealCurrent: 3, // 예: 현재 참여수/입찰수 등
-    endDate: "2025-08-20 23:59", // 딜 종료일
+    endDate: "2025-08-20", // 딜 종료일
   },
   {
     id: 3,
@@ -57,7 +57,7 @@ const initData = [
     img: "/images/cap.png",
     type: true,
     dealCurrent: 12,
-    endDate: "2025-08-25 18:00",
+    endDate: "2025-08-25",
   },
 
   // type === false : Shop 아이템 (일반 구매)
@@ -276,15 +276,10 @@ const CartPageComponent = () => {
           </FilterButton>
         </FilterBar>
 
-        {/* 전체 선택 */}
-        <DeliveryGroup>
-          <Checkbox checked={allChecked} onChange={handleAllCheck} /> 전체 선택
-        </DeliveryGroup>
-
         {/* === DEAL 섹션 (type === true) === */}
         {viewMode !== "shop" && (
           <DeliveryGroup>
-            <SectionHeader>딜 상품</SectionHeader>
+            <SectionHeader>Deal</SectionHeader>
             {dealCart.length > 0 ? (
               dealCart.map((item) => renderDealCard(item))
             ) : (
@@ -296,7 +291,7 @@ const CartPageComponent = () => {
         {/* === SHOP 섹션 (type === false) === */}
         {viewMode !== "deal" && (
           <DeliveryGroup>
-            <SectionHeader>일반 상품</SectionHeader>
+            <SectionHeader>Shop</SectionHeader>
             {shopCart.length > 0 ? (
               shopCart.map((item) => renderShopCard(item))
             ) : (
