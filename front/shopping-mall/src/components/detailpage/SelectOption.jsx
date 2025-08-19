@@ -103,8 +103,8 @@ const SelectOption = ({
 
     const fd = {
       productNo: param.productNo,
-      sizes: selectedSize,
       quantity: qty,
+      size: selectedSize,
     };
 
     console.log(fd);
@@ -117,6 +117,8 @@ const SelectOption = ({
       navigate("/cart");
     } else {
       alert("감사합니다.");
+      setQty(1);
+      setSelectedSize("");
     }
   };
 
