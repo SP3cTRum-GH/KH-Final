@@ -12,6 +12,7 @@ import com.kh.finalProject.tables.product.entity.Product;
 import com.kh.finalProject.tables.product.repository.ProductRepository;
 import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Log4j2
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
@@ -49,7 +51,8 @@ public class CartServiceImpl implements CartService {
                             .productNo(cartItem.getProduct().getProductNo())
                             .productName(cartItem.getProduct().getProductName())
                             .quantity(cartItem.getQuantity())
-                            .price(cartItem.getProduct().getPrice())
+                            .price(cartItem.getPrice())
+                            .size(cartItem.getSize())
                             .imgUrl(imageUrl)
                             .build();
                 })
@@ -74,11 +77,12 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(cartItemAddDto.getProductNo())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Optional<CartItem> cartItemOptional = cartItemRepository.findByCartAndProduct(cart, product);
+        Optional<CartItem> cartItemOptional = cartItemRepository.findByCartAndProductAndSize(cart, product, cartItemAddDto.getSize());
 
         if (cartItemOptional.isPresent()) {
             CartItem cartItem = cartItemOptional.get();
             cartItem.setQuantity(cartItem.getQuantity() + cartItemAddDto.getQuantity());
+            cartItem.setPrice(cartItem.getProduct().getPrice()*cartItemAddDto.getQuantity());
             cartItemRepository.save(cartItem);
         } else {
             CartItem newCartItem = CartItem.builder()
@@ -86,11 +90,14 @@ public class CartServiceImpl implements CartService {
                     .product(product)
                     .quantity(cartItemAddDto.getQuantity())
                     .price(product.getPrice())
+                    .size(cartItemAddDto.getSize())
+                    .price(cartItemAddDto.getQuantity() *  product.getPrice())
                     .build();
+            log.info(newCartItem.getPrice());
             cartItemRepository.save(newCartItem);
         }
     }
-    //
+    // 수정
     @Override
     public void changeQty(String memberId, Long cartItemId, int quantity) {
         Cart cart = cartRepository.findByMember_MemberId(memberId)
@@ -110,10 +117,12 @@ public class CartServiceImpl implements CartService {
             return;
         }
 
+        // 수량 변경
         item.setQuantity(quantity);
-        // 장바구니 총 금액을 CartItem.price에 저장한다면:
-        int unitPrice = item.getProduct().getPrice();
-        item.setPrice(unitPrice * quantity);
+
+        // price = 단가 (상품 가격) 그대로 저장
+        // 총금액은 조회할 때 price * quantity 로 계산하면 됨
+        item.setPrice(item.getProduct().getPrice() * quantity);
 
         cartItemRepository.save(item);
     }
