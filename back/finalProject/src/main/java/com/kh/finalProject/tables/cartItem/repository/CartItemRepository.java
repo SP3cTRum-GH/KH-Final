@@ -10,7 +10,8 @@ import java.util.Optional;
 
 public interface CartItemRepository extends JpaRepository<CartItem,Long> {
     List<CartItem> findByCart_CartNo(Long cartNo);
-    Optional<CartItem> findByCartAndProduct(Cart cart, Product product);
+
+    Optional<CartItem> findByCartAndProductAndSize(Cart cart, Product product, String size);
 
     void deleteAll(Iterable<? extends CartItem> items);
 }

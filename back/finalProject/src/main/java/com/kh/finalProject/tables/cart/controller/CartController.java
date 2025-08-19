@@ -51,6 +51,7 @@ public class CartController {
                 .memberId(memberId)                // ← 인증 없이 직접 전달
                 .productNo(cartRequestDTO.getProductNo())
                 .quantity(cartRequestDTO.getQuantity())
+                .size(cartRequestDTO.getSize())
                 .build());
         return ResponseEntity.ok().build();
     }
