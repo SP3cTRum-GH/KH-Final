@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PageWrapper, ButtonGroup, Button } from "./ModifyPageStyle";
 import ModifyBasicInfo from "./ProductBasicInfo";
 import CategorySizeManager from "./CategorySizeManager";
 import ImageUploader from "./ImageUploader";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { getShopOne, updateShopProduct } from "../../api/productShopApi";
+import { getDealOne, updateDealProduct } from "../../api/productDealApi";
+import { useLocation } from "react-router-dom";
 
 export default function ModifyPageComponent() {
   const [product, setProduct] = useState({

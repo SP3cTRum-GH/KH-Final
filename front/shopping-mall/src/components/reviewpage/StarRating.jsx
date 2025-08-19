@@ -31,7 +31,7 @@ const StarRating = ({
 
   const onClick = (r) => {
     setRate(r);
-    onSetRate(r);
+    if (onSetRate) onSetRate(r);
   };
 
   // defaultRate prop이 바뀔 때마다 rate 값도 동기화

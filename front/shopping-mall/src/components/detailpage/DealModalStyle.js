@@ -36,10 +36,11 @@ export const PriceLabel = styled.p`
 `;
 
 export const Input = styled.input`
-  width: 70%;
+  width: 100%;
   padding: 10px;
   font-size: 16px;
   margin-bottom: 20px;
+  resize: none;
 `;
 
 export const ButtonRow = styled.div`

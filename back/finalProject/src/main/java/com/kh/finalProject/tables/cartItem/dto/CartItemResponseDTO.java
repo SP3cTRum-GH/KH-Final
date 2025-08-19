@@ -15,5 +15,7 @@ public class CartItemResponseDTO {
     private String productName;
     private int quantity;
     private int price;
+    private Boolean type;
+    private String size;
     private String imgUrl;
 }

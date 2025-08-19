@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import Header from "./../include/Header";
 import Footer from "./../include/Footer";
+import GoogleRedirectPage from "../pages/member/GoogleRedirectPage";
 
 // 메인 페이지
 const MainPage = lazy(() => import("../pages/MainPage"));
@@ -155,7 +156,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/modify",
+    path: "/admin/modify/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ModifyPage />
@@ -195,7 +196,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/review",
+    path: "/review/:productNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ReviewPage />
@@ -207,6 +208,14 @@ const root = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <KakaoRedirect />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/member/google",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <GoogleRedirectPage />
       </Suspense>
     ),
   },

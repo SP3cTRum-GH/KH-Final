@@ -14,7 +14,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../../util/cookieUtil";
 
-const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
+const SelectOption = ({
+  productData,
+  scrollToReview,
+  handleOpenModal,
+  reviewListCount,
+}) => {
   const name = productData?.productName ?? "";
   const price = productData?.price ?? 0;
   const sizes = productData?.sizes ?? [];
@@ -88,7 +93,7 @@ const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
       사이즈 : ${selectedSize} 수량 : ${qty}개`
     );
 
-    if (getCookie("member" === undefined)) {
+    if (getCookie("member") === undefined) {
       alert("로그인 해주세요.");
       navigate("/login");
       return;
@@ -120,7 +125,7 @@ const SelectOption = ({ productData, scrollToReview, handleOpenModal }) => {
               scrollToReview();
             }}
           >
-            리뷰 347
+            리뷰 {reviewListCount}
           </a>
         </ReviewBox>
       </PriceContainer>
