@@ -67,8 +67,8 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public CustomUser getKakaoMember(String accessToken) {
-		String email = getEmailFromKakaoAccessToken(accessToken);
+	public CustomUser getSocialMember(String accessToken, int social) {
+		String email = getEmailFromSocialAccessToken(accessToken, social);
 		log.info("email: " + email);
 		Optional<Member> result = memberRepository.findByEmail(email);
 
@@ -80,7 +80,6 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		// 회원이 아니었다면 닉네임은 '소셜회원'으로
-
 		// 패스워드는 임의로 생성
 		Member socialMember = makeSocialMember(email);
 		memberRepository.save(socialMember);
@@ -89,10 +88,22 @@ public class MemberServiceImpl implements MemberService {
 
 	}
 
-	private String getEmailFromKakaoAccessToken(String accessToken) {
-
+	private String getEmailFromSocialAccessToken(String accessToken, int social) {
+		String getUserURL ="";
+		String getAccount = "";
 		// 사용자정보를 가져오는 url
-		String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
+		switch(social) {
+		case 1:
+			getUserURL = "https://kapi.kakao.com/v2/user/me";
+			getAccount = "kakao_account";
+			break;
+		case 2:
+			getUserURL ="https://www.googleapis.com/oauth2/v3/userinfo";
+			getAccount = "email";
+			break;
+		
+		}
+		
 		if (accessToken == null) {
 			throw new RuntimeException("Access Token is null");
 		}
@@ -107,7 +118,7 @@ public class MemberServiceImpl implements MemberService {
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 
 		// 카카오 API 요청에 사용할 URL을 생성한다. Request 요청 https://kapi.kakao.com/v2/user/me"
-		UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(kakaoGetUserURL).build();
+		UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(getUserURL).build();
 
 		ResponseEntity<LinkedHashMap> response = restTemplate.exchange(uriBuilder.toString(), // 요청 URL
 				HttpMethod.GET,
@@ -118,13 +129,19 @@ public class MemberServiceImpl implements MemberService {
 		// 응답 본문을 매핑할 클래스
 		);
 		log.info(response);
+		
+		if(social == 2) {
+			LinkedHashMap<String, String> socialAccount = response.getBody();
+			return socialAccount.get("email");
+		}
 
 		LinkedHashMap<String, LinkedHashMap> bodyMap = response.getBody();
 		log.info(bodyMap);
-		LinkedHashMap<String, String> kakaoAccount = bodyMap.get("kakao_account");
-		log.info("kakaoAccount: " + kakaoAccount);
+		LinkedHashMap<String, String> socialAccount = bodyMap.get(getAccount);
+		log.info("socialAccount: " + socialAccount);
+		
 
-		return kakaoAccount.get("email");
+		return socialAccount.get("email");
 
 	}
 
@@ -183,15 +200,13 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public MemberResponseDTO getWithRoles(String memberId) {
 		Member member = memberRepository.getWithRoles(memberId);
-		
+
 		return memberConvertor.toEntity(member);
 	}
 
 	@Override
 	public List<MemberResponseDTO> getAllMember() {
-		return memberRepository.findAll().stream()
-               .map(memberConvertor::toEntity)
-               .toList();
+		return memberRepository.findAll().stream().map(memberConvertor::toEntity).toList();
 	}
 
 }

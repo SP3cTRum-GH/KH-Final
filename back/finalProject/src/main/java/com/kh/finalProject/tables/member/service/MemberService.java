@@ -15,7 +15,7 @@ public interface MemberService {
 	
 	MemberResponseDTO socialMemberUpdate(MemberRequestDTO memberRequestDTO);
 
-	CustomUser getKakaoMember(String accessToken);
+	CustomUser getSocialMember(String accessToken, int social);//1.kakao 2.google
 
 	default CustomUser entityToDTO(Member member) {
 		CustomUser dto = new CustomUser(member.getMemberId(), member.getMemberPw(),member.getMemberName(), member.getMemberEmail(),
