@@ -145,6 +145,7 @@ const SelectOption = ({
       <OptionBox>
         <SelectWrapper>
           <label htmlFor="sizeSelect">사이즈</label>
+          <p>기간 : {productData.endDate.slice(0, 10)}</p>
           <select
             id="sizeSelect"
             value={selectedSize}

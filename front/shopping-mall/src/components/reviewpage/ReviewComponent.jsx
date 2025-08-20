@@ -5,12 +5,14 @@ import { useLocation, useParams } from "react-router-dom";
 import { getShopOne } from "../../api/productShopApi";
 import { getDealOne } from "../../api/productDealApi";
 import { postReview } from "../../api/reviewApi";
+import { getCookie } from "../../util/cookieUtil";
 
 const ReviewComponent = () => {
   const [product, setProduct] = useState({
     productName: "",
     price: 0,
   });
+
   const [formData, setFormData] = useState({
     reviewImg: "null",
     rating: 0,

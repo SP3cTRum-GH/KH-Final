@@ -324,10 +324,10 @@ const CartPageComponent = () => {
             );
           })()}
           <Price>
-            {/* {(
+            {(
               Number(item.price ?? 0) * Number(item.quantity ?? 0)
-            ).toLocaleString()} */}
-            {console.log(item)}원
+            ).toLocaleString()}
+            원
           </Price>
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
