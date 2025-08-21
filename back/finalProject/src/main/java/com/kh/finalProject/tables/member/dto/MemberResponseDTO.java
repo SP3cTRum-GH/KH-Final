@@ -1,5 +1,7 @@
 package com.kh.finalProject.tables.member.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +21,7 @@ public class MemberResponseDTO {
     private String memberAddress;
     private int memberPoint;
     private Boolean memberGender;
+    private LocalDateTime regDate;
     private Boolean enable;
     private Character grade;
     private String OAuth;

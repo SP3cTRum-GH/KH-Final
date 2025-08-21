@@ -74,10 +74,11 @@ const Carousel = ({ listLength, imgLength }) => {
         <Cell>
           <img
             src="https://blog.kakaocdn.net/dna/byMrtS/btsHcsUUbeT/AAAAAAAAAAAAAAAAAAAAAHzJXc6ayW-geNyH-iFTZznJB6lw8iyGa8eGp8x8TU70/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=VjPahY9jZGblii5TDRstr0ymzBE%3D"
+
             alt="장원영"
           />
-          <h3>아이브</h3>
-          <p>장원영</p>
+          <h3></h3>
+          <p>상의</p>
         </Cell>
         <Cell>
           <img src="https://media.nudge-community.com/8168135" alt="카리나" />

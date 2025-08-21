@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { getCookie } from "../../util/cookieUtil";
 import {
   ProfileBox,
   Header,
@@ -41,12 +42,13 @@ const MyPageComponent = () => {
   const [showAll, setShowAll] = useState(false);
   const [purchaseHistory, setPurchaseHistory] = useState([
     {
-      id: 54,
+      id: 1,
       name: "Adidas Superstar Core Black White",
       size: "260",
       date: "25/03/22",
       status: "결제 완료",
       reviewed: false,
+      img: "https://image2.lotteimall.com/goods/32/19/34/2971341932_L.jpg",
     },
     {
       id: 2,
@@ -55,6 +57,7 @@ const MyPageComponent = () => {
       date: "25/03/23",
       status: "결제 완료",
       reviewed: true,
+      img: "https://image2.lotteimall.com/goods/25/11/20/2375201125_L.jpg",
     },
     {
       id: 3,
@@ -63,6 +66,7 @@ const MyPageComponent = () => {
       date: "25/03/24",
       status: "결제 완료",
       reviewed: false,
+      img: "https://image2.lotteimall.com/goods/95/93/01/3065019395_L.jpg",
     },
     {
       id: 4,
@@ -71,6 +75,7 @@ const MyPageComponent = () => {
       date: "25/03/25",
       status: "결제 완료",
       reviewed: false,
+      img: "https://image2.lotteimall.com/goods/89/56/13/2569135689_L.jpg",
     },
     {
       id: 5,
@@ -79,6 +84,7 @@ const MyPageComponent = () => {
       date: "25/03/26",
       status: "결제 완료",
       reviewed: false,
+      img: "https://image2.lotteimall.com/goods/74/90/21/2284219074_L.jpg",
     },
     {
       id: 6,
@@ -102,6 +108,7 @@ const MyPageComponent = () => {
   const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
   const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
   const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
+  const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
 
   const levelInfo = [
     { level: 1, name: "브론즈", min: 0, max: 9 },
@@ -155,6 +162,25 @@ const MyPageComponent = () => {
     return true;
   });
 
+  // 쿠키 기반으로 사용자 정보 세팅
+  useEffect(() => {
+    const member = getCookie("member");
+    console.log("🍪 쿠키 값:", member);
+
+    if (!member) {
+      console.error("❌ member 쿠키가 없습니다.");
+      return;
+    }
+
+    setUser(member);
+    setEditForm({
+      memberName: member.memberName || "",
+      memberEmail: member.memberEmail || "",
+    });
+  }, []);
+
+  if (!user) return <div>로딩 중...</div>;
+
   const displayedItems = showAll
     ? filteredHistory
     : filteredHistory.slice(0, 5);
@@ -165,8 +191,8 @@ const MyPageComponent = () => {
         <Header>
           <Profile>
             <div>
-              <p>{user.email}</p>
-              <p>{user.name}</p>
+              <p>ID {user.memberId}</p>
+              <p>이름 {user.memberName}</p>
             </div>
           </Profile>
           <Button onClick={() => setIsProfileModalOpen(true)}>설정</Button>
@@ -203,7 +229,7 @@ const MyPageComponent = () => {
 
         {displayedItems.map((item) => (
           <ListItem key={item.id}>
-            <ProductImage src="" alt={item.name} />
+            <ProductImage src={item.img} alt={item.name} />
             <ProductInfo>
               <ProductName>{item.name}</ProductName>
               <ProductSize>{item.size}</ProductSize>

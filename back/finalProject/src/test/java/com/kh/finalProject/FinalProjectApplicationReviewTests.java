@@ -33,7 +33,7 @@ public class FinalProjectApplicationReviewTests {
     ReviewService reviewService;
 
     private Long productNo;
-    private Long memberNo;
+    private String memberId;
     private Long reviewNo;
 
     @BeforeAll
@@ -46,7 +46,7 @@ public class FinalProjectApplicationReviewTests {
         Pageable oneM = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "memberNo"));
         Member m = memberRepository.findAll(oneM).getContent()
                 .stream().findFirst().orElseThrow(() -> new IllegalStateException("멤버 없음"));
-        memberNo = m.getMemberNo();
+        memberId = m.getMemberId();
     }
 
     @Test @Order(1)
@@ -56,7 +56,7 @@ public class FinalProjectApplicationReviewTests {
                 .rating(4.5)
                 .content("첫 리뷰")
                 .productNo(productNo)
-                .memberNo(memberNo)
+                .memberId(memberId)
                 .build();
 
         ReviewResponseDTO res = reviewService.create(req); // 내부에서 converter.toDto 사용됨
@@ -64,7 +64,7 @@ public class FinalProjectApplicationReviewTests {
         assertNotNull(res.getReviewNo());
         assertEquals(4.5, res.getRating());
         assertEquals(productNo, res.getProductNo());
-        assertEquals(memberNo, res.getMemberNo());
+        assertEquals(memberId, res.getMemberId());
         reviewNo = res.getReviewNo();
     }
 
@@ -73,7 +73,7 @@ public class FinalProjectApplicationReviewTests {
         ReviewResponseDTO res = reviewService.get(reviewNo);
         assertEquals(reviewNo, res.getReviewNo());
         assertEquals(productNo, res.getProductNo());
-        assertEquals(memberNo, res.getMemberNo());
+        assertEquals(memberId, res.getMemberId());
     }
 
     @Test @Order(3)
@@ -83,7 +83,7 @@ public class FinalProjectApplicationReviewTests {
                 .rating(3.0)
                 .content("수정됨")
                 .productNo(productNo)
-                .memberNo(memberNo)
+                .memberId(memberId)
                 .build();
 
         ReviewResponseDTO res = reviewService.update(reviewNo, req);

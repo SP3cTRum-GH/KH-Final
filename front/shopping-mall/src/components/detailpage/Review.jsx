@@ -155,7 +155,7 @@ const Review = ({ reviewList }) => {
                 {/* 리뷰 이미지: 미리보기 + 파일 선택 (편집 중에만 파일선택 가능) */}
                 {(isEditing ? imagePreview : review.reviewImg) ? (
                   <ReviewImage
-                    src={isEditing ? imagePreview : review.reviewImg}
+                    src={isEditing ? "imagePreview" : review.reviewImg}
                     alt="제품 리뷰 사진"
                   />
                 ) : (

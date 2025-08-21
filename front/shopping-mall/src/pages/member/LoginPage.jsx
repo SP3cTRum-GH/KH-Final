@@ -6,6 +6,7 @@ import useCustomLogin from "../../hooks/useCustomLogin";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { getKakaoLoginLink } from "../../api/social/KakaoApi";
+import { getGoogleLoginLink } from "../../api/social/GoogleApi";
 
 const initState = { memberId: "", pw: "" };
 
@@ -78,6 +79,7 @@ const LoginPage = () => {
   const [loginParam, setLoginParam] = useState({ ...initState });
   const { doLogin, moveToPath } = useCustomLogin();
   const kakaoLink = getKakaoLoginLink();
+  const googleLink = getGoogleLoginLink();
 
   const handleChange = (e) => {
     loginParam[e.target.name] = e.target.value;
@@ -138,7 +140,12 @@ const LoginPage = () => {
                 border: "1px solid #dadce0",
               }}
             >
-              구글 로그인
+              <Link
+                to={googleLink}
+                style={{ textDecoration: "none", color: "black" }}
+              >
+                구글 로그인
+              </Link>
             </SocialButton>
             <SocialButton style={{ backgroundColor: "#03C75A" }}>
               네이버 로그인

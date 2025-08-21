@@ -1,13 +1,26 @@
 package com.kh.finalProject.tables.event.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.kh.finalProject.tables.eventImages.entity.EventImages;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
+import lombok.Setter;
 
 @Entity
 @SequenceGenerator(name = "event_seq_gen"
@@ -19,6 +32,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "event_seq_gen")
@@ -35,8 +49,14 @@ public class Event {
 
     @Column(nullable = false)
     private String eventTitle; // 이벤트 제목
-    @Column(nullable = false)
-    private String eventImg; // 이벤트 이미지
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<EventImages> eventImagesList = new ArrayList<>(); // 이벤트 이미지
     @Column(nullable = false)
     private String eventContent; // 이벤트 내용
+    
+    public void addImages (EventImages eventImages) {
+        eventImagesList.add(eventImages);
+        eventImages.setEvent(this);
+    }
 }
