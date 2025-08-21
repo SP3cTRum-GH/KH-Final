@@ -18,7 +18,7 @@ const mockDataList = [
     content: "여름 맞이 대규모 할인 이벤트!",
     startDate: "2025-08-01",
     endDate: "2025-08-31",
-    img: "https://blog.kakaocdn.net/dn/xwflc/btsN1rbClFI/LIdfevPTkBqTNVJKZ89F60/img.gif",
+    img: "https://image.oliveyoung.co.kr/uploads/contents/202508/01hyundaiCard/2508_01hyundaiCard_visual.gif",
   },
   {
     no: 2,

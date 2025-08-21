@@ -50,11 +50,11 @@ const DetailCarousel = ({ listLength, imgLength }) => {
       <div ref={carouselRef}>
         <Cell>
           <img
-            src="https://i.pinimg.com/originals/7c/9d/b1/7c9db1248225330a82c35080eda74eb0.gif"
+            src="https://image2.lotteimall.com/goods/29/67/51/2454516729_L.jpg"
             alt="장원영"
           />
-          <h3>아이브</h3>
-          <p>장원영</p>
+          {/* <h3>아이브</h3>
+          <p>장원영</p> */}
         </Cell>
         <Cell>
           <img
