@@ -25,7 +25,7 @@ import org.springframework.http.HttpHeaders;
 @Log4j2
 @RequiredArgsConstructor
 public class CustomFileUtil {
-    @Value("${com.kh.upload.path}")
+    @Value("${upload.path}")
     private String uploadPath;
 
     @PostConstruct

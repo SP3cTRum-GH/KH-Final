@@ -28,7 +28,7 @@ class FinalProjectApplicationTests {
 	@Autowired
 	private PasswordEncoder pe;
 
-//	@Test
+	@Test
 	public void testInsertMember() {
 
 		Member member = Member.builder()

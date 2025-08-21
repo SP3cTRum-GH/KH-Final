@@ -204,6 +204,7 @@ public class MemberServiceImpl implements MemberService {
 		return memberConvertor.toEntity(member);
 	}
 
+	//memberRole 같이출력하게 변경
 	@Override
 	public List<MemberResponseDTO> getAllMember() {
 		return memberRepository.findAll().stream().map(memberConvertor::toEntity).toList();
