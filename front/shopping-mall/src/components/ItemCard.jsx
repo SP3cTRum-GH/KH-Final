@@ -40,7 +40,10 @@ const ItemCard = ({ page, dtoList }) => {
           return (
             <ProductContainer key={product.productNo}>
               <img
-                src={product.img}
+                src={
+                  product.img ||
+                  "https://static.lookpin.co.kr/20230522103305-7865/b5d83dcf8c9a2ace9fbb76650fe33c8b.JPG"
+                }
                 alt=""
                 onClick={() => {
                   navigate(`/${page}/${product.productNo}`);
