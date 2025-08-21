@@ -19,6 +19,7 @@ export default function ModifyPageComponent() {
     dealCurrent: "",
     endDate: "",
   });
+
   const param = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -61,10 +62,29 @@ export default function ModifyPageComponent() {
       setPreviewImages(imgs);
     });
   }, [param.productNo, state?.type]);
+
   // 사이즈, 재고 상태
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [stockBySize, setStockBySize] = useState({});
   const [previewImages, setPreviewImages] = useState([]);
+
+  // state.type may be boolean or string. Avoid Boolean("false") === true pitfall.
+  const isDeal = state?.type === true || state?.type === "true";
+
+  const toBackendDateTime = (v) => {
+    if (!v) return null;
+    // If only date is provided, append midnight time for LocalDateTime
+    if (v.length === 10) return `${v}T00:00:00`;
+    // If minute precision, append seconds
+    if (v.length === 16) return `${v}:00`;
+    // If it already includes seconds or any other valid ISO string, send as-is
+    return v;
+  };
+
+  const toNumberOr = (val, fallback = 0) => {
+    const n = Number(val);
+    return Number.isFinite(n) ? n : fallback;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -72,21 +92,47 @@ export default function ModifyPageComponent() {
     const submitData = {
       productName: product.name,
       category: product.category,
-      price: Number(product.price),
+      price: toNumberOr(product.price),
       type: product.salesType === "true",
-      regDate: null,
-      images: previewImages.map((img) => ({ img: null })), // 실제 업로드 로직은 서버 연동 시 변경
+      images: (previewImages || [])
+        .map((img) => ({ img }))
+        .filter((o) => !!o.img),
       sizes: selectedSizes.map((size) => ({
         productSize: size,
-        stock: Number(product.stock) || 0,
+        stock: toNumberOr(stockBySize[size]),
       })),
-      ...(product.salesType === "false" && {
-        dealCount: Number(product.dealCount),
-        dealCurrent: Number(product.dealCurrent),
-        endDate: product.endDate,
+      ...(isDeal && {
+        dealCount: toNumberOr(product.dealCount),
+        dealCurrent: toNumberOr(product.dealCurrent),
+        endDate: toBackendDateTime(product.endDate),
       }),
     };
-    console.log("최종 전송 데이터:", submitData);
+
+    const updateFn = isDeal ? updateDealProduct : updateShopProduct;
+    console.log(
+      "updateFn:",
+      isDeal ? "updateDealProduct" : "updateShopProduct"
+    );
+    updateFn(submitData, param.productNo)
+      .then((data) => {
+        alert(isDeal ? "deal 수정완료" : "shop 수정완료");
+        navigate("/");
+      })
+      .catch((err) => {
+        // Axios error diagnostics
+        const status = err?.response?.status;
+        const data = err?.response?.data;
+        const msg = err?.message;
+        console.error(
+          "[update error] status:",
+          status,
+          "data:",
+          data,
+          "msg:",
+          msg
+        );
+        alert(`수정 실패 (코드: ${status ?? "?"})`);
+      });
   };
 
   return (
