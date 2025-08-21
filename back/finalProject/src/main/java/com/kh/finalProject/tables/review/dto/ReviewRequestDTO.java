@@ -14,5 +14,5 @@ public class ReviewRequestDTO {
     private double rating;
     private String content;
     private Long productNo;
-    private Long memberNo;
+    private String memberId;
 }

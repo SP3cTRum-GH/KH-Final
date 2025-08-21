@@ -56,7 +56,6 @@ public class ReviewServiceImpl implements ReviewService {
                         .content(r.getContent())
                         .productNo(r.getProduct().getProductNo())
                         .type(r.getProduct().getType())
-                        .memberNo(r.getMember().getMemberNo())
                         .memberId(r.getMember().getMemberId())
                         .regDate(r.getRegDate())
                         .build())
@@ -73,8 +72,7 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponseDTO create(ReviewRequestDTO dto) {
         Product product = productRepository.findById(dto.getProductNo())
                 .orElseThrow(() -> new IllegalArgumentException("product not found"));
-        Member member = memberRepository.findById(dto.getMemberNo())
-                .orElseThrow(() -> new IllegalArgumentException("member not found"));
+        Member member = memberRepository.getWithRoles(dto.getMemberId());
 
         Review review = reviewConverter.toEntity(dto, product, member); // 새 엔티티 생성
         Review saved = reviewRepository.save(review);                   // 저장
