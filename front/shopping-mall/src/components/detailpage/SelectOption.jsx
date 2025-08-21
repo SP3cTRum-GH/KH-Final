@@ -11,8 +11,9 @@ import {
   PriceContainer,
   OptionBox,
 } from "./SelectOptionStyle";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getCookie } from "../../util/cookieUtil";
+import { addCart } from "../../api/cartApi";
 
 const SelectOption = ({
   productData,
@@ -22,12 +23,25 @@ const SelectOption = ({
 }) => {
   const name = productData?.productName ?? "";
   const price = productData?.price ?? 0;
-  const sizes = productData?.sizes ?? [];
+  const sizes = Array.isArray(productData?.sizes) ? productData.sizes : [];
+  const reviewCount = Array.isArray(reviewListCount)
+    ? reviewListCount.length
+    : Number(reviewListCount ?? 0);
+  const endDateText = productData?.endDate
+    ? String(productData.endDate).slice(0, 10)
+    : null;
   const navigate = useNavigate();
+  const param = useParams();
 
   const [selectedSize, setSelectedSize] = useState("");
   const [stock, setStock] = useState(0);
   const [qty, setQty] = useState(1);
+
+  React.useEffect(() => {
+    setSelectedSize("");
+    setStock(0);
+    setQty(1);
+  }, [productData?.productNo]);
 
   const handleSizeChange = (e) => {
     const val = e.target.value;
@@ -99,14 +113,24 @@ const SelectOption = ({
       return;
     }
 
-    if (selectCart) {
-      navigate("/cart");
-    } else {
-      alert("감사합니다.");
-    }
-  };
+    const fd = {
+      productNo: param.productNo,
+      quantity: qty,
+      size: selectedSize,
+    };
 
-  console.log(getCookie("member"));
+    addCart(getCookie("member").memberId, fd).then((data) => {
+      console.log("장바구니 추가 완료:", data);
+
+      if (selectCart) {
+        navigate("/cart", { replace: true }); // 완료 후 이동
+      } else {
+        alert("감사합니다.");
+        setQty(1);
+        setSelectedSize("");
+      }
+    });
+  };
 
   return (
     <OptionContainer>
@@ -125,7 +149,7 @@ const SelectOption = ({
               scrollToReview();
             }}
           >
-            리뷰 {reviewListCount}
+            리뷰 {reviewCount}
           </a>
         </ReviewBox>
       </PriceContainer>
@@ -133,6 +157,7 @@ const SelectOption = ({
       <OptionBox>
         <SelectWrapper>
           <label htmlFor="sizeSelect">사이즈</label>
+          {endDateText && <p>기간 : {endDateText}</p>}
           <select
             id="sizeSelect"
             value={selectedSize}

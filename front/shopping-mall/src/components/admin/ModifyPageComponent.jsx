@@ -19,7 +19,48 @@ export default function ModifyPageComponent() {
     dealCurrent: "",
     endDate: "",
   });
+  const param = useParams();
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
+  useEffect(() => {
+    const resFunc = state?.type ? getDealOne : getShopOne;
+
+    resFunc(param.productNo).then((data) => {
+      // normalize API -> form state
+      setProduct({
+        name: data.productName ?? "",
+        // API has boolean `type`; form uses string 'true' | 'false'
+        salesType:
+          typeof data.type === "boolean"
+            ? String(data.type)
+            : data.salesType ?? "",
+        category: data.category ?? "",
+        price: data.price ?? "",
+        stock: "", // per-size stock managed separately
+        dealCount: data.dealCount ?? "",
+        dealCurrent: data.dealCurrent ?? "",
+        // If server sends 'YYYY-MM-DDTHH:mm:ss', trim seconds for datetime-local input
+        endDate: data.endDate ? String(data.endDate).slice(0, 10) : "",
+      });
+
+      // initialize sizes and stock map if present
+      const sizes = Array.isArray(data.sizes) ? data.sizes : [];
+      setSelectedSizes(sizes.map((s) => s.productSize));
+      setStockBySize(
+        sizes.reduce((acc, cur) => {
+          acc[cur.productSize] = cur.stock ?? 0;
+          return acc;
+        }, {})
+      );
+
+      // initialize images preview if present (keep as string urls/filenames)
+      const imgs = Array.isArray(data.images)
+        ? data.images.map((i) => i.img).filter(Boolean)
+        : [];
+      setPreviewImages(imgs);
+    });
+  }, [param.productNo, state?.type]);
   // 사이즈, 재고 상태
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [stockBySize, setStockBySize] = useState({});

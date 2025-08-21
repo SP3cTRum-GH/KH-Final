@@ -73,23 +73,21 @@ const Carousel = ({ listLength, imgLength }) => {
       <div ref={carouselRef}>
         <Cell>
           <img
-            src="https://image2.lotteimall.com/goods/29/67/51/2454516729_L.jpg"
+            src="https://blog.kakaocdn.net/dna/byMrtS/btsHcsUUbeT/AAAAAAAAAAAAAAAAAAAAAHzJXc6ayW-geNyH-iFTZznJB6lw8iyGa8eGp8x8TU70/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=VjPahY9jZGblii5TDRstr0ymzBE%3D"
+
             alt="장원영"
           />
           <h3></h3>
           <p>상의</p>
         </Cell>
         <Cell>
-          <img
-            src="https://image.baestmath.com/board-images/1624337b3c62d.gif"
-            alt="카리나"
-          />
+          <img src="https://media.nudge-community.com/8168135" alt="카리나" />
           <h3>에스파</h3>
           <p>카리나</p>
         </Cell>
         <Cell>
           <img
-            src="https://archive.myvibrary.com/original/1679403221374_e0c3ebdcdd.gif"
+            src="https://i.namu.wiki/i/lJFkyGv458HQ5zxoEd1GCA-ZEoQXa99P1llXw-FlLwajvLdvcrvxjSI_MRqZN84n-MHwdSoc51C1bv9LU3IpOw.gif"
             alt="설윤"
           />
           <h3>엔믹스</h3>
@@ -97,7 +95,7 @@ const Carousel = ({ listLength, imgLength }) => {
         </Cell>
         <Cell>
           <img
-            src="https://i.namu.wiki/i/x2z_-qDM1bENMt2qrlAcONT13qnSNZRc-LNcm5G70dGj1kIhYnkFetgVvIgPRWY8r6tj0DTK3NeVjcppD5-JYg.gif"
+            src="https://i.namu.wiki/i/U7LmaE_y3-SOgBGus89SgTYcQ5iZwHMP3T4vDDCwjQ3Uwjvd01WN_hOSGNziNeDA5bl1D6Vzr-B-giHJ6xch6g.gif"
             alt="유나"
           />
           <h3>있지</h3>
@@ -105,7 +103,7 @@ const Carousel = ({ listLength, imgLength }) => {
         </Cell>
         <Cell>
           <img
-            src="https://i.namu.wiki/i/pK1bvyzYXWLuQozJoOre7DEdlVL8wJx4197EqGZPe2HN2KxTEwip50fVT2CFHG_5aDpsOpIdi9vXXmgo8_FLrA.gif"
+            src="https://i.namu.wiki/i/1dwopFuzij_ymDHRkH_w89nrCA0f6u5beJovCSUqCY5vFrIIuMgJqHggDg8_vJ-Kbp72nu5U_mhQ9MircVSaxg.gif"
             alt="이안"
           />
           <h3>하츠투하츠</h3>

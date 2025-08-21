@@ -10,6 +10,8 @@ import { useParams } from "react-router-dom";
 import { getReviewList } from "../../api/reviewApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
+import { getCookie } from "../../util/cookieUtil";
+import { addCart, getCart } from "../../api/cartApi";
 
 const Div = styled.div`
   width: 100%;
