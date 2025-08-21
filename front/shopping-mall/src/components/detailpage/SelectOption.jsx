@@ -23,13 +23,25 @@ const SelectOption = ({
 }) => {
   const name = productData?.productName ?? "";
   const price = productData?.price ?? 0;
-  const sizes = productData?.sizes ?? [];
+  const sizes = Array.isArray(productData?.sizes) ? productData.sizes : [];
+  const reviewCount = Array.isArray(reviewListCount)
+    ? reviewListCount.length
+    : Number(reviewListCount ?? 0);
+  const endDateText = productData?.endDate
+    ? String(productData.endDate).slice(0, 10)
+    : null;
   const navigate = useNavigate();
   const param = useParams();
 
   const [selectedSize, setSelectedSize] = useState("");
   const [stock, setStock] = useState(0);
   const [qty, setQty] = useState(1);
+
+  React.useEffect(() => {
+    setSelectedSize("");
+    setStock(0);
+    setQty(1);
+  }, [productData?.productNo]);
 
   const handleSizeChange = (e) => {
     const val = e.target.value;
@@ -137,7 +149,7 @@ const SelectOption = ({
               scrollToReview();
             }}
           >
-            리뷰 {reviewListCount}
+            리뷰 {reviewCount}
           </a>
         </ReviewBox>
       </PriceContainer>
@@ -145,7 +157,7 @@ const SelectOption = ({
       <OptionBox>
         <SelectWrapper>
           <label htmlFor="sizeSelect">사이즈</label>
-          <p>기간 : {productData.endDate.slice(0, 10)}</p>
+          {endDateText && <p>기간 : {endDateText}</p>}
           <select
             id="sizeSelect"
             value={selectedSize}

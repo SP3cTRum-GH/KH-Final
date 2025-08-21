@@ -41,6 +41,7 @@ const ShopPage = () => {
           pageType="shop"
         />
         <PageComponent
+          type={"shop"}
           listData={listData}
           moveToProductList={moveToProductList}
         />

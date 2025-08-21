@@ -30,10 +30,10 @@ const hrStyle = {
 };
 
 const ShopDetailCompont = () => {
-  const [shopProductData, setShopProductData] = useState({});
+  const [shopProductData, setShopProductData] = useState(null);
   const reviewRef = useRef(null);
   const param = useParams();
-  const [reviewList, setReviewList] = useState({});
+  const [reviewList, setReviewList] = useState({ content: [], totalCount: 0 });
   const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
 
   useEffect(() => {
@@ -61,10 +61,15 @@ const ShopDetailCompont = () => {
     <>
       <Div>
         <DetailCarousel listLength={1200} imgLength={5} />
-        <SelectOption
-          productData={shopProductData}
-          scrollToReview={scrollToReview}
-        />
+        {shopProductData ? (
+          <SelectOption
+            productData={shopProductData}
+            scrollToReview={scrollToReview}
+            reviewListCount={reviewList.content ?? []}
+          />
+        ) : (
+          <>Loading...</>
+        )}
       </Div>
       <hr style={hrStyle} />
       <div>
