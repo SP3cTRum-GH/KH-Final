@@ -65,7 +65,7 @@ const ShopDetailCompont = () => {
           <SelectOption
             productData={shopProductData}
             scrollToReview={scrollToReview}
-            reviewListCount={reviewList.content ?? []}
+            reviewListCount={reviewList.totalCount}
           />
         ) : (
           <>Loading...</>
