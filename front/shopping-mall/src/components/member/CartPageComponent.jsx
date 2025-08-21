@@ -127,6 +127,16 @@ const CartPageComponent = () => {
     try {
       const apiFn = item?.type ? getDealOne : getShopOne; // true => deal, false => shop
       const res = await apiFn(item.productNo);
+      console.log(res);
+
+      setCurrentPrice(res.dealCurrent);
+
+      if (item?.type) {
+        const base = Number(res?.dealCurrent ?? item.price ?? 0);
+        setBidPrice(base + MIN_BID_STEP);
+      } else {
+        setBidPrice(0);
+      }
 
       const rawSizes = res?.sizes ||
         res?.sizeList ||
@@ -151,6 +161,12 @@ const CartPageComponent = () => {
       setPrevValue({ size: initSize, quantity: initQty });
       setIsModalOpen(true);
     } catch (e) {
+      if (item?.type) {
+        const base = Number(item?.price ?? 0);
+        setBidPrice(base > 0 ? base + MIN_BID_STEP : 0);
+      } else {
+        setBidPrice(0);
+      }
       const sizes = normalizeSizes(item?.sizes ?? ["FREE"]);
       const initQty = Number(item?.quantity ?? 1);
       const initSize = sizes?.[0]?.value || "FREE";
@@ -179,6 +195,9 @@ const CartPageComponent = () => {
   const [modalQuantity, setModalQuantity] = useState(1);
   const [modalSize, setModalSize] = useState("");
   const [prevValue, setPrevValue] = useState({ size: "", quantity: 0 });
+  const [currentPrice, setCurrentPrice] = useState(0);
+  const [bidPrice, setBidPrice] = useState(0);
+  const MIN_BID_STEP = 1000; // 딜(경매) 최소 호가 단위
 
   const openModal = (item) => {
     // 이전에는 즉시 모달을 열었지만, 이제는 상세 호출로 사이즈를 채운 뒤 오픈
@@ -196,16 +215,35 @@ const CartPageComponent = () => {
 
   const handleOptionChange = async () => {
     try {
-      // API 호출
-      await updateCart(getCookie("member").memberId, selectedItem.cartItemNo, {
-        quantity: modalQuantity,
-      });
+      const memberId = getCookie("member").memberId;
 
-      // 클라이언트 상태 반영
+      // 딜(경매) 상품은 최소 호가 이상인지 검사
+      if (selectedItem?.type) {
+        const minAllow = Number(currentPrice ?? 0) + MIN_BID_STEP;
+        if (Number(bidPrice) < minAllow) {
+          alert(
+            `입찰가는 최소 ${minAllow.toLocaleString()}원 이상이어야 합니다.`
+          );
+          return;
+        }
+      }
+
+      const payload = selectedItem?.type
+        ? { quantity: modalQuantity, price: Number(bidPrice) }
+        : { quantity: modalQuantity };
+
+      await updateCart(memberId, selectedItem.cartItemNo, payload);
+
+      // 클라이언트 상태 반영 (딜이면 price도 갱신)
       setCartItems((prev) =>
         prev.map((it) =>
           it.cartItemNo === selectedItem.cartItemNo
-            ? { ...it, quantity: modalQuantity, size: modalSize }
+            ? {
+                ...it,
+                quantity: modalQuantity,
+                size: modalSize,
+                ...(selectedItem?.type ? { price: Number(bidPrice) } : {}),
+              }
             : it
         )
       );
@@ -273,12 +311,7 @@ const CartPageComponent = () => {
               </p>
             );
           })()}
-          <Price>
-            {(
-              Number(item.price ?? 0) * Number(item.quantity ?? 0)
-            ).toLocaleString()}
-            원
-          </Price>
+          <Price>{Number(item.price ?? 0).toLocaleString()}원</Price>
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
               옵션 변경
@@ -323,12 +356,7 @@ const CartPageComponent = () => {
               </p>
             );
           })()}
-          <Price>
-            {(
-              Number(item.price ?? 0) * Number(item.quantity ?? 0)
-            ).toLocaleString()}
-            원
-          </Price>
+          <Price>{Number(item.price ?? 0).toLocaleString()}원</Price>
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
               옵션 변경
@@ -372,7 +400,7 @@ const CartPageComponent = () => {
             {dealCart.length > 0 ? (
               dealCart.map((item) => renderDealCard(item))
             ) : (
-              <p>딜 상품이 없습니다.</p>
+              <p>상품이 없습니다.</p>
             )}
           </DeliveryGroup>
         )}
@@ -384,7 +412,7 @@ const CartPageComponent = () => {
             {shopCart.length > 0 ? (
               shopCart.map((item) => renderShopCard(item))
             ) : (
-              <p>일반 상품이 없습니다.</p>
+              <p>상품이 없습니다.</p>
             )}
           </DeliveryGroup>
         )}
@@ -416,7 +444,6 @@ const CartPageComponent = () => {
         <ModalOverlay>
           <ModalContent>
             <ModalHeader>옵션 변경</ModalHeader>
-
             <Dropdown
               value={modalSize}
               onChange={(e) => setModalSize(e.target.value)}
@@ -431,28 +458,59 @@ const CartPageComponent = () => {
                 )
               )}
             </Dropdown>
-
+            {selectedItem?.type && (
+              <div>
+                <ModalHeader>입찰 변경</ModalHeader>
+                <input
+                  type="number"
+                  value={bidPrice}
+                  min={Number(currentPrice ?? 0) + MIN_BID_STEP || 0}
+                  step={MIN_BID_STEP}
+                  onChange={(e) => {
+                    const v = Number(e.target.value || 0);
+                    setBidPrice(v);
+                  }}
+                  style={{
+                    width: "87%",
+                    padding: "10px",
+                    marginBottom: "20px",
+                    borderRadius: "6px",
+                    border: "1px solid #ccc",
+                    fontSize: "15px",
+                  }}
+                />
+                <span> 원</span>
+              </div>
+            )}
             <QuantityControl>
               <button onClick={() => handleModalQuantityChange(-1)}>-</button>
               <span>{modalQuantity}</span>
               <button onClick={() => handleModalQuantityChange(1)}>+</button>
             </QuantityControl>
-
             <PriceDisplay>
-              가격:{" "}
-              {(
-                Number(selectedItem.price ?? 0) * Number(modalQuantity ?? 0)
-              ).toLocaleString()}
-              원
+              {selectedItem?.type ? (
+                <>입찰 가격: {Number(bidPrice ?? 0).toLocaleString()}원</>
+              ) : (
+                <>
+                  판매가: {Number(selectedItem.price ?? 0).toLocaleString()}원
+                </>
+              )}
             </PriceDisplay>
-
+            {selectedItem?.type && (
+              <PriceDisplay>
+                현재 가격: {Number(currentPrice ?? 0).toLocaleString()}원
+              </PriceDisplay>
+            )}
             <ModalActions>
               <button onClick={closeModal}>취소</button>
               <button
                 onClick={handleOptionChange}
                 disabled={
                   (modalSize ?? "") === (prevValue.size ?? "") &&
-                  Number(modalQuantity ?? 0) === Number(prevValue.quantity ?? 0)
+                  Number(modalQuantity ?? 0) ===
+                    Number(prevValue.quantity ?? 0) &&
+                  (!selectedItem?.type ||
+                    Number(bidPrice ?? 0) === Number(selectedItem?.price ?? 0))
                 }
               >
                 변경
