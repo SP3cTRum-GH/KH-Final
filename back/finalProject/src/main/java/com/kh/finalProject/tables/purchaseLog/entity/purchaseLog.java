@@ -18,11 +18,6 @@ import java.time.LocalDateTime;
     ,allocationSize = 1
     ,initialValue = 1
 )
-//@SequenceGenerator(name = "purchase_group_log_seq_gen"
-//        ,sequenceName = "purchase_group_log_seq"
-//        ,allocationSize = 1
-//        ,initialValue = 1
-//)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,20 +27,21 @@ public class purchaseLog {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_log_seq_gen")
     private Long logNo;
 
-//    @Column(nullable = false)
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_group_log_seq_gen")
-//    private Long groupLogNo;
-
     @CreationTimestamp
     private LocalDateTime regDate;
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "cartItem_no", nullable = false)
-    // private CartItem cartItem;
+    @Column
+    private Boolean isReviewed = false;
 
     // ⬇️ 결제 당시 스냅샷 값으로 저장
     @Column(nullable = false)
     private Long productNo;   // i.getProduct().getProductNo()
+
+    @Column
+    private String productName;
+
+    @Column(name = "product_size",nullable = false)
+    private String size;
 
     @Column (nullable = false)
     private int quantity; // 장바구니 수량

@@ -4,6 +4,7 @@ import com.kh.finalProject.tables.cart.dto.CartItemAddDTO;
 import com.kh.finalProject.tables.cart.dto.CartRequestDTO;
 import com.kh.finalProject.tables.cart.service.CartService;
 import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
+import com.kh.finalProject.tables.purchaseLog.service.PurchaseLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class CartController {
 
     private final CartService cartService;
+    private final PurchaseLogService purchaseLogService;
 
     // 목록 불러오기 (http://localhost:8080/api/cart/test?memberId=admin)
     @GetMapping
@@ -73,5 +75,11 @@ public class CartController {
     @DeleteMapping("/killyou")
     public void clear(@RequestParam String memberId) {
         cartService.clear(memberId);
+    }
+
+    @PostMapping("/checkout/test")
+    public ResponseEntity<Map<String, Integer>> checkoutTest(@RequestParam String memberId) {
+        int saved = purchaseLogService.snapshotFromCart(memberId);
+        return ResponseEntity.ok(Map.of("saved", saved));
     }
 }
