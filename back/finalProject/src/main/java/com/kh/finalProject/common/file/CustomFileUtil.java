@@ -9,17 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 
 @Component
 @Log4j2
@@ -34,7 +35,7 @@ public class CustomFileUtil {
     public void init() {
         try {
             Path dir = Paths.get(uploadPath);
-            Files.createDirectories(dir);  // 이미 있으면 통과, 실패 시 이유 포함 예외
+            Files.createDirectories(dir); // 이미 있으면 통과, 실패 시 이유 포함 예외
             uploadPath = dir.toFile().getAbsolutePath();
         } catch (IOException e) {
             throw new IllegalStateException("폴더 생성 실패: " + uploadPath, e);
@@ -62,7 +63,7 @@ public class CustomFileUtil {
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage());
             }
-        }  //  end for
+        } // end for
         return uploadNames;
     }
 
@@ -73,8 +74,8 @@ public class CustomFileUtil {
         }
         HttpHeaders headers = new HttpHeaders();
         try {
-            // Files.probeContentType()은 파일 경로를 분석하여 MIME 타입을 자동 감지  jpg → image/jpeg,  png →
-            //image/pngpdf → application/pdf  이 정보를 HTTP 응답 헤더에 Content-Type으로 추가한다
+            // Files.probeContentType()은 파일 경로를 분석하여 MIME 타입을 자동 감지 jpg → image/jpeg, png →
+            // image/pngpdf → application/pdf 이 정보를 HTTP 응답 헤더에 Content-Type으로 추가한다
             headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
