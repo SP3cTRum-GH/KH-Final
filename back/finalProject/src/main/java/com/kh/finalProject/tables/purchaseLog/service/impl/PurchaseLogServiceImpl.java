@@ -1,26 +1,33 @@
 package com.kh.finalProject.tables.purchaseLog.service.impl;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.kh.finalProject.tables.cart.entity.Cart;
 import com.kh.finalProject.tables.cart.repository.CartRepository;
 import com.kh.finalProject.tables.cartItem.entity.CartItem;
 import com.kh.finalProject.tables.cartItem.repository.CartItemRepository;
+import com.kh.finalProject.tables.product.component.ProductConverter;
+import com.kh.finalProject.tables.product.dto.MainPageDTO;
+import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
+import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 import com.kh.finalProject.tables.product.entity.Product;
 import com.kh.finalProject.tables.product.repository.ProductRepository;
 import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import com.kh.finalProject.tables.productImages.repository.ProductImagesRepository;
 import com.kh.finalProject.tables.purchaseLog.dto.BuyNowDTO;
 import com.kh.finalProject.tables.purchaseLog.dto.purchaseLogResponseDTO;
-import com.kh.finalProject.tables.purchaseLog.entity.purchaseLog;
+import com.kh.finalProject.tables.purchaseLog.entity.PurchaseLog;
 import com.kh.finalProject.tables.purchaseLog.repository.PurchaseLogRepository;
 import com.kh.finalProject.tables.purchaseLog.service.PurchaseLogService;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -28,191 +35,173 @@ import java.util.stream.Collectors;
 @Transactional
 public class PurchaseLogServiceImpl implements PurchaseLogService {
 
-    private final CartRepository cartRepository;               // Cart 조회용
-    private final ProductRepository productRepository;
-    private final CartItemRepository cartItemRepository;       // CartItem 조회/삭제용
-    private final PurchaseLogRepository purchaseLogRepository; // purchase_log 저장용
-    private final ProductImagesRepository productImagesRepository;
+	private final CartRepository cartRepository; // Cart 조회용
+	private final ProductRepository productRepository;
+	private final CartItemRepository cartItemRepository; // CartItem 조회/삭제용
+	private final PurchaseLogRepository purchaseLogRepository; // purchase_log 저장용
+	private final ProductImagesRepository productImagesRepository;
+	private final ProductConverter productConverter;
 
-    // 체크아웃 확정: 카트 → purchase_log 복사 + 카트 비우기
-    @Override
-    public int checkoutAll(String memberId) {
-        Cart cart = cartRepository.findByMember_MemberId(memberId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+	// 체크아웃 확정: 카트 → purchase_log 복사 + 카트 비우기
+	@Override
+	public int checkoutAll(String memberId) {
+		Cart cart = cartRepository.findByMember_MemberId(memberId)
+				.orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        List<CartItem> items = cartItemRepository.findByCart_CartNo(cart.getCartNo());
-        if (items.isEmpty()) return 0;
+		List<CartItem> items = cartItemRepository.findByCart_CartNo(cart.getCartNo());
+		if (items.isEmpty())
+			return 0;
 
-        List<purchaseLog> logs = items.stream()
-                .map(ci -> purchaseLog.builder()
-                        .productNo(ci.getProduct().getProductNo())
-                        .quantity(ci.getQuantity())
-                        .productName(ci.getProduct().getProductName())
-                        .isReviewed(false)
-                        .size(ci.getSize())
-                        .price(ci.getPrice())     // 라인합계 구조면 그대로 사용
-                        .build())
-                .toList();
+		List<PurchaseLog> logs = items.stream()
+				.map(ci -> PurchaseLog.builder().memberId(memberId).productNo(ci.getProduct().getProductNo())
+						.quantity(ci.getQuantity()).productName(ci.getProduct().getProductName()).isReviewed(false)
+						.size(ci.getSize()).price(ci.getPrice()) // 라인합계 구조면 그대로 사용
+						.build())
+				.toList();
 
-        purchaseLogRepository.saveAll(logs);
-        cartItemRepository.deleteAll(items);
-        return logs.size();
-    }
+		purchaseLogRepository.saveAll(logs);
+		cartItemRepository.deleteAll(items);
+		return logs.size();
+	}
 
-    @Override
-    public int checkoutSelected(String memberId, List<Long> cartItemNo) {
-        Cart cart = cartRepository.findByMember_MemberId(memberId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+	@Override
+	public int checkoutSelected(String memberId, List<Long> cartItemNo) {
+		Cart cart = cartRepository.findByMember_MemberId(memberId)
+				.orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        if (cartItemNo == null || cartItemNo.isEmpty()) return 0;
+		if (cartItemNo == null || cartItemNo.isEmpty())
+			return 0;
+		List<CartItem> items = cartItemRepository.findByCart_CartNoAndCartItemNoIn(cart.getCartNo(), cartItemNo);
+		if (items.isEmpty())
+			return 0;
+		for (CartItem i : items) {
+			log.info(i);
+		}
+		List<PurchaseLog> logs = items.stream()
+				.map(ci -> PurchaseLog.builder().memberId(memberId).productNo(ci.getProduct().getProductNo())
+						.productName(ci.getProduct().getProductName()).size(ci.getSize()).quantity(ci.getQuantity())
+						.price(ci.getPrice()) // 카트에 저장된 라인총액
+						.isReviewed(false).build())
+				.toList();
+		purchaseLogRepository.saveAll(logs);
+		// todo product stok 수정 ;
+		cartItemRepository.deleteAll(items);
 
-        List<CartItem> items = cartItemRepository
-                .findByCart_CartNoAndCartItemNoIn(cart.getCartNo(), cartItemNo);
-        if (items.isEmpty()) return 0;
+		return logs.size();
+	}
 
-        for(CartItem i : items){
-            log.info(i);
-        }
+	/** 구매내역 조회용(컨트롤러: GET /api/purchase/logs) */
+	@Override
+	public List<purchaseLogResponseDTO> listAll(String memberId) {
+		List<PurchaseLog> rows = (memberId == null || memberId.isBlank()) ? purchaseLogRepository.findAll()
+				: purchaseLogRepository.findByMemberIdOrderByRegDateDesc(memberId);
 
-        List<purchaseLog> logs = items.stream()
-                .map(ci -> purchaseLog.builder()
-                        .productNo(ci.getProduct().getProductNo())
-                        .productName(ci.getProduct().getProductName())
-                        .size(ci.getSize())
-                        .quantity(ci.getQuantity())
-                        .price(ci.getPrice()) // 카트에 저장된 라인총액
-                        .isReviewed(false)
-                        .build())
-                .toList();
+		return rows.stream().map(pl -> {
+			Product p = productRepository.findById(pl.getProductNo()).orElse(null);
+			String imgUrl = productImagesRepository
+					.findTop1ByProduct_ProductNoOrderByProductImageNoAsc(pl.getProductNo()).map(ProductImages::getImg)
+					.map(this::normalizeImageUrl).orElse(null);
 
-        purchaseLogRepository.saveAll(logs);
-        cartItemRepository.deleteAll(items); // ✅ 선택건만 비우기
-        return logs.size();
-    }
+			return purchaseLogResponseDTO.builder().logNo(pl.getLogNo()).regDate(pl.getRegDate())
+					.isReviewed(pl.getIsReviewed()).productNo(pl.getProductNo())
+					.productName(p != null ? p.getProductName() : pl.getProductName())
+					.type(p != null ? p.getType() : null).size(pl.getSize()).price(pl.getPrice()).img(imgUrl)
+					.memberId(pl.getMemberId()).build();
+		}).collect(java.util.stream.Collectors.toList());
+	}
 
-    /** 구매내역 조회용(컨트롤러: GET /api/purchase/logs) */
-    @Override
-    public List<purchaseLogResponseDTO> listAll(String memberId) {
-        List<purchaseLog> rows = (memberId == null || memberId.isBlank())
-                ? purchaseLogRepository.findAll()
-                : purchaseLogRepository.findByMemberIdOrderByRegDateDesc(memberId);
+	@Override
+	public purchaseLogResponseDTO buyNow(String memberId, BuyNowDTO req) {
+		Product p = productRepository.findById(req.getProductNo())
+				.orElseThrow(() -> new RuntimeException("Product not found"));
 
-        return rows.stream()
-                .map(pl -> {
-                    Product p = productRepository.findById(pl.getProductNo()).orElse(null);
-                    String imgUrl = productImagesRepository
-                            .findTop1ByProduct_ProductNoOrderByProductImageNoAsc(pl.getProductNo())
-                            .map(ProductImages::getImg)
-                            .map(this::normalizeImageUrl)
-                            .orElse(null);
+		// 단가 × 수량
+		int unitPrice = p.getPrice(); // 필드명이 다르면 맞게 변경
+		int lineTotal = Math.toIntExact((long) unitPrice * req.getQuantity());
 
-                    return purchaseLogResponseDTO.builder()
-                            .logNo(pl.getLogNo())
-                            .regDate(pl.getRegDate())
-                            .isReviewed(pl.getIsReviewed())
-                            .productNo(pl.getProductNo())
-                            .productName(p != null ? p.getProductName() : pl.getProductName())
-                            .type(p != null ? p.getType() : null)
-                            .size(pl.getSize())
-                            .price(pl.getPrice())
-                            .img(imgUrl)
-                            .memberId(pl.getMemberId())
-                            .build();
-                })
-                .collect(java.util.stream.Collectors.toList());
-    }
+		PurchaseLog saved = purchaseLogRepository.save(PurchaseLog.builder().productNo(p.getProductNo()).memberId(memberId)
+				.productName(p.getProductName()).size(req.getSize()).quantity(req.getQuantity()).price(lineTotal) // 서버계산값저장
+				.isReviewed(false).build());
 
-    @Override
-    public purchaseLogResponseDTO buyNow(BuyNowDTO req) {
-        Product p = productRepository.findById(req.getProductNo())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+		return purchaseLogResponseDTO.builder().logNo(saved.getLogNo()).memberId(saved.getMemberId()).regDate(saved.getRegDate())
+				.isReviewed(saved.getIsReviewed()).productNo(saved.getProductNo()).productName(saved.getProductName())
+				.type(p.getType()).size(saved.getSize()).price(saved.getPrice()).img(null).memberId(saved.getMemberId())
+				.build();
+	}
 
-        // 단가 × 수량
-        int unitPrice = p.getPrice(); // 필드명이 다르면 맞게 변경
-        int lineTotal = Math.toIntExact((long) unitPrice * req.getQuantity());
+	@Override
+	public List<Map<String, Object>> salesByDateCategory(LocalDate from, LocalDate to, String category) {
+		List<PurchaseLog> rows = purchaseLogRepository.findAll();
 
-        purchaseLog saved = purchaseLogRepository.save(
-                purchaseLog.builder()
-                        .productNo(p.getProductNo())
-                        .productName(p.getProductName())
-                        .size(req.getSize())
-                        .quantity(req.getQuantity())
-                        .price(lineTotal)      // ✔ 서버 계산값 저장
-                        .isReviewed(false)
-                        .build()
-        );
+		// productNo -> category 매핑 (N+1 방지)
+		java.util.Set<Long> pnos = new java.util.HashSet<>();
+		for (PurchaseLog pl : rows)
+			pnos.add(pl.getProductNo());
 
-        return purchaseLogResponseDTO.builder()
-                .logNo(saved.getLogNo())
-                .regDate(saved.getRegDate())
-                .isReviewed(saved.getIsReviewed())
-                .productNo(saved.getProductNo())
-                .productName(saved.getProductName())
-                .type(p.getType())
-                .size(saved.getSize())
-                .price(saved.getPrice())
-                .img(null)
-                .memberId(saved.getMemberId())
-                .build();
-    }
+		java.util.Map<Long, String> pnoToCategory = new java.util.HashMap<>();
+		for (Product p : productRepository.findAllById(pnos)) {
+			pnoToCategory.put(p.getProductNo(), p.getCategory()); // 필드명 맞게
+		}
 
-    @Override
-    public List<Map<String, Object>> salesByDateCategory(LocalDate from, LocalDate to , String category) {
-        List<purchaseLog> rows = purchaseLogRepository.findAll();
+		boolean hasFilter = (category != null && !category.trim().isEmpty());
+		String filter = hasFilter ? category.trim() : null;
 
-        // productNo -> category 매핑 (N+1 방지)
-        java.util.Set<Long> pnos = new java.util.HashSet<>();
-        for (purchaseLog pl : rows) pnos.add(pl.getProductNo());
+		// 누적: key = "YYYY-MM-DD\0CATEGORY", value = [qty, revenue]
+		java.util.Map<String, long[]> acc = new java.util.LinkedHashMap<>();
 
-        java.util.Map<Long, String> pnoToCategory = new java.util.HashMap<>();
-        for (Product p : productRepository.findAllById(pnos)) {
-            pnoToCategory.put(p.getProductNo(), p.getCategory()); // 필드명 맞게
-        }
+		for (PurchaseLog pl : rows) {
+			LocalDate d = pl.getRegDate().toLocalDate();
+			if (from != null && d.isBefore(from))
+				continue;
+			if (to != null && d.isAfter(to))
+				continue;
 
-        boolean hasFilter = (category != null && !category.trim().isEmpty());
-        String filter = hasFilter ? category.trim() : null;
+			String cat = pnoToCategory.getOrDefault(pl.getProductNo(), "UNKNOWN");
+			if (hasFilter && !cat.equalsIgnoreCase(filter))
+				continue;
 
-        // 누적: key = "YYYY-MM-DD\0CATEGORY", value = [qty, revenue]
-        java.util.Map<String, long[]> acc = new java.util.LinkedHashMap<>();
+			String key = d.toString() + "\u0000" + cat; // 안전한 구분자
+			long[] v = acc.computeIfAbsent(key, k -> new long[2]);
+			v[0] += pl.getQuantity(); // 필요 시 쓰려고 남김
+			v[1] += pl.getPrice(); // amount = 총매출(라인총액 합)
+		}
 
-        for (purchaseLog pl : rows) {
-            LocalDate d = pl.getRegDate().toLocalDate();
-            if (from != null && d.isBefore(from)) continue;
-            if (to   != null && d.isAfter(to))   continue;
+		// 응답 형태로 변환 & 날짜→카테고리 순 정렬
+		java.util.List<Map<String, Object>> out = new java.util.ArrayList<>();
+		for (java.util.Map.Entry<String, long[]> e : acc.entrySet()) {
+			String key = e.getKey();
+			int sep = key.indexOf('\u0000');
+			String date = key.substring(0, sep);
+			String cat = key.substring(sep + 1);
 
-            String cat = pnoToCategory.getOrDefault(pl.getProductNo(), "UNKNOWN");
-            if (hasFilter && !cat.equalsIgnoreCase(filter)) continue;
+			java.util.Map<String, Object> m = new java.util.HashMap<>();
+			m.put("date", date);
+			m.put("category", cat);
+			m.put("amount", e.getValue()[1]); // <- 프론트가 원하는 필드명
+			out.add(m);
+		}
 
-            String key = d.toString() + "\u0000" + cat; // 안전한 구분자
-            long[] v = acc.computeIfAbsent(key, k -> new long[2]);
-            v[0] += pl.getQuantity();  // 필요 시 쓰려고 남김
-            v[1] += pl.getPrice();     // amount = 총매출(라인총액 합)
-        }
+		out.sort(java.util.Comparator.comparing((Map<String, Object> m) -> (String) m.get("date"))
+				.thenComparing(m -> (String) m.get("category")));
 
-        // 응답 형태로 변환 & 날짜→카테고리 순 정렬
-        java.util.List<Map<String, Object>> out = new java.util.ArrayList<>();
-        for (java.util.Map.Entry<String, long[]> e : acc.entrySet()) {
-            String key = e.getKey();
-            int sep = key.indexOf('\u0000');
-            String date = key.substring(0, sep);
-            String cat  = key.substring(sep + 1);
+		return out;
+	}
 
-            java.util.Map<String, Object> m = new java.util.HashMap<>();
-            m.put("date", date);
-            m.put("category", cat);
-            m.put("amount", e.getValue()[1]); // <- 프론트가 원하는 필드명
-            out.add(m);
-        }
+	private String normalizeImageUrl(String img) {
+		if (img == null || img.isBlank())
+			return null;
+		return img.startsWith("/api/image/") ? img : "/api/image/" + img;
+	}
 
-        out.sort(java.util.Comparator
-                .comparing((Map<String, Object> m) -> (String) m.get("date"))
-                .thenComparing(m -> (String) m.get("category")));
+	@Override
+	public MainPageDTO bestItem() {
+		List<Long> bestItemNo = purchaseLogRepository.findBestProduct();
+		List<ProductDealResponseDTO> dealProducts = productRepository.findByProductNoInAndType(bestItemNo, true)
+				.stream().limit(5).map(productConverter::toDealResponse).collect(Collectors.toList());
+		List<ProductShopResponseDTO> shopProducts = productRepository.findByProductNoInAndType(bestItemNo, false)
+				.stream().limit(5).map(productConverter::toShopResponse).collect(Collectors.toList());
 
-        return out;
-    }
-
-    private String normalizeImageUrl(String img) {
-        if (img == null || img.isBlank()) return null;
-        return img.startsWith("/api/image/") ? img : "/api/image/" + img;
-    }
+		MainPageDTO main = new MainPageDTO(shopProducts, dealProducts);
+		return main;
+	}
 }

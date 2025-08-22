@@ -111,4 +111,6 @@ public class ProductConverter {
 
     // ---------- util ----------
     private static <T> T nvl(T v, T defVal) { return v != null ? v : defVal; }
+    
+    
 }
