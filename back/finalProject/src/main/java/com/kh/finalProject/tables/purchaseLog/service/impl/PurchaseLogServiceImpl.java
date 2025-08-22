@@ -92,17 +92,18 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 
     /** 구매내역 조회용(컨트롤러: GET /api/purchase/logs) */
     @Override
-    public List<purchaseLogResponseDTO> listAll() {
-        List<purchaseLog> rows = purchaseLogRepository.findAll();
+    public List<purchaseLogResponseDTO> listAll(String memberId) {
+        List<purchaseLog> rows = (memberId == null || memberId.isBlank())
+                ? purchaseLogRepository.findAll()
+                : purchaseLogRepository.findByMemberIdOrderByRegDateDesc(memberId);
 
         return rows.stream()
                 .map(pl -> {
                     Product p = productRepository.findById(pl.getProductNo()).orElse(null);
-
                     String imgUrl = productImagesRepository
                             .findTop1ByProduct_ProductNoOrderByProductImageNoAsc(pl.getProductNo())
                             .map(ProductImages::getImg)
-                            .map(this::normalizeImageUrl) // 선택
+                            .map(this::normalizeImageUrl)
                             .orElse(null);
 
                     return purchaseLogResponseDTO.builder()
@@ -111,45 +112,15 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
                             .isReviewed(pl.getIsReviewed())
                             .productNo(pl.getProductNo())
                             .productName(p != null ? p.getProductName() : pl.getProductName())
-                            .type(p != null ? p.getType() : null) // NPE 방지
+                            .type(p != null ? p.getType() : null)
                             .size(pl.getSize())
                             .price(pl.getPrice())
                             .img(imgUrl)
+                            .memberId(pl.getMemberId())
                             .build();
                 })
-                .toList();
+                .collect(java.util.stream.Collectors.toList());
     }
-
-    @Override
-    public List<Map<String, Object>> salesByDate(LocalDate from, LocalDate to) {
-        List<purchaseLog> rows = purchaseLogRepository.findAll();
-
-        // 날짜별 누적: [0]=수량, [1]=매출
-        Map<LocalDate, long[]> acc = new TreeMap<>(); // 날짜 오름차순
-
-        for (purchaseLog pl : rows) {
-            LocalDate d = pl.getRegDate().toLocalDate();
-            if (from != null && d.isBefore(from)) continue; // from 이상
-            if (to   != null && d.isAfter(to))   continue; // to 이하
-
-            long[] v = acc.computeIfAbsent(d, k -> new long[2]);
-            v[0] += pl.getQuantity();
-            v[1] += pl.getPrice(); // price가 라인총액이면 그대로 합산
-        }
-
-        // 결과 변환
-        List<Map<String, Object>> out = new ArrayList<>();
-        for (Map.Entry<LocalDate, long[]> e : acc.entrySet()) {
-            Map<String, Object> m = new HashMap<>();
-            m.put("salesDate", e.getKey().toString()); // "YYYY-MM-DD"
-            m.put("totalQuantity", e.getValue()[0]);
-            m.put("totalRevenue", e.getValue()[1]);
-            out.add(m);
-        }
-        return out;
-    }
-
-
 
     @Override
     public purchaseLogResponseDTO buyNow(BuyNowDTO req) {
@@ -181,44 +152,64 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
                 .size(saved.getSize())
                 .price(saved.getPrice())
                 .img(null)
+                .memberId(saved.getMemberId())
                 .build();
     }
 
     @Override
-    public List<Map<String, Object>> salesByCategory() {
+    public List<Map<String, Object>> salesByDateCategory(LocalDate from, LocalDate to , String category) {
         List<purchaseLog> rows = purchaseLogRepository.findAll();
 
-        // productNo -> category 매핑
-        Set<Long> pnos = new HashSet<>();
+        // productNo -> category 매핑 (N+1 방지)
+        java.util.Set<Long> pnos = new java.util.HashSet<>();
         for (purchaseLog pl : rows) pnos.add(pl.getProductNo());
 
-        Map<Long, String> pnoToCategory = new HashMap<>();
+        java.util.Map<Long, String> pnoToCategory = new java.util.HashMap<>();
         for (Product p : productRepository.findAllById(pnos)) {
             pnoToCategory.put(p.getProductNo(), p.getCategory()); // 필드명 맞게
         }
 
-        // 카테고리 누적 [0]=qty, [1]=revenue
-        Map<String, long[]> acc = new LinkedHashMap<>();
+        boolean hasFilter = (category != null && !category.trim().isEmpty());
+        String filter = hasFilter ? category.trim() : null;
+
+        // 누적: key = "YYYY-MM-DD\0CATEGORY", value = [qty, revenue]
+        java.util.Map<String, long[]> acc = new java.util.LinkedHashMap<>();
+
         for (purchaseLog pl : rows) {
+            LocalDate d = pl.getRegDate().toLocalDate();
+            if (from != null && d.isBefore(from)) continue;
+            if (to   != null && d.isAfter(to))   continue;
+
             String cat = pnoToCategory.getOrDefault(pl.getProductNo(), "UNKNOWN");
-            long[] pair = acc.computeIfAbsent(cat, k -> new long[]{0L, 0L});
-            pair[0] += pl.getQuantity();
-            pair[1] += pl.getPrice();
+            if (hasFilter && !cat.equalsIgnoreCase(filter)) continue;
+
+            String key = d.toString() + "\u0000" + cat; // 안전한 구분자
+            long[] v = acc.computeIfAbsent(key, k -> new long[2]);
+            v[0] += pl.getQuantity();  // 필요 시 쓰려고 남김
+            v[1] += pl.getPrice();     // amount = 총매출(라인총액 합)
         }
 
-        // → List<Map<String,Object>>로 변환 (Map.of 안 씀)
-        return acc.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(e -> {
-                    Map<String, Object> m = new HashMap<>();
-                    m.put("category", e.getKey());
-                    m.put("totalQuantity", e.getValue()[0]);
-                    m.put("totalRevenue", e.getValue()[1]);
-                    return m;
-                })
-                .collect(Collectors.toList());
-    }
+        // 응답 형태로 변환 & 날짜→카테고리 순 정렬
+        java.util.List<Map<String, Object>> out = new java.util.ArrayList<>();
+        for (java.util.Map.Entry<String, long[]> e : acc.entrySet()) {
+            String key = e.getKey();
+            int sep = key.indexOf('\u0000');
+            String date = key.substring(0, sep);
+            String cat  = key.substring(sep + 1);
 
+            java.util.Map<String, Object> m = new java.util.HashMap<>();
+            m.put("date", date);
+            m.put("category", cat);
+            m.put("amount", e.getValue()[1]); // <- 프론트가 원하는 필드명
+            out.add(m);
+        }
+
+        out.sort(java.util.Comparator
+                .comparing((Map<String, Object> m) -> (String) m.get("date"))
+                .thenComparing(m -> (String) m.get("category")));
+
+        return out;
+    }
 
     private String normalizeImageUrl(String img) {
         if (img == null || img.isBlank()) return null;
