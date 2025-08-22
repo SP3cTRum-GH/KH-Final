@@ -7,24 +7,40 @@ import {
   CurrentValue,
 } from "./CarouselStyle";
 
-const Carousel = ({ imgLength }) => {
+const Carousel = ({ listLength, imgLength }) => {
   const [current, setCurrent] = useState(0);
   const carouselRef = useRef(null);
-  const containerRef = useRef(null);
-  const [imgSize, setImgSize] = useState(0);
-  const CAROUSEL_LENGTH = imgLength - 1;
+  const CAROUSEL_LENGTH = imgLength - 1; // 0 to 3 (4 images)
+  // const [imgSize, setImgSize] = useState(
+  //   listLength === 300
+  //     ? 300
+  //     : window.innerWidth < 400
+  //     ? window.innerWidth
+  //     : listLength
+  //   );
+  // const containerRef = useRef(null);
+  // const [imgSize, setImgSize] = useState(0);
+  // const CAROUSEL_LENGTH = imgLength - 1;
 
+  const [imgSize, setImgSize] = useState(
+    window.innerWidth > 500 ? 1200 : window.innerWidth
+  );
   useEffect(() => {
-    const updateImgSize = () => {
-      if (containerRef.current) {
-        setImgSize(containerRef.current.offsetWidth);
-      }
+    const handleResize = () => {
+      // setImgSize(window.innerWidth < 400 ? window.innerWidth : listLength);
+      setImgSize(window.innerWidth > 500 ? 1200 : window.innerWidth);
+      // const updateImgSize = () => {
+      //   if (containerRef.current) {
+      //     setImgSize(containerRef.current.offsetWidth);
+      //   }
     };
-
-    updateImgSize();
-    window.addEventListener("resize", updateImgSize);
-    return () => window.removeEventListener("resize", updateImgSize);
-  }, []);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [listLength]);
+  //   updateImgSize();
+  //   window.addEventListener("resize", updateImgSize);
+  //   return () => window.removeEventListener("resize", updateImgSize);
+  // }, []);
 
   const nextEvent = () => {
     const nextIndex = current < CAROUSEL_LENGTH ? current + 1 : 0;
@@ -62,7 +78,8 @@ const Carousel = ({ imgLength }) => {
   }, [CAROUSEL_LENGTH, imgSize]);
 
   return (
-    <CarouselContainer ref={containerRef}>
+    <CarouselContainer>
+      {/* <CarouselContainer ref={containerRef}> */}
       <div ref={carouselRef}>
         <Cell>
           <img

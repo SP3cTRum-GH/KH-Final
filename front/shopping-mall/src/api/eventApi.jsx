@@ -16,16 +16,13 @@ export const postAdd = async (formData) => {
   }
 };
 
-export const getList = async (pageParam) => {
-  const { page, size } = pageParam;
-  const res = await axios.get(`${host}/list`, {
-    params: { page: page, size: size },
-  });
+export const getAllEvents = async () => {
+  const res = await axios.get(`${host}/all`);
   return res.data;
 };
 
 export const getOne = async (no) => {
-  const res = await axios.get(`${host}/${no}`);
+  const res = await axios.get(`${host}/${no}`, { withCredentials: true });
   return res.data;
 };
 
