@@ -4,6 +4,7 @@ import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.product.component.ProductConverter;
+import com.kh.finalProject.tables.product.dto.MainPageDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
@@ -252,5 +253,8 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(productNo);           // orphanRemoval로 이미지 row 삭제
         if (!names.isEmpty()) fileUtil.deleteFiles(names); // 디스크 파일 삭제(썸네일 포함)
     }
+
+	
+    
 
 }

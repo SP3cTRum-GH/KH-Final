@@ -1,13 +1,14 @@
 package com.kh.finalProject.tables.product.service;
 
+import java.util.List;
+
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
+import com.kh.finalProject.tables.product.dto.MainPageDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
-
-import java.util.List;
 
 public interface ProductService {
 
@@ -31,5 +32,7 @@ public interface ProductService {
 
     // DELETE
     void delete(Long productNo);
+    
+   
 
 }
