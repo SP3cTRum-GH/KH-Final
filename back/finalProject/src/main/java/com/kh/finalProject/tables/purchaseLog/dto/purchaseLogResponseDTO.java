@@ -1,13 +1,11 @@
 package com.kh.finalProject.tables.purchaseLog.dto;
 
-import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -22,6 +20,6 @@ public class purchaseLogResponseDTO {
     private Boolean type;
     private String size;
     private int price;
-
+    private String memberId;
     private String img;
 }

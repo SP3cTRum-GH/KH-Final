@@ -218,6 +218,7 @@ public class MemberServiceImpl implements MemberService {
 	public boolean checkPassword(String memberId, String pw) {
 		Member member = memberRepository.getWithRoles(memberId);
 		String encodedPassword = member.getMemberPw(); 
+		log.info(pw + encodedPassword);
 		return passwordEncoder.matches(pw, encodedPassword);
 	}
 
