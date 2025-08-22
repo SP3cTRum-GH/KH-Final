@@ -36,6 +36,7 @@ import {
   LevelRange,
   ProfileBtnWrapper,
 } from "./MyPageStyle";
+import { getPuchaseList } from "../../api/purchaseApi";
 
 const MyPageComponent = () => {
   const navigate = useNavigate();
@@ -109,6 +110,10 @@ const MyPageComponent = () => {
   const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
   const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
   const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
+
+  getPuchaseList(getCookie("member").memberId).then((data) => {
+    console.log(data);
+  });
 
   const levelInfo = [
     { level: 1, name: "브론즈", min: 0, max: 9 },
