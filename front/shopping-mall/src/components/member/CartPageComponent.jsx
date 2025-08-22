@@ -263,22 +263,29 @@ const CartPageComponent = () => {
   };
 
   const handleDeleteCart = async (cartItemNo) => {
+    const msg = confirm("삭제 하시겠습니까?");
+
     try {
-      const memberId = getCookie("member")?.memberId;
-      await deleteCart(memberId, cartItemNo);
+      if (msg) {
+        const memberId = getCookie("member")?.memberId;
 
-      // 클라이언트 상태에서 해당 아이템 제거
-      setCartItems((prev) => prev.filter((it) => it.cartItemNo !== cartItemNo));
+        await deleteCart(memberId, cartItemNo);
 
-      // 체크맵 동기화
-      setCheckedMap((prev) => {
-        const { [cartItemNo]: _removed, ...rest } = prev;
-        return rest;
-      });
+        // 클라이언트 상태에서 해당 아이템 제거
+        setCartItems((prev) =>
+          prev.filter((it) => it.cartItemNo !== cartItemNo)
+        );
 
-      // 모달이 해당 아이템을 가리키고 있었다면 닫기
-      if (isModalOpen && selectedItem?.cartItemNo === cartItemNo) {
-        closeModal();
+        // 체크맵 동기화
+        setCheckedMap((prev) => {
+          const { [cartItemNo]: _removed, ...rest } = prev;
+          return rest;
+        });
+
+        // 모달이 해당 아이템을 가리키고 있었다면 닫기
+        if (isModalOpen && selectedItem?.cartItemNo === cartItemNo) {
+          closeModal();
+        }
       }
     } catch (err) {
       console.log("삭제 실패 : ", err);
@@ -292,7 +299,13 @@ const CartPageComponent = () => {
   const handlePurchase = () => {
     // shopCart에서 체크된 항목만 필터
     const checkedItems = shopCart.filter((item) => checkedMap[item.cartItemNo]);
-    const checkedCartItemNos = checkedItems.map((item) => item.cartItemNo);
+    const checkedCartItemNos = {
+      cartItemNo: checkedItems.map((item) => item.cartItemNo),
+    };
+    if (checkedCartItemNos.cartItemNo.length === 0) {
+      alert("구매 상품을 확인해주세요.");
+      return;
+    }
     console.log("구매할 cartItemNo 목록:", checkedCartItemNos);
   };
 
@@ -309,7 +322,10 @@ const CartPageComponent = () => {
             </span>
           </ItemName>
 
-          <DealTime>경매 기간 : </DealTime>
+          <DealTime>
+            경매 기간 : {item.startDate.slice(2, 10)} ~{" "}
+            {item.endDate.slice(2, 10)}
+          </DealTime>
 
           {(() => {
             const displaySize =
