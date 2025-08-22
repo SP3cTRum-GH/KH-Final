@@ -4,6 +4,7 @@ import com.kh.finalProject.tables.cart.dto.CartItemAddDTO;
 import com.kh.finalProject.tables.cart.dto.CartRequestDTO;
 import com.kh.finalProject.tables.cart.service.CartService;
 import com.kh.finalProject.tables.cartItem.dto.CartItemResponseDTO;
+import com.kh.finalProject.tables.purchaseLog.dto.CheckoutSelectedRequestDTO;
 import com.kh.finalProject.tables.purchaseLog.service.PurchaseLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -77,9 +78,19 @@ public class CartController {
         cartService.clear(memberId);
     }
 
-    @PostMapping("/checkout/test")
-    public ResponseEntity<Map<String, Integer>> checkoutTest(@RequestParam String memberId) {
-        int saved = purchaseLogService.snapshotFromCart(memberId);
-        return ResponseEntity.ok(Map.of("saved", saved));
+    // 카트 전체 구매 (http://localhost:8080/api/cart/checkout/all?memberId=adimin)
+    @PostMapping("/checkout/all")
+    public Map<String,Object> checkoutAll(@RequestParam String memberId) {
+        return Map.of("created", purchaseLogService.checkoutAll(memberId));
+    }
+
+    // 카트 선택 부매 (http://localhost:8080/api/cart/checkout/selected?memberId=adimin)
+    // Body : { "cartItemId : [숫자1, 숫자2, 숫자3]"}
+    @PostMapping("/checkout/selected")
+    public Map<String,Object> checkoutSelected(
+            @RequestParam String memberId,
+            @RequestBody CheckoutSelectedRequestDTO req) {
+        int created = purchaseLogService.checkoutSelected(memberId, req.getCartItemNo());
+        return Map.of("created", created);
     }
 }

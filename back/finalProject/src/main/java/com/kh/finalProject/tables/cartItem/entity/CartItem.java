@@ -3,11 +3,7 @@ package com.kh.finalProject.tables.cartItem.entity;
 import com.kh.finalProject.tables.cart.entity.Cart;
 import com.kh.finalProject.tables.product.entity.Product;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -19,6 +15,7 @@ import java.math.BigDecimal;
 )
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
