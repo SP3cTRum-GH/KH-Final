@@ -1,16 +1,19 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { PageWrapper, ButtonGroup, Button } from "./ModifyPageStyle";
 import ProductBasicInfo from "./ProductBasicInfo";
 import CategorySizeManager from "./CategorySizeManager";
 import ImageUploader from "./ImageUploader";
 import { postShopProductItem } from "../../api/productShopApi";
 import { postDealProductItem } from "../../api/productDealApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function UploadPageComponent() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [product, setProduct] = useState({
     name: "",
-    salesType: "",
+    salesType: location.state?.salesType ? "true" : "false",
     category: "",
     price: "",
     stock: "",
@@ -18,7 +21,16 @@ export default function UploadPageComponent() {
     dealCurrent: "",
     endDate: "",
   });
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(location.state.salesType);
+    if (location.state?.salesType !== undefined) {
+      setProduct((prev) => ({
+        ...prev,
+        salesType: location.state.salesType ? "true" : "false",
+      }));
+    }
+  }, [location.state?.salesType]);
 
   // Normalize to Spring LocalDateTime format (YYYY-MM-DDTHH:mm:ss)
   const toSpringLocalDateTime = (input) => {

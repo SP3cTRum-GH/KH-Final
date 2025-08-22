@@ -19,9 +19,10 @@ export const CarouselContainer = styled.div`
 `
 
 export const Cell = styled.div`
+    width: 100%;
 
     img {
-        width: 1200px;
+        width: 100%;
         height: 500px;
         border-radius: 20px;
 

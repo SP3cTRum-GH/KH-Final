@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getCookie } from "../../util/cookieUtil";
+import axios from "axios";
 import {
   ProfileBox,
   Header,
@@ -109,6 +110,8 @@ const MyPageComponent = () => {
   const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
   const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
   const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const levelInfo = [
     { level: 1, name: "브론즈", min: 0, max: 9 },
@@ -185,6 +188,26 @@ const MyPageComponent = () => {
     ? filteredHistory
     : filteredHistory.slice(0, 5);
 
+  const handlePasswordCheck = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(
+        `http://localhost:8080/api/member/checkpw?memberId=${user.memberId}`,
+        password,
+        {
+          headers: { "Content-Type": "text/plain" },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data === true) {
+        navigate("/modifymypage");
+      }
+    } catch (err) {
+      setErrorMsg("❌ 비밀번호가 일치하지 않습니다.");
+    }
+  };
   return (
     <>
       <ProfileBox>
@@ -299,7 +322,7 @@ const MyPageComponent = () => {
         <ModalOverlay onClick={() => setIsProfileModalOpen(false)}>
           <ModalContent
             as="form"
-            onSubmit={handleProfileUpdate}
+            onSubmit={handlePasswordCheck}
             onClick={(e) => e.stopPropagation()}
           >
             <h3>비밀번호 확인</h3>
@@ -310,12 +333,13 @@ const MyPageComponent = () => {
                 </label>
                 <input
                   type="password"
-                  name="password"
-                  defaultValue={user.password}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="비밀번호 입력"
                 />
               </li>
             </ul>
+            {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
             <ProfileBtnWrapper>
               <CloseBtn type="submit">입력</CloseBtn>
               <CloseBtn onClick={() => setIsProfileModalOpen(false)}>

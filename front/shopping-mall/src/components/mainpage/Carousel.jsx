@@ -7,31 +7,24 @@ import {
   CurrentValue,
 } from "./CarouselStyle";
 
-const Carousel = ({ listLength, imgLength }) => {
+const Carousel = ({ imgLength }) => {
   const [current, setCurrent] = useState(0);
   const carouselRef = useRef(null);
-  const CAROUSEL_LENGTH = imgLength - 1; // 0 to 3 (4 images)
-  // const [imgSize, setImgSize] = useState(
-  //   listLength === 300
-  //     ? 300
-  //     : window.innerWidth < 400
-  //     ? window.innerWidth
-  //     : listLength
-  // );
-
-  const [imgSize, setImgSize] = useState(
-    window.innerWidth > 500 ? 1200 : window.innerWidth
-  );
+  const containerRef = useRef(null);
+  const [imgSize, setImgSize] = useState(0);
+  const CAROUSEL_LENGTH = imgLength - 1;
 
   useEffect(() => {
-    const handleResize = () => {
-      // setImgSize(window.innerWidth < 400 ? window.innerWidth : listLength);
-      setImgSize(window.innerWidth > 500 ? 1200 : window.innerWidth);
+    const updateImgSize = () => {
+      if (containerRef.current) {
+        setImgSize(containerRef.current.offsetWidth);
+      }
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [listLength]);
+    updateImgSize();
+    window.addEventListener("resize", updateImgSize);
+    return () => window.removeEventListener("resize", updateImgSize);
+  }, []);
 
   const nextEvent = () => {
     const nextIndex = current < CAROUSEL_LENGTH ? current + 1 : 0;
@@ -69,12 +62,11 @@ const Carousel = ({ listLength, imgLength }) => {
   }, [CAROUSEL_LENGTH, imgSize]);
 
   return (
-    <CarouselContainer>
+    <CarouselContainer ref={containerRef}>
       <div ref={carouselRef}>
         <Cell>
           <img
             src="https://blog.kakaocdn.net/dna/byMrtS/btsHcsUUbeT/AAAAAAAAAAAAAAAAAAAAAHzJXc6ayW-geNyH-iFTZznJB6lw8iyGa8eGp8x8TU70/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=VjPahY9jZGblii5TDRstr0ymzBE%3D"
-
             alt="장원영"
           />
           <h3></h3>
