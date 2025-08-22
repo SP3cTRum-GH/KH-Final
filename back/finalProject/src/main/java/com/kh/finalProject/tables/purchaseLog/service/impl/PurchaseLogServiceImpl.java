@@ -34,7 +34,6 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 @Transactional
 public class PurchaseLogServiceImpl implements PurchaseLogService {
-
 	private final CartRepository cartRepository; // Cart 조회용
 	private final ProductRepository productRepository;
 	private final CartItemRepository cartItemRepository; // CartItem 조회/삭제용

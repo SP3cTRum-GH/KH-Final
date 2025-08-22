@@ -294,3 +294,9 @@ export const CartDeleteButton = styled.p`
   cursor: pointer;
   color: rgb(136, 136, 136)
 `
+
+export const DealTime = styled.p`
+  font-size: 12px;
+  color: rgb(201, 201, 201);
+  margin-bottom: 5px;
+`
