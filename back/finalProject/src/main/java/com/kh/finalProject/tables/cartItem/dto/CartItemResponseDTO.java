@@ -1,5 +1,7 @@
 package com.kh.finalProject.tables.cartItem.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +20,7 @@ public class CartItemResponseDTO {
     private Boolean type;
     private String size;
     private String imgUrl;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private int dealCurrent; 
 }
