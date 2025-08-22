@@ -17,21 +17,30 @@ const Carousel = ({ listLength, imgLength }) => {
   //     : window.innerWidth < 400
   //     ? window.innerWidth
   //     : listLength
-  // );
+  //   );
+  // const containerRef = useRef(null);
+  // const [imgSize, setImgSize] = useState(0);
+  // const CAROUSEL_LENGTH = imgLength - 1;
 
   const [imgSize, setImgSize] = useState(
     window.innerWidth > 500 ? 1200 : window.innerWidth
   );
-
   useEffect(() => {
     const handleResize = () => {
       // setImgSize(window.innerWidth < 400 ? window.innerWidth : listLength);
       setImgSize(window.innerWidth > 500 ? 1200 : window.innerWidth);
+      // const updateImgSize = () => {
+      //   if (containerRef.current) {
+      //     setImgSize(containerRef.current.offsetWidth);
+      //   }
     };
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [listLength]);
+  //   updateImgSize();
+  //   window.addEventListener("resize", updateImgSize);
+  //   return () => window.removeEventListener("resize", updateImgSize);
+  // }, []);
 
   const nextEvent = () => {
     const nextIndex = current < CAROUSEL_LENGTH ? current + 1 : 0;
@@ -70,11 +79,11 @@ const Carousel = ({ listLength, imgLength }) => {
 
   return (
     <CarouselContainer>
+      {/* <CarouselContainer ref={containerRef}> */}
       <div ref={carouselRef}>
         <Cell>
           <img
             src="https://blog.kakaocdn.net/dna/byMrtS/btsHcsUUbeT/AAAAAAAAAAAAAAAAAAAAAHzJXc6ayW-geNyH-iFTZznJB6lw8iyGa8eGp8x8TU70/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=VjPahY9jZGblii5TDRstr0ymzBE%3D"
-
             alt="장원영"
           />
           <h3></h3>
