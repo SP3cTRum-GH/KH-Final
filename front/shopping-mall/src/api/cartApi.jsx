@@ -27,10 +27,17 @@ export const updateCart = async (memberId, cartItemId, payload) => {
 
 // 장바구니 수량 삭제
 export const deleteCart = async (memberId, cartItemId) => {
-  console.log(memberId);
-  console.log(cartItemId);
   const res = await axios.delete(
     `${prefix}/items/${cartItemId}?memberId=${memberId}`
+  );
+  return res.data;
+};
+
+// 장바구니 shop 상품 구매하기
+export const cartPay = async (memberId, cartItemNos) => {
+  const res = await axios.post(
+    `${prefix}/checkout/selected?memberId=${memberId}`,
+    cartItemNos
   );
   return res.data;
 };

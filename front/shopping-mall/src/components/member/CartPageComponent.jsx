@@ -31,7 +31,7 @@ import {
   CartDeleteButton,
   DealTime,
 } from "./CartPageStyle";
-import { deleteCart, getCart, updateCart } from "../../api/cartApi";
+import { cartPay, deleteCart, getCart, updateCart } from "../../api/cartApi";
 import { getCookie } from "../../util/cookieUtil";
 import { getDealOne } from "../../api/productDealApi";
 import { getShopOne } from "../../api/productShopApi";
@@ -219,7 +219,7 @@ const CartPageComponent = () => {
 
       // 딜(경매) 상품은 최소 호가 이상인지 검사
       if (selectedItem?.type) {
-        const minAllow = Number(currentPrice ?? 0) + MIN_BID_STEP;
+        const minAllow = Number(currentPrice ?? 0);
         if (Number(bidPrice) < minAllow) {
           alert(
             `입찰가는 최소 ${minAllow.toLocaleString()}원 이상이어야 합니다.`
@@ -232,8 +232,6 @@ const CartPageComponent = () => {
       const payload = selectedItem?.type
         ? { quantity: modalQuantity, price: Number(bidPrice) } // 딜은 입찰가 포함
         : { quantity: modalQuantity }; // 샵은 수량만
-
-      await updateCart(memberId, selectedItem.cartItemNo, payload);
 
       // 1) 서버에 반영
       await updateCart(memberId, selectedItem.cartItemNo, payload);
@@ -296,7 +294,7 @@ const CartPageComponent = () => {
   const expectedPoints = Math.floor(totalPrice * 0.01);
 
   // 구매 버튼 핸들러
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     // shopCart에서 체크된 항목만 필터
     const checkedItems = shopCart.filter((item) => checkedMap[item.cartItemNo]);
     const checkedCartItemNos = {
@@ -306,7 +304,15 @@ const CartPageComponent = () => {
       alert("구매 상품을 확인해주세요.");
       return;
     }
-    console.log("구매할 cartItemNo 목록:", checkedCartItemNos);
+
+    const memberId = await getCookie("member").memberId;
+
+    await cartPay(memberId, checkedCartItemNos);
+
+    alert("구매 완료!");
+
+    const fresh = await getCart(memberId);
+    setCartItems(fresh);
   };
 
   // ====== type에 따라 카드 UI를 다르게 렌더링하는 함수 ======
@@ -341,7 +347,11 @@ const CartPageComponent = () => {
               </p>
             );
           })()}
-          <Price>{Number(item.price ?? 0).toLocaleString()}원</Price>
+          <Price>
+            나의 입찰 가격 :{" "}
+            {(Number(item.price ?? 0) / item.quantity).toLocaleString()} 원 /
+            최고 가격 : {Number(item.dealCurrent).toLocaleString()}원{" "}
+          </Price>
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
               옵션 변경
