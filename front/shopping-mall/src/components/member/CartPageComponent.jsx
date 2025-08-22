@@ -29,6 +29,7 @@ import {
   FilterButton,
   SectionHeader,
   CartDeleteButton,
+  DealTime,
 } from "./CartPageStyle";
 import { deleteCart, getCart, updateCart } from "../../api/cartApi";
 import { getCookie } from "../../util/cookieUtil";
@@ -93,7 +94,7 @@ const CartPageComponent = () => {
     let total = 0;
     for (const it of cartItems) {
       if (checkedMap[it.cartItemNo]) {
-        total += Number(it?.price ?? 0) * Number(it?.quantity ?? 0);
+        total += Number(it?.price ?? 0);
       }
     }
     setTotalPrice(total);
@@ -127,7 +128,6 @@ const CartPageComponent = () => {
     try {
       const apiFn = item?.type ? getDealOne : getShopOne; // true => deal, false => shop
       const res = await apiFn(item.productNo);
-      console.log(res);
 
       setCurrentPrice(res.dealCurrent);
 
@@ -228,11 +228,19 @@ const CartPageComponent = () => {
         }
       }
 
+      // PATCH payload
       const payload = selectedItem?.type
-        ? { quantity: modalQuantity, price: Number(bidPrice) }
-        : { quantity: modalQuantity };
+        ? { quantity: modalQuantity, price: Number(bidPrice) } // 딜은 입찰가 포함
+        : { quantity: modalQuantity }; // 샵은 수량만
 
       await updateCart(memberId, selectedItem.cartItemNo, payload);
+
+      // 1) 서버에 반영
+      await updateCart(memberId, selectedItem.cartItemNo, payload);
+
+      // 2) 서버 최신 장바구니 재조회 → 상태 갱신(리렌더링 보장)
+      const fresh = await getCart(memberId);
+      setCartItems(fresh);
 
       // 클라이언트 상태 반영 (딜이면 price도 갱신)
       setCartItems((prev) =>
@@ -280,15 +288,18 @@ const CartPageComponent = () => {
   const checkedCount = Object.values(checkedMap).filter(Boolean).length;
   const expectedPoints = Math.floor(totalPrice * 0.01);
 
+  // 구매 버튼 핸들러
+  const handlePurchase = () => {
+    // shopCart에서 체크된 항목만 필터
+    const checkedItems = shopCart.filter((item) => checkedMap[item.cartItemNo]);
+    const checkedCartItemNos = checkedItems.map((item) => item.cartItemNo);
+    console.log("구매할 cartItemNo 목록:", checkedCartItemNos);
+  };
+
   // ====== type에 따라 카드 UI를 다르게 렌더링하는 함수 ======
   const renderDealCard = (item) => {
     return (
       <ItemBox key={`deal-${item.cartItemNo}`}>
-        <Checkbox
-          type="checkbox"
-          checked={!!checkedMap[item.cartItemNo]}
-          onChange={() => handleSingleCheck(item.cartItemNo)}
-        />
         <ItemImage src={item.img || item.imgUrl || ""} alt={item.productName} />
         <ItemInfo>
           <ItemName>
@@ -297,6 +308,9 @@ const CartPageComponent = () => {
               [DEAL]
             </span>
           </ItemName>
+
+          <DealTime>경매 기간 : </DealTime>
+
           {(() => {
             const displaySize =
               item?.size && typeof item.size === "object"
@@ -436,7 +450,9 @@ const CartPageComponent = () => {
           </SummaryRow>
         </SummaryBox>
         <Notice>적립 혜택 예상 최대 {expectedPoints.toLocaleString()}원</Notice>
-        <PurchaseButton>구매하기 ({checkedCount}개)</PurchaseButton>
+        <PurchaseButton onClick={handlePurchase}>
+          구매하기 ({checkedCount}개)
+        </PurchaseButton>
       </RightSection>
 
       {/* 옵션 변경 모달 (Deal/Shop 공통) */}
@@ -523,7 +539,7 @@ const CartPageComponent = () => {
       {/* 모바일 하단 요약 */}
       <MobileSection>
         <span>{totalPrice.toLocaleString()}원</span>
-        <button>구매하기 ({checkedCount}개)</button>
+        <button onClick={handlePurchase}>구매하기 ({checkedCount}개)</button>
       </MobileSection>
     </CartContainer>
   );
