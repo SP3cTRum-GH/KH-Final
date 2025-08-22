@@ -18,10 +18,9 @@ public interface PurchaseLogService {
     purchaseLogResponseDTO buyNow(BuyNowDTO req);
 
     // (구매내역 조회가 필요하면 따로)
-    List<purchaseLogResponseDTO> listAll();
+    List<purchaseLogResponseDTO> listAll(String memberId);
 
-    // 날짜별 총매출 집계
-    List<Map<String, Object>> salesByDate(LocalDate from, LocalDate to);
-    // 카테고리별 총매출 집계
-    List<Map<String, Object>> salesByCategory();
+    // 날짜 & 카테고리별 총매출 집계
+    List<Map<String, Object>> salesByDateCategory(LocalDate from, LocalDate to , String category);
+
 }

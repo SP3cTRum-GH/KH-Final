@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link as RouterLink } from "react-router-dom";
 
 export const Wrapper = styled.div`
   display: flex;
@@ -82,16 +83,49 @@ export const ProductContainer = styled.div`
     }
   }
 `
+
+export const PlusContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 2px dashed #ccc;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #666;
+  min-height: 250px;
+  width: 200px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #999;
+    color: #333;
+    background-color: #f9f9f9;
+  }
+`
 export const Wrap = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    button {
-        height: 30px;
-        margin-left: 5px;
+    > div > button {
+        font-size: medium;
+        margin-top: 0.5px;
+        padding: 6px 12px;
+        background-color: #ef4444; // 빨강 계열
+        color: white;
+        font-weight: 500;
+        border: none;
+        border-radius: 6px;
         cursor: pointer;
+        transition: background-color 0.2s;
     }
+
+    // 오른쪽 버튼 그룹
+  > div > div {
+    display: flex;
+    gap: 8px; // 버튼 사이 간격
+  }
 
     h4 {
     @media (max-width: 500px) {
@@ -99,3 +133,15 @@ export const Wrap = styled.div`
     }
     }
 `
+export const EditButton = styled(RouterLink)`
+  display: inline-block;
+  padding: 7.5px 12px;
+  background-color: #4f46e5; // 보라 계열
+  color: white;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  gap: 15px;
+  margin-right: 5px;
+`;

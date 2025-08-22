@@ -39,5 +39,5 @@ export const BtnContainer = styled.div`
 `
 
 export const SortBtn = styled.div`
-    margin-right: 100px;
+    margin-right: 200px;
 `

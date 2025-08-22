@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-// import { getList } from "../../api/eventApi";  // 👈 목업 모드에서는 주석 처리
 import useCustomMove from "../../hooks/useCustomMove";
-import { getList } from "../../api/eventApi";
+import { getAllEvents } from "../../api/eventApi";
 import { API_SERVER_HOST } from "../../api/HostUrl";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const host = API_SERVER_HOST;
 
@@ -30,14 +31,24 @@ const Row = styled.div`
 
 const Card = styled.div`
   width: 382px;
-  height: 200px; // 카드 높이 지정
+  height: 200px;
   cursor: pointer;
-  /* border: 1px solid rgba(56, 12, 12, 0.125); */
   border-radius: 0.5rem;
-  overflow: hidden; // 이미지가 카드 영역 벗어나지 않도록
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${(props) => (props.isPlus ? "#fff" : "#fff")};
+  border: ${(props) => (props.isPlus ? "2px dashed #ccc" : "none")};
+  font-size: ${(props) => (props.isPlus ? "3rem" : "inherit")};
+  color: ${(props) => (props.isPlus ? "#333" : "inherit")};
+  transition: all 0.3s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
 `;
 
 const CardImage = styled.img`
@@ -57,12 +68,16 @@ const CardContent = styled.h5`
   font-size: smaller;
 `;
 
-const ListComponent = () => {
+const ListComponent = ({ page }) => {
+  const navigate = useNavigate();
   const { moveToEventRead } = useCustomMove();
   const [events, setEvents] = useState([]);
+  const loginState = useSelector((state) => state.loginSlice);
+  const isAdmin =
+    loginState.roleNames && loginState.roleNames.includes("ADMIN");
 
   useEffect(() => {
-    getList()
+    getAllEvents()
       .then((data) => {
         console.log("✅ 이벤트 리스트:", data);
         setEvents(data);
@@ -75,6 +90,24 @@ const ListComponent = () => {
   return (
     <>
       <Row>
+        {isAdmin && (
+          <CardContainer>
+            <Card
+              isPlus
+              onClick={() => {
+                console.log("page:", page);
+                navigate("/event/add");
+                window.scrollTo(0, 0);
+              }}
+            >
+              +
+            </Card>
+            <CardBody>
+              <CardTitle isPlus>새 이벤트 등록</CardTitle>
+            </CardBody>
+          </CardContainer>
+        )}
+
         {events.map((event) => {
           const imageUrl = event.imageFileNames?.length
             ? `${host}/api/events/view/${event.imageFileNames[0]}`
@@ -82,13 +115,24 @@ const ListComponent = () => {
 
           return (
             <CardContainer key={event.no}>
-              <Card onClick={() => moveToEventRead(event.no)}>
+              <Card
+                onClick={() => {
+                  moveToEventRead(event.no);
+                  window.scrollTo(0, 0);
+                }}
+              >
                 <CardImage alt="event" src={imageUrl} />
               </Card>
               <CardBody>
                 <CardTitle>{event.title}</CardTitle>
                 <CardContent>
-                  {event.startDate} ~ {event.endDate}
+                  {event.startDate
+                    ? event.startDate.split("-").join(".").substring(2, 10)
+                    : ""}{" "}
+                  ~{" "}
+                  {event.endDate
+                    ? event.endDate.split("-").join(".").substring(2, 10)
+                    : ""}
                 </CardContent>
               </CardBody>
             </CardContainer>

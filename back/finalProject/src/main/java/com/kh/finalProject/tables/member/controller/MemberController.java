@@ -41,7 +41,7 @@ public class MemberController {
 			@RequestBody MemberRequestDTO dto) {
 		return ResponseEntity.ok(memberService.memberUpdate(memberId, dto));
 	}
-	
+
 	@PutMapping("/updatepw")
 	public ResponseEntity<MemberResponseDTO> updateMemberPw(@RequestParam String memberId,
 			@RequestBody String newPw) {
@@ -79,7 +79,7 @@ public class MemberController {
 		claims.put("refreshToken", jwtRefreshToken);
 		return claims;
 	}
-	
+
 	@GetMapping("/google")
 	public Map<String, Object> getMemberFromGoogle(String accessToken) {
 		CustomUser user = memberService.getSocialMember(accessToken, 2);
@@ -90,18 +90,18 @@ public class MemberController {
 		claims.put("refreshToken", jwtRefreshToken);
 		return claims;
 	}
-	 
+
 	@GetMapping("/all")
-	public ResponseEntity<List<MemberResponseDTO>> getAllMember(){
+	public ResponseEntity<List<MemberResponseDTO>> getAllMember() {
 		return ResponseEntity.ok(memberService.getAllMember());
 	}
-	
+
 	@PostMapping("/checkpw")
 	public ResponseEntity<Boolean> checkpw(@RequestParam String memberId, @RequestBody String pw){
 		boolean match = memberService.checkPassword(memberId, pw);
-		if(match) {
+		if (match) {
 			return ResponseEntity.ok(true);
-		}else {
+		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
 		}
 	}

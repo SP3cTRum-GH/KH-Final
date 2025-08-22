@@ -20,6 +20,6 @@ public class purchaseLogResponseDTO {
     private Boolean type;
     private String size;
     private int price;
-
+    private String memberId;
     private String img;
 }

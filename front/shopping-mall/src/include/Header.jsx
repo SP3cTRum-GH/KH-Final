@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   Nav,
@@ -14,8 +14,17 @@ import useCustomLogin from "../hooks/useCustomLogin";
 const Header = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const loginState = useSelector((state) => state.loginSlice);
   const { doLogout } = useCustomLogin();
+
+  const currentPath = location.pathname;
+
+  const getLinkStyle = (path) => ({
+    textDecoration: "none",
+    borderBottom: currentPath === path ? "5px solid tomato" : "none",
+    paddingBottom: "14px",
+  });
 
   return (
     <Nav>
@@ -31,17 +40,23 @@ const Header = () => {
           <div className="MenuItemLeft">
             <MenuItem>
               <label htmlFor="menuCheckbox">
-                <a href="/shop">Shop</a>
+                <a href="/shop" style={getLinkStyle("/shop")}>
+                  Shop
+                </a>
               </label>
             </MenuItem>
             <MenuItem>
               <label htmlFor="menuCheckbox">
-                <a href="/deal">Deal</a>
+                <a href="/deal" style={getLinkStyle("/deal")}>
+                  Deal
+                </a>
               </label>
             </MenuItem>
             <MenuItem>
               <label htmlFor="menuCheckbox">
-                <a href="/event">Event</a>
+                <a href="/event" style={getLinkStyle("/event")}>
+                  Event
+                </a>
               </label>
             </MenuItem>
           </div>
@@ -50,17 +65,23 @@ const Header = () => {
             <div className="MenuItemRight">
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="/cart">장바구니</a>
+                  <a href="/cart" style={getLinkStyle("/cart")}>
+                    장바구니
+                  </a>
                 </label>
               </MenuItem>
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="/mypage">마이페이지</a>
+                  <a href="/mypage" style={getLinkStyle("/mypage")}>
+                    마이페이지
+                  </a>
                 </label>
               </MenuItem>
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="#" onClick={() => doLogout()}>로그아웃</a>
+                  <a href="#" onClick={() => doLogout()}>
+                    로그아웃
+                  </a>
                 </label>
               </MenuItem>
             </div>
@@ -80,17 +101,23 @@ const Header = () => {
             <div className="MenuItemLeft">
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="/shop">Shop</a>
+                  <a href="/shop" style={getLinkStyle("/shop")}>
+                    Shop
+                  </a>
                 </label>
               </MenuItem>
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="/deal">Deal</a>
+                  <a href="/deal" style={getLinkStyle("/deal")}>
+                    Deal
+                  </a>
                 </label>
               </MenuItem>
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="/event">Event</a>
+                  <a href="/event" style={getLinkStyle("/event")}>
+                    Event
+                  </a>
                 </label>
               </MenuItem>
             </div>
@@ -100,17 +127,23 @@ const Header = () => {
             <div className="MenuItemRight">
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="/cart">장바구니</a>
+                  <a href="/cart" style={getLinkStyle("/cart")}>
+                    장바구니
+                  </a>
                 </label>
               </MenuItem>
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="/mypage">마이페이지</a>
+                  <a href="/mypage" style={getLinkStyle("/mypage")}>
+                    마이페이지
+                  </a>
                 </label>
               </MenuItem>
               <MenuItem>
                 <label htmlFor="menuCheckbox">
-                  <a href="#" onClick={() => doLogout()}>로그아웃</a>
+                  <a href="#" onClick={() => doLogout()}>
+                    로그아웃
+                  </a>
                 </label>
               </MenuItem>
             </div>

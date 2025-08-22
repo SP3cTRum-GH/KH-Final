@@ -22,24 +22,22 @@ public class PurchaseLogController {
     private final PurchaseLogService purchaseLogService;
 
     @GetMapping("/logs")
-    public ResponseEntity<List<purchaseLogResponseDTO>> listAll() { // ✅ DTO 반환
-        return ResponseEntity.ok(purchaseLogService.listAll());
+    public ResponseEntity<List<purchaseLogResponseDTO>> listAll(
+            @RequestParam(required = false) String memberId) {
+        return ResponseEntity.ok(purchaseLogService.listAll(memberId));
     }
 
     // 날짜별 집계
-    // 예) /api/purchase/sales/daily?from=2025-08-01&to=2025-08-21
-    @GetMapping("/sales/daily")
-    public List<Map<String, Object>> salesByDate(
+    //전체: GET /api/purchase/sales/date-category
+    // 날짜 필터: GET /api/purchase/sales/date-category?from=2025-08-01&to=2025-08-31
+    // 카테고리 필터 GET /api/purchase/sales/date-category?category=BAG
+    // 둘 다 GET /api/purchase/sales/date-category?from=2025-08-01&to=2025-08-31&category=BAG
+    @GetMapping("/sales/date-category")
+    public List<Map<String, Object>> salesByDateCategory(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return purchaseLogService.salesByDate(from, to);
-    }
-
-    // 카테고리별 집계
-    // 예) /api/purchase/sales/category
-    @GetMapping("/sales/category")
-    public List<Map<String, Object>> salesByCategory() {
-        return purchaseLogService.salesByCategory();
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) String category) {
+        return purchaseLogService.salesByDateCategory(from, to, category);
     }
 
     // POST http://localhost:8080/api/purchase/buy-now?memberId=admin

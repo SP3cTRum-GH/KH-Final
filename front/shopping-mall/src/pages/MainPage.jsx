@@ -10,7 +10,7 @@ const MainPage = () => {
     <>
       <Header />
       <Container>
-        <Carousel listLength={1200} imgLength={5} />
+        <Carousel imgLength={5} />
         {/* <ItemCard /> */}
       </Container>
       <Footer />

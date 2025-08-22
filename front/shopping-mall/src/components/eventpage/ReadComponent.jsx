@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import useCustomMove from "../../hooks/useCustomMove";
+import { getOne } from "../../api/eventApi";
+import { API_SERVER_HOST } from "../../api/HostUrl";
+import { useSelector } from "react-redux";
+
+const host = API_SERVER_HOST;
 
 const initState = {
   no: "",
@@ -9,34 +14,8 @@ const initState = {
   startDate: "",
   endDate: "",
   img: "",
+  imageFileNames: [],
 };
-
-const mockDataList = [
-  {
-    no: 1,
-    title: "여름 할인 이벤트",
-    content: "여름 맞이 대규모 할인 이벤트!",
-    startDate: "2025-08-01",
-    endDate: "2025-08-31",
-    img: "https://image.oliveyoung.co.kr/uploads/contents/202508/01hyundaiCard/2508_01hyundaiCard_visual.gif",
-  },
-  {
-    no: 2,
-    title: "가을 페스티벌",
-    content: "가을 맞이 페스티벌 행사 안내",
-    startDate: "2025-09-10",
-    endDate: "2025-09-20",
-    img: "https://blog.kakaocdn.net/dna/s0Xai/btsGidZB1JE/AAAAAAAAAAAAAAAAAAAAAOG41CVYZXLIaejdgQSPwDfiPwAwVWY6eYDO2ZYwfQ6o/img.gif",
-  },
-  {
-    no: 3,
-    title: "겨울 세일",
-    content: "겨울 시즌 할인 안내",
-    startDate: "2025-12-01",
-    endDate: "2025-12-15",
-    img: "https://i.namu.wiki/i/DfzlaTHEJiDhRYeE4Ug4ohu_KdDDnwZj9CSJldP6Qz-a4gSceW3NkB49dR_Po6XMUheD9EdDuRt_iCReljfdMQ.gif",
-  },
-];
 
 const Container = styled.div`
   display: flex;
@@ -101,6 +80,18 @@ const InfoSection = styled.div`
   }
 `;
 
+const ExtraImages = styled.div`
+  margin-top: 2rem;
+
+  img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+`;
+
 const ButtonGroup = styled.div`
   display: flex;
   justify-content: center;
@@ -137,35 +128,74 @@ const ReadComponent = ({ no }) => {
   const [event, setEvent] = useState(initState);
   const { moveToEventModify, moveToEventList } = useCustomMove();
 
+  const loginState = useSelector((state) => state.loginSlice);
+
+  const isAdmin =
+    loginState.roleNames && loginState.roleNames.includes("ADMIN");
+
   useEffect(() => {
-    // const data = mockDataList.find((item) => item.no === no) || initState;
-    // setEvent(data);
-    setEvent(mockDataList[0]);
+    if (!no) return;
+
+    getOne(no)
+      .then((data) => {
+        console.log("✅ 이벤트 데이터:", data);
+        setEvent(data);
+      })
+      .catch((err) => {
+        console.error("❌ 이벤트 불러오기 실패:", err);
+      });
   }, [no]);
+
+  // 대표 이미지 선택
+  const bannerImg = event.imageFileNames?.length
+    ? `${host}/api/events/view/${encodeURIComponent(event.imageFileNames[0])}`
+    : "https://via.placeholder.com/900x450";
+
+  const extraImgs = event.imageFileNames?.slice(1) || [];
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    return dateStr.slice(2, 10); // "25-08-21"
+  };
 
   return (
     <Container>
       {/* 상단 배너 */}
-      <Banner bg={event.img} />
+      <Banner bg={bannerImg} />
 
       {/* 이벤트 정보 */}
       <InfoSection>
         <h2>{event.title}</h2>
         <div className="date">
-          {event.startDate} ~ {event.endDate}
+          {formatDate(event.startDate)} ~ {formatDate(event.endDate)}
         </div>
         <p>{event.content}</p>
       </InfoSection>
 
+      {/* 추가 이미지 */}
+      {extraImgs.length > 0 && (
+        <ExtraImages>
+          {extraImgs.map((file, idx) => (
+            <img
+              key={idx}
+              src={`${host}/api/events/view/${encodeURIComponent(file)}`}
+              alt={`event-extra-${idx}`}
+            />
+          ))}
+        </ExtraImages>
+      )}
+
       {/* 버튼 영역 */}
       <ButtonGroup>
-        <button
-          className="modify"
-          type="button"
-          onClick={() => moveToEventModify(no)}
-        >
-          수정하기
-        </button>
+        {isAdmin && (
+          <button
+            className="modify"
+            type="button"
+            onClick={() => moveToEventModify(no)}
+          >
+            수정하기
+          </button>
+        )}
         <button
           className="list"
           type="button"
