@@ -1,17 +1,25 @@
 package com.kh.finalProject.tables.purchaseLog.controller;
 
-import com.kh.finalProject.tables.purchaseLog.dto.BuyNowDTO;
-import com.kh.finalProject.tables.purchaseLog.dto.purchaseLogResponseDTO;
-import com.kh.finalProject.tables.purchaseLog.service.PurchaseLogService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.kh.finalProject.tables.product.dto.MainPageDTO;
+import com.kh.finalProject.tables.purchaseLog.dto.BuyNowDTO;
+import com.kh.finalProject.tables.purchaseLog.dto.purchaseLogResponseDTO;
+import com.kh.finalProject.tables.purchaseLog.service.PurchaseLogService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestController
@@ -44,6 +52,12 @@ public class PurchaseLogController {
     // Body: { "productNo": 2, "size": "S", "quantity": 2}
     @PostMapping("/buy-now")
     public purchaseLogResponseDTO buyNow(@RequestParam String memberId, @RequestBody BuyNowDTO req) {
-        return purchaseLogService.buyNow(req); // memberId는 현재 미사용(일관성 위해 쿼리로만 받음)
+        return purchaseLogService.buyNow(memberId,req); // memberId는 현재 미사용(일관성 위해 쿼리로만 받음)
+    }
+    
+    @GetMapping("/main")
+    public ResponseEntity<MainPageDTO> best(){
+    	MainPageDTO main = purchaseLogService.bestItem();
+    	return ResponseEntity.ok(main);
     }
 }

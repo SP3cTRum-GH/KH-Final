@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class purchaseLog {
+public class PurchaseLog {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_log_seq_gen")
     private Long logNo;
@@ -37,7 +37,7 @@ public class purchaseLog {
     @Column(nullable = false)
     private Long productNo;   // i.getProduct().getProductNo()
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String memberId;
 
     @Column
