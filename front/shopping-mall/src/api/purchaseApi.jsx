@@ -8,3 +8,12 @@ export const getPuchaseList = async (memberId) => {
   const res = await axios.get(`${prefix}/logs?memberId=${memberId}`);
   return res.data;
 };
+
+// 즉시 구매
+export const productBuy = async (product, memberId) => {
+  const res = await axios.post(
+    `${prefix}/buy-now?memberId=${memberId}`,
+    product
+  );
+  return res.data;
+};

@@ -14,6 +14,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { getCookie } from "../../util/cookieUtil";
 import { addCart } from "../../api/cartApi";
+import { productBuy } from "../../api/purchaseApi";
 
 const SelectOption = ({
   productData,
@@ -83,7 +84,15 @@ const SelectOption = ({
       return;
     }
 
-    alert(`사이즈 : ${selectedSize} 수량 : ${qty}개`);
+    const fd = {
+      productNo: param.productNo,
+      quantity: qty,
+      size: selectedSize,
+    };
+
+    productBuy(fd, getCookie("member").memberId);
+
+    alert("구매 완료");
   };
 
   const handleCartClick = () => {
