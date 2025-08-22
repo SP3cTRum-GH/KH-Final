@@ -10,7 +10,7 @@ import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import com.kh.finalProject.tables.productImages.repository.ProductImagesRepository;
 import com.kh.finalProject.tables.purchaseLog.dto.BuyNowDTO;
 import com.kh.finalProject.tables.purchaseLog.dto.purchaseLogResponseDTO;
-import com.kh.finalProject.tables.purchaseLog.entity.purchaseLog;
+import com.kh.finalProject.tables.purchaseLog.entity.PurchaseLog;
 import com.kh.finalProject.tables.purchaseLog.repository.PurchaseLogRepository;
 import com.kh.finalProject.tables.purchaseLog.service.PurchaseLogService;
 import jakarta.transaction.Transactional;
@@ -43,8 +43,8 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
         List<CartItem> items = cartItemRepository.findByCart_CartNo(cart.getCartNo());
         if (items.isEmpty()) return 0;
 
-        List<purchaseLog> logs = items.stream()
-                .map(ci -> purchaseLog.builder()
+        List<PurchaseLog> logs = items.stream()
+                .map(ci -> PurchaseLog.builder()
                 		.memberId(memberId)
                         .productNo(ci.getProduct().getProductNo())
                         .quantity(ci.getQuantity())
@@ -75,8 +75,8 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
             log.info(i);
         }
 
-        List<purchaseLog> logs = items.stream()
-                .map(ci -> purchaseLog.builder()
+        List<PurchaseLog> logs = items.stream()
+                .map(ci -> PurchaseLog.builder()
                 		.memberId(memberId)
                         .productNo(ci.getProduct().getProductNo())
                         .productName(ci.getProduct().getProductName())
@@ -95,7 +95,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
     /** 구매내역 조회용(컨트롤러: GET /api/purchase/logs) */
     @Override
     public List<purchaseLogResponseDTO> listAll(String memberId) {
-        List<purchaseLog> rows = (memberId == null || memberId.isBlank())
+        List<PurchaseLog> rows = (memberId == null || memberId.isBlank())
                 ? purchaseLogRepository.findAll()
                 : purchaseLogRepository.findByMemberIdOrderByRegDateDesc(memberId);
 
@@ -133,8 +133,8 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
         int unitPrice = p.getPrice(); // 필드명이 다르면 맞게 변경
         int lineTotal = Math.toIntExact((long) unitPrice * req.getQuantity());
 
-        purchaseLog saved = purchaseLogRepository.save(
-                purchaseLog.builder()
+        PurchaseLog saved = purchaseLogRepository.save(
+                PurchaseLog.builder()
                         .productNo(p.getProductNo())
                         .productName(p.getProductName())
                         .size(req.getSize())
@@ -160,11 +160,11 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 
     @Override
     public List<Map<String, Object>> salesByDateCategory(LocalDate from, LocalDate to , String category) {
-        List<purchaseLog> rows = purchaseLogRepository.findAll();
+        List<PurchaseLog> rows = purchaseLogRepository.findAll();
 
         // productNo -> category 매핑 (N+1 방지)
         java.util.Set<Long> pnos = new java.util.HashSet<>();
-        for (purchaseLog pl : rows) pnos.add(pl.getProductNo());
+        for (PurchaseLog pl : rows) pnos.add(pl.getProductNo());
 
         java.util.Map<Long, String> pnoToCategory = new java.util.HashMap<>();
         for (Product p : productRepository.findAllById(pnos)) {
@@ -177,7 +177,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
         // 누적: key = "YYYY-MM-DD\0CATEGORY", value = [qty, revenue]
         java.util.Map<String, long[]> acc = new java.util.LinkedHashMap<>();
 
-        for (purchaseLog pl : rows) {
+        for (PurchaseLog pl : rows) {
             LocalDate d = pl.getRegDate().toLocalDate();
             if (from != null && d.isBefore(from)) continue;
             if (to   != null && d.isAfter(to))   continue;

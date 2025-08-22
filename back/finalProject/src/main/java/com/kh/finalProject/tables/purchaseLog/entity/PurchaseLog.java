@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class purchaseLog {
+public class PurchaseLog {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "purchase_log_seq_gen")
     private Long logNo;
