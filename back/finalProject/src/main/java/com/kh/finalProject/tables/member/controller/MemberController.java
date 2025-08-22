@@ -97,7 +97,7 @@ public class MemberController {
 	}
 	
 	@PostMapping("/checkpw")
-	public ResponseEntity<Boolean> checkpw(@RequestBody String memberId,String pw){
+	public ResponseEntity<Boolean> checkpw(@RequestParam String memberId, @RequestBody String pw){
 		boolean match = memberService.checkPassword(memberId, pw);
 		if(match) {
 			return ResponseEntity.ok(true);
