@@ -9,7 +9,7 @@ const EventPage = () => {
     <div>
       <Header />
       <Container>
-      <ListComponent />
+        <ListComponent />
       </Container>
       <Footer />
     </div>

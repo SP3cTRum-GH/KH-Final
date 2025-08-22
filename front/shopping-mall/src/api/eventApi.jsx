@@ -1,12 +1,19 @@
 import axios from "axios";
-export const API_SERVER_HOST = "http://localhost:8080"; //서버 주소
+import { API_SERVER_HOST } from "./HostUrl";
 const host = `${API_SERVER_HOST}/api/events`;
 
-export const postAdd = async (event) => {
-  //파일업로드 할때에는 기본값인  ‘Content-Type’: ‘application/json’을 ‘multipart/form-data’ 변경해야됨
-  const header = { headers: { "Content-Type": "multipart/form-data" } };
-  const res = await axios.post(`${host}/`, event, header);
-  return res.data;
+export const postAdd = async (formData) => {
+  try {
+    const res = await axios.post(`${host}/`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data; // {result: no}
+  } catch (err) {
+    console.error("이벤트 등록 실패:", err);
+    throw err;
+  }
 };
 
 export const getList = async (pageParam) => {
@@ -22,9 +29,10 @@ export const getOne = async (no) => {
   return res.data;
 };
 
-export const putOne = async (no, event) => {
-  const header = { headers: { "Content-Type": "multipart/form-data" } };
-  const res = await axios.put(`${host}/${no}`, event, header);
+export const putOne = async (no, formData) => {
+  const res = await axios.put(`${host}/${no}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data;
 };
 
