@@ -17,6 +17,11 @@ export const loginPost = async (loginParam) => {
   return res.data;
 };
 
+export const signup = async (member) => {
+  const res = await axios.post(`${host}/signup`, member);
+  return res;
+};
+
 export const modifySocialMember = async (member) => {
   const res = await jwtAxios.put(`${host}/social`, member);
   return res.data;

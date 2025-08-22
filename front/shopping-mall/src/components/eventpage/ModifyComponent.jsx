@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { deleteOne, getOne, putOne } from "../../api/eventApi";
-import { API_SERVER_HOST } from "../../api/eventApi";
+import { API_SERVER_HOST } from "../../api/HostUrl";
 import useCustomMove from "../../hooks/useCustomMove";
 import {
   PageWrapper,
@@ -23,55 +23,76 @@ const initState = {
   startDate: "",
   endDate: "",
   img: "",
+  imageFileNames: [],
 };
-const host = API_SERVER_HOST;
 
 const ModifyComponent = ({ no }) => {
   const [event, setEvent] = useState(initState);
-  const uploadRef = useRef();
   //결과 모달(result 결과에 따라서 화면이동에 사용 result = 'Modified'  or 'Deleted')
   const [result, setResult] = useState(null);
   const [previewImages, setPreviewImages] = useState([]);
 
   //이동용 함수
-  const { moveToEventRead, moveToEventList } = useCustomMove();
+  const { moveToEventList } = useCustomMove();
 
   useEffect(() => {
     getOne(no).then((data) => {
+      // previewImages 초기화
+      const previews = data.imageFileNames?.map((fileName) => ({
+        url: `${API_SERVER_HOST}/api/events/view/${fileName}`,
+        file: null, // 기존 이미지라면 file은 null
+      }));
+      setPreviewImages(previews || []);
       setEvent(data);
     });
   }, [no]);
 
   const handleChangeEvent = (e) => {
-    event[e.target.name] = e.target.value;
-    setEvent({ ...event });
+    const { name, value } = e.target;
+    setEvent((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleClickModify = () => {
-    const files = uploadRef.current.files;
+  const formatDateForInput = (dateTimeStr) => {
+    if (!dateTimeStr) return "";
+    return dateTimeStr.split("T")[0]; // yyyy-MM-dd
+  };
+
+  const handleClickModify = async () => {
     const formData = new FormData();
 
-    formData.append("imgFile", files[0]);
+    // 새로 추가된 이미지 파일만 append
+    previewImages.forEach((img) => {
+      if (img.file) formData.append("uploadFiles", img.file);
+    });
 
-    //other data
     formData.append("title", event.title);
     formData.append("content", event.content);
     formData.append("startDate", event.startDate);
     formData.append("endDate", event.endDate);
-    formData.append("img", event.img);
 
-    //수정 처리
-    //setResult("Modified");
-    putOne(no, formData).then((data) => {
+    try {
+      await putOne(no, formData); // axios에서 FormData 전송
       setResult("Modified");
-    });
+    } catch (err) {
+      console.error("수정 실패:", err);
+    }
   };
 
-  const handleClickDelete = () => {
-    console.log(`handleClickDelete before`);
-    deleteOne(no).then((data) => {
-      setResult("Deleted");
-    });
+  const handleClickDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return; // 삭제 확인
+    try {
+      const res = await deleteOne(no);
+      if (res.RESULT === "SUCCESS") {
+        setResult("Deleted");
+        moveToEventList(); // 삭제 후 리스트로 이동
+      } else {
+        console.error("삭제 실패:", res);
+        alert("삭제에 실패했습니다.");
+      }
+    } catch (err) {
+      console.error("삭제 실패:", err);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -106,8 +127,13 @@ const ModifyComponent = ({ no }) => {
             <Input
               type="date"
               name="startDate"
-              value={event.startDate}
-              onChange={handleChangeEvent}
+              value={formatDateForInput(event.startDate)}
+              onChange={(e) =>
+                setEvent((prev) => ({
+                  ...prev,
+                  startDate: `${e.target.value}T00:00:00`,
+                }))
+              }
             />
           </Label>
         </FormGroup>
@@ -117,8 +143,13 @@ const ModifyComponent = ({ no }) => {
             <Input
               type="date"
               name="endDate"
-              value={event.endDate}
-              onChange={handleChangeEvent}
+              value={formatDateForInput(event.endDate)}
+              onChange={(e) =>
+                setEvent((prev) => ({
+                  ...prev,
+                  endDate: `${e.target.value}T00:00:00`,
+                }))
+              }
             />
           </Label>
         </FormGroup>

@@ -22,7 +22,6 @@ const initState = {
 
 export default function AddComponent() {
   const [event, setEvent] = useState({ ...initState });
-  const uploadRef = useRef();
   const [result, setResult] = useState(null);
   const [previewImages, setPreviewImages] = useState([]);
   const { moveToEventList } = useCustomMove();
@@ -34,26 +33,40 @@ export default function AddComponent() {
     });
   };
 
-  const handleClickAdd = () => {
-    const files = uploadRef.current.files;
+  const handleClickAdd = async () => {
     const formData = new FormData();
-    Array.from(files).forEach((file) => {
-      formData.append("imgFiles", file);
-    });
+
+    // LocalDateTime 형식 변환
+    const formatDateTime = (dateStr) => {
+      if (!dateStr) return null;
+      const date = new Date(dateStr);
+      const pad = (num) => String(num).padStart(2, "0");
+      const year = date.getFullYear();
+      const month = pad(date.getMonth() + 1);
+      const day = pad(date.getDate());
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+      const seconds = pad(date.getSeconds());
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    };
 
     formData.append("title", event.title);
     formData.append("content", event.content);
-    formData.append("startDate", event.startDate);
-    formData.append("endDate", event.endDate);
+    formData.append("startDate", formatDateTime(event.startDate));
+    formData.append("endDate", formatDateTime(event.endDate));
 
-    postAdd(formData).then((data) => {
-      setResult(data.result);
+    // 모든 이미지 업로드
+    previewImages.forEach((img) => {
+      formData.append("uploadFiles", img.file);
     });
-  };
 
-  const closeModal = () => {
-    setResult(null);
-    moveToEventList();
+    try {
+      const data = await postAdd(formData);
+      setResult(data.result);
+      moveToEventList();
+    } catch (err) {
+      console.error("등록 에러:", err);
+    }
   };
 
   return (

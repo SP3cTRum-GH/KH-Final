@@ -8,7 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
@@ -17,6 +19,7 @@ import com.kh.finalProject.tables.event.entity.Event;
 import com.kh.finalProject.tables.event.repository.EventRepository;
 import com.kh.finalProject.tables.event.service.EventService;
 import com.kh.finalProject.tables.eventImages.entity.EventImages;
+import com.kh.finalProject.tables.member.dto.MemberResponseDTO;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -124,4 +127,13 @@ public class EventServiceImpl implements EventService {
 		}
 		return dto;
 	}
+
+	@Override
+	public List<EventDTO> getAllEvent() {
+		return eventRepository.findAll().stream()
+				.map(this::entityToDTO)
+				.collect(Collectors.toList());
+	}
+	
+	
 }

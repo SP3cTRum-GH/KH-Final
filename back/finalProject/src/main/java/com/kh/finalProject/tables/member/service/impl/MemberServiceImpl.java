@@ -53,11 +53,9 @@ public class MemberServiceImpl implements MemberService {
 
 	// 정보 수정
 	@Override
-	public MemberResponseDTO memberUpdate(Long memberNo, MemberRequestDTO memberRequestDTO) {
+	public MemberResponseDTO memberUpdate(String memberId, MemberRequestDTO memberRequestDTO) {
 
-		Member member = memberRepository.findById(memberNo)
-				.orElseThrow(() -> new NoSuchElementException("failed search user"));
-		member.setMemberPw(passwordEncoder.encode(memberRequestDTO.getMemberPw()));
+		Member member = memberRepository.getWithRoles(memberId);
 		member.setMemberName(memberRequestDTO.getMemberName());
 		member.setMemberEmail(memberRequestDTO.getMemberEmail());
 		member.setMemberPhone(memberRequestDTO.getMemberPhone());
@@ -89,21 +87,21 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	private String getEmailFromSocialAccessToken(String accessToken, int social) {
-		String getUserURL ="";
+		String getUserURL = "";
 		String getAccount = "";
 		// 사용자정보를 가져오는 url
-		switch(social) {
+		switch (social) {
 		case 1:
 			getUserURL = "https://kapi.kakao.com/v2/user/me";
 			getAccount = "kakao_account";
 			break;
 		case 2:
-			getUserURL ="https://www.googleapis.com/oauth2/v3/userinfo";
+			getUserURL = "https://www.googleapis.com/oauth2/v3/userinfo";
 			getAccount = "email";
 			break;
-		
+
 		}
-		
+
 		if (accessToken == null) {
 			throw new RuntimeException("Access Token is null");
 		}
@@ -129,8 +127,8 @@ public class MemberServiceImpl implements MemberService {
 		// 응답 본문을 매핑할 클래스
 		);
 		log.info(response);
-		
-		if(social == 2) {
+
+		if (social == 2) {
 			LinkedHashMap<String, String> socialAccount = response.getBody();
 			return socialAccount.get("email");
 		}
@@ -139,7 +137,6 @@ public class MemberServiceImpl implements MemberService {
 		log.info(bodyMap);
 		LinkedHashMap<String, String> socialAccount = bodyMap.get(getAccount);
 		log.info("socialAccount: " + socialAccount);
-		
 
 		return socialAccount.get("email");
 
@@ -204,10 +201,25 @@ public class MemberServiceImpl implements MemberService {
 		return memberConvertor.toEntity(member);
 	}
 
-	//memberRole 같이출력하게 변경
+	// memberRole 같이출력하게 변경
 	@Override
 	public List<MemberResponseDTO> getAllMember() {
 		return memberRepository.findAll().stream().map(memberConvertor::toEntity).toList();
+	}
+
+	@Override
+	public MemberResponseDTO memberUpdatePw(String memeberId, String newPw) {
+		Member member = memberRepository.getWithRoles(memeberId);
+		member.setMemberPw(passwordEncoder.encode(newPw));
+		return memberConvertor.toEntity(memberRepository.save(member));
+	}
+
+	@Override
+	public boolean checkPassword(String memberId, String pw) {
+		Member member = memberRepository.getWithRoles(memberId);
+		String encodedPassword = member.getMemberPw(); 
+		log.info(pw + encodedPassword);
+		return passwordEncoder.matches(pw, encodedPassword);
 	}
 
 }

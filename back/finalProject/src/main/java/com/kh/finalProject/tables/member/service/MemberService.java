@@ -11,7 +11,11 @@ import com.kh.finalProject.tables.member.entity.Member;
 public interface MemberService {
 	MemberResponseDTO memberSignUp(MemberRequestDTO memberRequestDTO);
 
-	MemberResponseDTO memberUpdate(Long membrNo, MemberRequestDTO memberRequestDTO);
+	MemberResponseDTO memberUpdate(String memberId, MemberRequestDTO memberRequestDTO);
+	
+	boolean checkPassword(String memberId, String pw);
+	
+	MemberResponseDTO memberUpdatePw (String memeberId, String newPw);
 	
 	MemberResponseDTO socialMemberUpdate(MemberRequestDTO memberRequestDTO);
 

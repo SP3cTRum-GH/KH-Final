@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from "react";
 import styled from "styled-components";
+import { signup } from "../../api/memberApi";
+import { useNavigate } from "react-router-dom";
 
 const SignUpForm = styled.form`
   max-width: 450px;
@@ -64,6 +66,7 @@ const ErrorText = styled.p`
 const SignUpComponent = () => {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const validate = useCallback((fd) => {
     const errs = {};
@@ -127,6 +130,19 @@ const SignUpComponent = () => {
       // 완료 후 버튼 재활성화 (실제 API에서는 응답 후 처리)
       setSubmitting(false);
       alert("회원가입 데이터가 유효합니다. (API 연동 시 제출) ");
+
+      const sendData = {
+        memberId: data.member_id,
+        memberPw: data.member_pw,
+        memberName: data.member_name,
+        memberEmail: data.member_email,
+        memberGender: data.member_gender === "male" ? true : false,
+        memberPhone: data.member_phone,
+        memberAddress: data.member_address,
+      };
+      console.log(sendData);
+      signup(sendData);
+      navigate("/");
     },
     [validate]
   );

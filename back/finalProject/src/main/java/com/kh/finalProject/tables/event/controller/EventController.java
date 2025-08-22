@@ -18,6 +18,7 @@ import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.event.dto.EventDTO;
+import com.kh.finalProject.tables.event.entity.Event;
 import com.kh.finalProject.tables.event.service.EventService;
 
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,11 @@ public class EventController {
 	public PageResponseDTO<EventDTO> list(PageRequestDTO pageRequestDTO) {
 		log.info("list. ............ " + pageRequestDTO);
 		return eventService.getList(pageRequestDTO);
+	}
+	
+	@GetMapping("/all")
+	public ResponseEntity<List<EventDTO>> getAllEvents(){
+		return ResponseEntity.ok(eventService.getAllEvent());
 	}
 
 //이벤트하나만가져오는select

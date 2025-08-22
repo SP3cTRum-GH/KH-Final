@@ -3,6 +3,7 @@ package com.kh.finalProject.tables.member.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.finalProject.security.domain.CustomUser;
@@ -34,10 +36,16 @@ public class MemberController {
 		return ResponseEntity.ok(memberService.memberSignUp(dto));
 	}
 
-	@PutMapping("/{memberNo}")
-	public ResponseEntity<MemberResponseDTO> updateMember(@PathVariable Long memberNo,
+	@PutMapping("/update")
+	public ResponseEntity<MemberResponseDTO> updateMember(@RequestParam String memberId,
 			@RequestBody MemberRequestDTO dto) {
-		return ResponseEntity.ok(memberService.memberUpdate(memberNo, dto));
+		return ResponseEntity.ok(memberService.memberUpdate(memberId, dto));
+	}
+	
+	@PutMapping("/updatepw")
+	public ResponseEntity<MemberResponseDTO> updateMemberPw(@RequestParam String memberId,
+			@RequestBody String newPw) {
+		return ResponseEntity.ok(memberService.memberUpdatePw(memberId, newPw));
 	}
 
 	@PutMapping("/social")
@@ -86,5 +94,15 @@ public class MemberController {
 	@GetMapping("/all")
 	public ResponseEntity<List<MemberResponseDTO>> getAllMember(){
 		return ResponseEntity.ok(memberService.getAllMember());
+	}
+	
+	@PostMapping("/checkpw")
+	public ResponseEntity<Boolean> checkpw(@RequestParam String memberId, @RequestBody String pw){
+		boolean match = memberService.checkPassword(memberId, pw);
+		if(match) {
+			return ResponseEntity.ok(true);
+		}else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+		}
 	}
 }
