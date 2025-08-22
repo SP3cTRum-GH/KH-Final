@@ -44,65 +44,16 @@ const MyPageComponent = () => {
   const [showAll, setShowAll] = useState(false);
   const [purchaseHistory, setPurchaseHistory] = useState([
     {
-      id: 1,
-      name: "Adidas Superstar Core Black White",
-      size: "260",
-      date: "25/03/22",
-      status: "결제 완료",
-      reviewed: false,
-      img: "https://image2.lotteimall.com/goods/32/19/34/2971341932_L.jpg",
-    },
-    {
-      id: 2,
-      name: "Nike Air Force 1",
-      size: "270",
-      date: "25/03/23",
-      status: "결제 완료",
-      reviewed: true,
-      img: "https://image2.lotteimall.com/goods/25/11/20/2375201125_L.jpg",
-    },
-    {
-      id: 3,
-      name: "Converse Chuck 70",
-      size: "250",
-      date: "25/03/24",
-      status: "결제 완료",
-      reviewed: false,
-      img: "https://image2.lotteimall.com/goods/95/93/01/3065019395_L.jpg",
-    },
-    {
-      id: 4,
-      name: "Vans Old Skool",
-      size: "280",
-      date: "25/03/25",
-      status: "결제 완료",
-      reviewed: false,
-      img: "https://image2.lotteimall.com/goods/89/56/13/2569135689_L.jpg",
-    },
-    {
-      id: 5,
-      name: "New Balance 574",
-      size: "265",
-      date: "25/03/26",
-      status: "결제 완료",
-      reviewed: false,
-      img: "https://image2.lotteimall.com/goods/74/90/21/2284219074_L.jpg",
-    },
-    {
-      id: 6,
-      name: "Puma Suede Classic",
-      size: "275",
-      date: "25/03/27",
-      status: "결제 완료",
-      reviewed: true,
-    },
-    {
-      id: 7,
-      name: "Reebok Club C 85",
-      size: "255",
-      date: "25/03/28",
-      status: "결제 완료",
-      reviewed: false,
+      img: "",
+      isReviewed: false,
+      logNo: 0,
+      memberId: "",
+      price: 0,
+      productName: "",
+      productNo: 0,
+      regDate: "",
+      size: "",
+      type: false,
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -114,9 +65,11 @@ const MyPageComponent = () => {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  getPuchaseList(getCookie("member").memberId).then((data) => {
-    console.log(data);
-  });
+  useEffect(() => {
+    getPuchaseList(getCookie("member").memberId).then((data) => {
+      setPurchaseHistory(data);
+    });
+  }, []);
 
   const levelInfo = [
     { level: 1, name: "브론즈", min: 0, max: 9 },
@@ -256,28 +209,29 @@ const MyPageComponent = () => {
         </StatusBox>
 
         {displayedItems.map((item) => (
-          <ListItem key={item.id}>
+          <ListItem key={item.productNo}>
             <ProductImage src={item.img} alt={item.name} />
             <ProductInfo>
-              <ProductName>{item.name}</ProductName>
-              <ProductSize>{item.size}</ProductSize>
+              <ProductName>{item.productName}</ProductName>
+              <ProductSize>사이즈 : {item.size}</ProductSize>
             </ProductInfo>
             <ProductMeta>
-              <ProductDate>{item.date}</ProductDate>
+              <ProductDate>
+                {item.regDate.split("-").join(".").slice(0, 10)}
+              </ProductDate>
               <ProductStatus>
-                {item.status}
-                {item.status === "결제 완료" &&
-                  (item.reviewed ? (
-                    <ReviewStatus as="span">리뷰 완료</ReviewStatus>
-                  ) : (
-                    <ReviewStatus
-                      as={Link}
-                      to={`/review/${item.id}`}
-                      state={{ type: true }}
-                    >
-                      리뷰 올리기
-                    </ReviewStatus>
-                  ))}
+                결재 완료
+                {item.isReviewed ? (
+                  <ReviewStatus as="span">리뷰 완료</ReviewStatus>
+                ) : (
+                  <ReviewStatus
+                    as={Link}
+                    to={`/review/${item.productNo}`}
+                    state={{ type: item.type }}
+                  >
+                    리뷰 올리기
+                  </ReviewStatus>
+                )}
               </ProductStatus>
             </ProductMeta>
           </ListItem>

@@ -45,6 +45,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 
         List<purchaseLog> logs = items.stream()
                 .map(ci -> purchaseLog.builder()
+                		.memberId(memberId)
                         .productNo(ci.getProduct().getProductNo())
                         .quantity(ci.getQuantity())
                         .productName(ci.getProduct().getProductName())
@@ -76,6 +77,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 
         List<purchaseLog> logs = items.stream()
                 .map(ci -> purchaseLog.builder()
+                		.memberId(memberId)
                         .productNo(ci.getProduct().getProductNo())
                         .productName(ci.getProduct().getProductName())
                         .size(ci.getSize())

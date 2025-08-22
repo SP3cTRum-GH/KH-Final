@@ -5,6 +5,6 @@ const prefix = `${API_SERVER_HOST}/api/purchase`;
 
 // 구매 내역 불러오기
 export const getPuchaseList = async (memberId) => {
-  const res = await axios.get(`${prefix}/logs`);
+  const res = await axios.get(`${prefix}/logs?memberId=${memberId}`);
   return res.data;
 };

@@ -12,13 +12,14 @@ const ReviewComponent = () => {
     productName: "",
     price: 0,
   });
+  const memberId = getCookie("member").memberId;
 
   const [formData, setFormData] = useState({
     reviewImg: "null",
     rating: 0,
     content: "",
     productNo: 0,
-    memberNo: 2, // 수정 필요
+    memberId: memberId,
   });
   const [reviewText, setReviewText] = useState("");
   const [files, setFiles] = useState([]);
@@ -67,7 +68,7 @@ const ReviewComponent = () => {
       rating: rating,
       content: reviewText,
       productNo: parseInt(productNo),
-      memberNo: 2, // 로그인 한 유저로 변경 필요
+      memberId: memberId,
     };
 
     postReview(sendData).then((data) => {

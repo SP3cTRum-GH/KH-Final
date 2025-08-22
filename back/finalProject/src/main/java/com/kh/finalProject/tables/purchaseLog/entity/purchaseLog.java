@@ -37,7 +37,7 @@ public class purchaseLog {
     @Column(nullable = false)
     private Long productNo;   // i.getProduct().getProductNo()
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String memberId;
 
     @Column
