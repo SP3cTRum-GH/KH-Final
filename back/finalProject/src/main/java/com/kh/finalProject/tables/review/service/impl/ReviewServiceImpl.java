@@ -15,6 +15,7 @@ import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.member.repository.MemberRepository;
 import com.kh.finalProject.tables.product.entity.Product;
 import com.kh.finalProject.tables.product.repository.ProductRepository;
+import com.kh.finalProject.tables.purchaseLog.entity.PurchaseLog;
 import com.kh.finalProject.tables.purchaseLog.repository.PurchaseLogRepository;
 import com.kh.finalProject.tables.review.component.ReviewConverter;
 import com.kh.finalProject.tables.review.dto.ReviewRequestDTO;
@@ -77,7 +78,11 @@ public class ReviewServiceImpl implements ReviewService {
         Product product = productRepository.findById(dto.getProductNo())
                 .orElseThrow(() -> new IllegalArgumentException("product not found"));
         Member member = memberRepository.getWithRoles(dto.getMemberId());
-        PurchaseLog purchase = purchaseLogRepository.findById(null);
+        PurchaseLog log = purchaseLogRepository.findById(dto.getLogNo())
+        		.orElseThrow(() -> new IllegalArgumentException("log not found"));
+        
+        log.setIsReviewed(true);
+        purchaseLogRepository.save(log);
 
         Review review = reviewConverter.toEntity(dto, product, member); // 새 엔티티 생성
         Review saved = reviewRepository.save(review);                   // 저장
