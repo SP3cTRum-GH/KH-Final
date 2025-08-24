@@ -1,15 +1,21 @@
 package com.kh.finalProject.tables.purchaseLog.entity;
 
-import com.kh.finalProject.tables.cart.entity.Cart;
-import com.kh.finalProject.tables.cartItem.entity.CartItem;
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
+import lombok.Setter;
 
 @Entity
 @Table(name = "purchase_log")
@@ -19,6 +25,7 @@ import java.time.LocalDateTime;
     ,initialValue = 1
 )
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
