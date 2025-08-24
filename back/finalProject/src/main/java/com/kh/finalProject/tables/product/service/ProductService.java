@@ -13,8 +13,8 @@ import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 public interface ProductService {
 
     // Paging
-    PageResponseDTO<ProductDealResponseDTO> pageDeal(PageRequestDTO req);
-    PageResponseDTO<ProductShopResponseDTO> pageShop(PageRequestDTO req);
+    PageResponseDTO<ProductDealResponseDTO> pageDeal(String category, PageRequestDTO req);
+    PageResponseDTO<ProductShopResponseDTO> pageShop(String category, PageRequestDTO req);
 
     // CREATE
     ProductDealResponseDTO createDeal(ProductDealRequestDTO dto);
@@ -32,7 +32,5 @@ public interface ProductService {
 
     // DELETE
     void delete(Long productNo);
-    
-   
 
 }

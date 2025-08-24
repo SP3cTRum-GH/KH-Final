@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
@@ -59,8 +60,8 @@ public class ProductController {
     }
 
     @GetMapping("/deal/list")
-    public PageResponseDTO<ProductDealResponseDTO> pageDeal(PageRequestDTO pageRequestDTO) {
-        return productService.pageDeal(pageRequestDTO);
+    public PageResponseDTO<ProductDealResponseDTO> pageDeal(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
+        return productService.pageDeal(category,pageRequestDTO);
     }
 
     // ====== SHOP(일반) ======
@@ -87,8 +88,8 @@ public class ProductController {
     }
 
     @GetMapping("/shop/list")
-    public PageResponseDTO<ProductShopResponseDTO> pageShop(PageRequestDTO pageRequestDTO) {
-        return productService.pageShop(pageRequestDTO);
+    public PageResponseDTO<ProductShopResponseDTO> pageShop(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
+        return productService.pageShop(category, pageRequestDTO);
     }
 
     // 공통 삭제
@@ -97,5 +98,7 @@ public class ProductController {
         productService.delete(id);
         return Map.of("RESULT", "SUCCESS");
     }
+    
+    
     
 }

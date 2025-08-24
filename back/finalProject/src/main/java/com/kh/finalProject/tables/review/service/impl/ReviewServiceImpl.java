@@ -1,5 +1,13 @@
 package com.kh.finalProject.tables.review.service.impl;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
@@ -7,22 +15,17 @@ import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.member.repository.MemberRepository;
 import com.kh.finalProject.tables.product.entity.Product;
 import com.kh.finalProject.tables.product.repository.ProductRepository;
+import com.kh.finalProject.tables.purchaseLog.repository.PurchaseLogRepository;
 import com.kh.finalProject.tables.review.component.ReviewConverter;
 import com.kh.finalProject.tables.review.dto.ReviewRequestDTO;
 import com.kh.finalProject.tables.review.dto.ReviewResponseDTO;
 import com.kh.finalProject.tables.review.entity.Review;
 import com.kh.finalProject.tables.review.repository.ReviewRepository;
 import com.kh.finalProject.tables.review.service.ReviewService;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -33,6 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
     public final ReviewRepository reviewRepository;
     public final ProductRepository productRepository;
     public final MemberRepository memberRepository;
+    public final PurchaseLogRepository purchaseLogRepository;
     private final ReviewConverter reviewConverter;
     private final CustomFileUtil fileUtil;
 
@@ -73,6 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
         Product product = productRepository.findById(dto.getProductNo())
                 .orElseThrow(() -> new IllegalArgumentException("product not found"));
         Member member = memberRepository.getWithRoles(dto.getMemberId());
+        PurchaseLog purchase = purchaseLogRepository.findById(null);
 
         Review review = reviewConverter.toEntity(dto, product, member); // 새 엔티티 생성
         Review saved = reviewRepository.save(review);                   // 저장

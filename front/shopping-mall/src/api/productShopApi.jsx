@@ -13,7 +13,9 @@ export const getShopOne = async (productNo) => {
 // 페이징 리스트
 export const getShopProductList = async (pageParam) => {
   const { page, size } = pageParam;
-  const res = await axios.get(`${prefix}/list`, { params: { page, size } });
+  const res = await axios.get(`${prefix}/list`, {
+    params: { page, size },
+  });
 
   return res.data;
 };
