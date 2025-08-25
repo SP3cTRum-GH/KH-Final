@@ -1,15 +1,17 @@
 package com.kh.finalProject.tables.purchaseLog.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class purchaseLogResponseDTO {
     private Long logNo;
@@ -22,4 +24,5 @@ public class purchaseLogResponseDTO {
     private int price;
     private String memberId;
     private String img;
+    private int quantity;
 }
