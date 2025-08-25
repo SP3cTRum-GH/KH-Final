@@ -1,10 +1,18 @@
 package com.kh.finalProject.tables.product.service.impl;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.product.component.ProductConverter;
-import com.kh.finalProject.tables.product.dto.MainPageDTO;
+import com.kh.finalProject.tables.product.dto.BidDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
@@ -15,24 +23,15 @@ import com.kh.finalProject.tables.product.service.ProductService;
 import com.kh.finalProject.tables.productImages.component.ProductImagesConverter;
 import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
 import com.kh.finalProject.tables.productImages.entity.ProductImages;
-import com.kh.finalProject.tables.productImages.repository.ProductImagesRepository;
 import com.kh.finalProject.tables.productsize.component.ProductSizeConverter;
 import com.kh.finalProject.tables.productsize.dto.ProductSizeDTO;
 import com.kh.finalProject.tables.productsize.entity.Productsize;
-import com.kh.finalProject.tables.productsize.repository.ProductSizeRepository;
 import com.kh.finalProject.tables.purchaseLog.repository.PurchaseLogRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Log4j2
@@ -88,39 +87,17 @@ public class ProductServiceImpl implements ProductService {
 
     // CREATE
     @Override
-    public ProductDealResponseDTO createDeal(ProductDealRequestDTO dto) {
-        Product saved = productConverter.toEntityFromDeal(dto);
-        if(dto.getImages() != null && !dto.getImages().isEmpty()) {
-            for(ProductImagesDTO i : dto.getImages()){
-                ProductImages productImages = productImagesConverter.toEntityFromProductImages(i,saved);
-                saved.getProductImagesList().add(productImages);
-            }
-        }
-        if(dto.getSizes() != null && !dto.getSizes().isEmpty()) {
-            for(ProductSizeDTO i : dto.getSizes()){
-                Productsize productsize = productSizeConverter.toEntityFromProductSize(i,saved);
-                saved.getProductsizeList().add(productsize);
-            }
-        }
-        return productConverter.toDealResponse(productRepository.save(saved));
+    public Long createDeal(ProductDealRequestDTO dto) {
+        Product product = productConverter.toEntityFromDeal(dto);
+        Product saved = productRepository.save(product);
+        return saved.getProductNo();
     }
 
     @Override
-    public ProductShopResponseDTO createShop(ProductShopRequestDTO dto) {
-        Product saved = productConverter.toEntityFromShop(dto);
-        if(dto.getImages() != null && !dto.getImages().isEmpty()) {
-            for(ProductImagesDTO i : dto.getImages()){
-                ProductImages productImages = productImagesConverter.toEntityFromProductImages(i,saved);
-                saved.getProductImagesList().add(productImages);
-            }
-        }
-        if(dto.getSizes() != null && !dto.getSizes().isEmpty()) {
-            for(ProductSizeDTO i : dto.getSizes()){
-                Productsize productsize = productSizeConverter.toEntityFromProductSize(i,saved);
-                saved.getProductsizeList().add(productsize);
-            }
-        }
-        return productConverter.toShopResponse(productRepository.save(saved));
+    public Long createShop(ProductShopRequestDTO dto) {
+        Product product = productConverter.toEntityFromShop(dto);
+        Product saved = productRepository.save(product);
+        return saved.getProductNo();
     }
 
     // READ
@@ -159,88 +136,65 @@ public class ProductServiceImpl implements ProductService {
     // UPDATE
     @Override
     @Transactional
-    public ProductDealResponseDTO updateDeal(Long productNo, ProductDealRequestDTO dto) {
-        Product existing = productRepository.findById(productNo)
-                .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
-        if (!Boolean.TRUE.equals(existing.getType())) throw new EntityNotFoundException("경매 상품 아님");
+    public void updateDeal(ProductDealRequestDTO dto) {
+        Product product = productRepository.findById(dto.getProductNo())
+                .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + dto.getProductNo()));
 
-        // 1) 기존/신규 파일명 집합
-        var oldNames = existing.getProductImagesList().stream()
-                .map(ProductImages::getImg).collect(java.util.stream.Collectors.toSet());
-        var newNames = (dto.getImages() == null) ? java.util.Set.<String>of()
-                : dto.getImages().stream().map(ProductImagesDTO::getImg)
-                .filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
-        var toDelete = oldNames.stream().filter(n -> !newNames.contains(n)).toList();
-
-        // 2) 스칼라 필드 갱신 (이미지/사이즈 제외)
-        // rebuildForDealUpdate는 existing의 필드만 수정하도록 구현되어 있어야 함.
-        existing = productConverter.rebuildForDealUpdate(existing, dto);
-
-        // 3) 이미지 컬렉션 갈아끼우기
-        existing.getProductImagesList().clear();
-        if (dto.getImages() != null) {
-            for (ProductImagesDTO i : dto.getImages()) {
-                existing.getProductImagesList()
-                        .add(productImagesConverter.toEntityFromProductImages(i, existing));
-            }
+        if (!Boolean.TRUE.equals(product.getType())) {
+            throw new IllegalStateException("경매 상품 아님");
         }
 
-        // 4) 사이즈 컬렉션 갈아끼우기
-        existing.getProductsizeList().clear();
+        if (dto.getProductName() != null) product.setProductName(dto.getProductName());
+        if (dto.getCategory()    != null) product.setCategory(dto.getCategory());
+        if (dto.getPrice()       != null) product.setPrice(dto.getPrice());
+        if (dto.getEndDate()     != null) product.setEndDate(dto.getEndDate());
+
+        product.getProductImagesList().clear();
+        if (dto.getImageFileNames() != null) {
+            dto.getImageFileNames().forEach(fileName -> {
+                product.addImages(ProductImages.builder().img(fileName).build());
+            });
+        }
+
+        product.getProductsizeList().clear();
         if (dto.getSizes() != null) {
-            for (ProductSizeDTO i : dto.getSizes()) {
-                existing.getProductsizeList()
-                        .add(productSizeConverter.toEntityFromProductSize(i, existing));
-            }
+            dto.getSizes().forEach(sizeDto -> {
+                product.addSize(productSizeConverter.toEntityFromProductSize(sizeDto, product));
+            });
         }
 
-        // 5) 저장
-        Product saved = productRepository.save(existing);
-
-        // 6) 디스크에서 더 이상 쓰지 않는 파일 삭제
-        if (!toDelete.isEmpty()) fileUtil.deleteFiles(toDelete);
-
-        return productConverter.toDealResponse(saved);
+        productRepository.save(product);
     }
-
     
     @Override
     @Transactional
-    public ProductShopResponseDTO updateShop(Long productNo, ProductShopRequestDTO dto) {
-        Product existing = productRepository.findById(productNo)
-                .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + productNo));
-        if (Boolean.TRUE.equals(existing.getType())) throw new EntityNotFoundException("일반 상품 아님");
+    public void updateShop(ProductShopRequestDTO dto) {
+        Product product = productRepository.findById(dto.getProductNo())
+                .orElseThrow(() -> new EntityNotFoundException("상품 없음: " + dto.getProductNo()));
 
-        var oldNames = existing.getProductImagesList().stream()
-                .map(ProductImages::getImg).collect(java.util.stream.Collectors.toSet());
-        var newNames = (dto.getImages() == null) ? java.util.Set.<String>of()
-                : dto.getImages().stream().map(ProductImagesDTO::getImg)
-                .filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
-        var toDelete = oldNames.stream().filter(n -> !newNames.contains(n)).toList();
-
-        existing = productConverter.rebuildForShopUpdate(existing, dto);
-
-        existing.getProductImagesList().clear();
-        if (dto.getImages() != null) {
-            for (ProductImagesDTO i : dto.getImages()) {
-                existing.getProductImagesList()
-                        .add(productImagesConverter.toEntityFromProductImages(i, existing));
-            }
+        if (Boolean.TRUE.equals(product.getType())) {
+            throw new IllegalStateException("일반 상품 아님");
         }
 
-        existing.getProductsizeList().clear();
+        if (dto.getProductName() != null) product.setProductName(dto.getProductName());
+        if (dto.getCategory()    != null) product.setCategory(dto.getCategory());
+        if (dto.getPrice()       != null) product.setPrice(dto.getPrice());
+
+        product.getProductImagesList().clear();
+        if (dto.getImageFileNames() != null) {
+            dto.getImageFileNames().forEach(fileName -> {
+                product.addImages(ProductImages.builder().img(fileName).build());
+            });
+        }
+
+        product.getProductsizeList().clear();
         if (dto.getSizes() != null) {
-            for (ProductSizeDTO i : dto.getSizes()) {
-                existing.getProductsizeList()
-                        .add(productSizeConverter.toEntityFromProductSize(i, existing));
-            }
+            dto.getSizes().forEach(sizeDto -> {
+                product.addSize(productSizeConverter.toEntityFromProductSize(sizeDto, product));
+            });
         }
 
-        Product saved = productRepository.save(existing);
-
-        if (!toDelete.isEmpty()) fileUtil.deleteFiles(toDelete);
-
-        return productConverter.toShopResponse(saved);
+        productRepository.save(product);
     }
 
     // DELETE
@@ -256,6 +210,16 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(productNo);           // orphanRemoval로 이미지 row 삭제
         if (!names.isEmpty()) fileUtil.deleteFiles(names); // 디스크 파일 삭제(썸네일 포함)
     }
+
+	@Override
+	public Integer bid(BidDTO bid) {
+		Product p = productRepository.findById(bid.getProductNo()).orElseThrow(null);
+		p.setDealCount(p.getDealCount()+1);
+		p.setDealCurrent(bid.getPrice());
+		
+		productRepository.save(p);
+		return p.getDealCurrent();
+	}
     
 
 }

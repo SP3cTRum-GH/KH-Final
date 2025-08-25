@@ -12,6 +12,7 @@ import {
 import StarRating from "../reviewpage/StarRating";
 import { Input } from "./DealModalStyle";
 import { deleteReview, updateReview } from "../../api/reviewApi";
+import { getCookie } from "../../util/cookieUtil";
 
 const Review = ({ reviewList }) => {
   // 1) 부모 prop을 표시용 로컬 상태로 복사
@@ -65,7 +66,7 @@ const Review = ({ reviewList }) => {
       content: draftContent ?? "",
       rating: draftRating ?? 0,
       productNo: review.productNo, // 서버에서 필요하다면 유지
-      memberNo: 2, // 실제 로그인 사용자 번호로 교체
+      memberNo: getCookie("member").memberId,
       reviewImg: typeof draftImage === "string" ? draftImage : "", // 파일명 문자열
     };
 
