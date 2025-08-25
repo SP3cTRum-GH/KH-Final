@@ -76,15 +76,16 @@ const ListComponent = ({ page }) => {
   const isAdmin =
     loginState.roleNames && loginState.roleNames.includes("ADMIN");
 
+  const fetchEvents = async () => {
+    try {
+      const data = await getAllEvents();
+      setEvents(data);
+    } catch (err) {
+      console.error("❌ 이벤트 불러오기 실패:", err);
+    }
+  };
   useEffect(() => {
-    getAllEvents()
-      .then((data) => {
-        console.log("✅ 이벤트 리스트:", data);
-        setEvents(data);
-      })
-      .catch((err) => {
-        console.error("❌ 이벤트 불러오기 실패:", err);
-      });
+    fetchEvents();
   }, []);
 
   return (
@@ -109,9 +110,13 @@ const ListComponent = ({ page }) => {
         )}
 
         {events.map((event) => {
-          const imageUrl = event.imageFileNames?.length
-            ? `${host}/api/events/view/${event.imageFileNames[0]}`
-            : "https://via.placeholder.com/150";
+          // 가장 최신 이미지 URL로 변경
+          const imageUrl =
+            event.imageFileNames?.length > 0
+              ? `${host}/api/events/view/${encodeURIComponent(
+                  event.imageFileNames[0]
+                )}`
+              : "https://via.placeholder.com/150";
 
           return (
             <CardContainer key={event.no}>

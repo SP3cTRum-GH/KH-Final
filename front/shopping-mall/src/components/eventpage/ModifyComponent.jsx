@@ -62,7 +62,12 @@ const ModifyComponent = ({ no }) => {
 
     // 새로 추가된 이미지 파일만 append
     previewImages.forEach((img) => {
-      if (img.file) formData.append("uploadFiles", img.file);
+      if (img.file) {
+        formData.append("uploadFiles", img.file); // 새 이미지
+      } else {
+        const fileName = img.url.split("/").pop();
+        formData.append("existingFiles", fileName); // 기존 이미지
+      }
     });
 
     formData.append("title", event.title);
