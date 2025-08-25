@@ -1,6 +1,7 @@
 package com.kh.finalProject.tables.review.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -128,4 +129,11 @@ public class ReviewServiceImpl implements ReviewService {
     private String toUrl(String fileName) {
         return (fileName == null || fileName.isBlank()) ? null : "/api/image/" + fileName;
     }
+
+	@Override
+	public List<ReviewResponseDTO> getReviewForMember(String memberId) {
+		List<Review> review = reviewRepository.getReviewByMember_MemberId(memberId);
+		
+		return review.stream().map(reviewConverter::toDto).toList();
+	}
 }
