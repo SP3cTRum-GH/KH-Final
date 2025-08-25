@@ -11,9 +11,15 @@ export const postReview = async (product) => {
   return res.data;
 };
 
-// 상품 1개 가져오기
-export const getReviewOne = async (productNo) => {
-  const res = await axios.get(`${prefix}/${productNo}`);
+// 리뷰 1개 가져오기
+export const getReviewOne = async (reviewNo) => {
+  const res = await axios.get(`${prefix}/${reviewNo}`);
+  return res.data;
+};
+
+// 유저 리뷰 리스트
+export const getUserReviewList = async (memberId) => {
+  const res = await axios.get(`${prefix}?memberId=${memberId}`);
   return res.data;
 };
 

@@ -147,6 +147,19 @@ export const ProductDate = styled.div`
   margin-bottom: 0.5rem;
 `;
 
+export const ReviewBtn = styled.div`
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+
+  p {
+    cursor: pointer;
+  }
+`
+
 export const ProductStatus = styled.div`
   font-size: 0.875rem;
   color: #111827;
