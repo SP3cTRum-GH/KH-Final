@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class purchaseLogResponseDTO {
     private Long logNo;
     private LocalDateTime regDate;
-    private Boolean isReviewed = false; // 중복 리뷰 방지
+    private Boolean isReviewed ; // 중복 리뷰 방지
     private Long productNo;
     private String productName;
     private Boolean type;

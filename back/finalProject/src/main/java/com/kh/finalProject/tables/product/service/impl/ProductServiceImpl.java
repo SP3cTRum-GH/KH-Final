@@ -20,6 +20,8 @@ import com.kh.finalProject.tables.productsize.component.ProductSizeConverter;
 import com.kh.finalProject.tables.productsize.dto.ProductSizeDTO;
 import com.kh.finalProject.tables.productsize.entity.Productsize;
 import com.kh.finalProject.tables.productsize.repository.ProductSizeRepository;
+import com.kh.finalProject.tables.purchaseLog.repository.PurchaseLogRepository;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     private final ProductConverter productConverter;
+    private final PurchaseLogRepository purchaseLogRepository;
 
     private final ProductImagesConverter productImagesConverter;
     private final ProductSizeConverter  productSizeConverter;
@@ -50,7 +53,8 @@ public class ProductServiceImpl implements ProductService {
     // Paging
     @Override
     public PageResponseDTO<ProductDealResponseDTO> pageDeal(String category, PageRequestDTO req) {
-        Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize()); 
+        Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize() ,
+        		 Sort.by(Sort.Direction.DESC, "productNo"));
         Page<Product> page = productRepository.findByType(true,category, pageable);
 
         List<ProductDealResponseDTO> list = page.getContent().stream()
