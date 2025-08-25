@@ -18,8 +18,7 @@ import {
 export default function MemberListPageComponent() {
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editData, setEditData] = useState(null);
+  const [memberPurchaseCount, setMemberPurchaseCount] = useState(0);
 
   // 검색어 상태
   const [searchId, setSearchId] = useState("");
@@ -29,7 +28,6 @@ export default function MemberListPageComponent() {
     axios
       .get("http://localhost:8080/api/member/all", { withCredentials: true })
       .then((res) => {
-        console.log("📌 회원 데이터:", res.data);
         setMembers(res.data);
       })
       .catch((err) => {
@@ -48,45 +46,28 @@ export default function MemberListPageComponent() {
     return matchId && matchName;
   });
 
-  const handleRowClick = (member) => {
+  const handleRowClick = async (member) => {
     setSelectedMember(member);
-    setEditMode(false);
-    setEditData(null);
+
+    // 구매 내역 API 호출
+    try {
+      const res = await axios.get("http://localhost:8080/api/purchase/logs", {
+        params: { memberId: member.memberId },
+      });
+
+      const filtered = res.data.filter(
+        (item) => item.memberId === member.memberId
+      );
+
+      setMemberPurchaseCount(filtered.length);
+    } catch (err) {
+      console.error("구매 내역 불러오기 실패:", err);
+      setMemberPurchaseCount(0);
+    }
   };
 
   const closeModal = () => {
     setSelectedMember(null);
-    setEditMode(false);
-    setEditData(null);
-  };
-
-  const handleEditClick = () => {
-    setEditMode(true);
-    setEditData({ ...selectedMember });
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setEditData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSave = () => {
-    alert(`${editData.memberName} 회원 정보가 저장되었습니다.`);
-    // 여기서 실제 API 호출로 저장하거나 상태 업데이트 필요
-    setSelectedMember(editData);
-    setEditMode(false);
-  };
-
-  const handleDelete = () => {
-    if (
-      window.confirm(`${selectedMember.memberName} 회원을 삭제하시겠습니까?`)
-    ) {
-      alert("회원이 삭제되었습니다.");
-      closeModal();
-    }
   };
 
   // 성별 변환
@@ -106,20 +87,20 @@ export default function MemberListPageComponent() {
     });
   };
 
-  // 등급 변환
-  const getGradeText = (grade) => {
-    switch (grade) {
-      case "V":
-        return "VIP";
-      case "G":
-        return "Gold";
-      case "S":
-        return "Silver";
-      case "N":
-        return "일반";
-      default:
-        return "미지정";
-    }
+  // 등급 계산용 레벨 정보
+  const levelInfo = [
+    { level: 1, name: "브론즈", min: 0, max: 9 },
+    { level: 2, name: "실버", min: 10, max: 19 },
+    { level: 3, name: "골드", min: 20, max: 29 },
+    { level: 4, name: "플래티넘", min: 30, max: 39 },
+    { level: 5, name: "다이아몬드", min: 40, max: Infinity },
+  ];
+
+  // 선택된 회원의 구매 횟수(memberPurchaseCount)를 기준으로 등급 계산
+  const getMemberLevel = (purchaseCount) => {
+    return levelInfo.find(
+      (lvl) => purchaseCount >= lvl.min && purchaseCount <= lvl.max
+    );
   };
 
   return (
@@ -183,191 +164,44 @@ export default function MemberListPageComponent() {
               <CloseButton onClick={closeModal}>×</CloseButton>
             </ModalHeader>
             <ModalBody>
-              {editMode ? (
-                <>
-                  <p>
-                    <strong>회원번호:</strong> {editData.memberNo}
-                  </p>
-                  <p>
-                    <strong>아이디:</strong>{" "}
-                    <input
-                      type="text"
-                      name="memberId"
-                      value={editData.memberId}
-                      onChange={handleInputChange}
-                    />
-                  </p>
-                  <p>
-                    <strong>이름:</strong>{" "}
-                    <input
-                      type="text"
-                      name="memberName"
-                      value={editData.memberName}
-                      onChange={handleInputChange}
-                    />
-                  </p>
-                  <p>
-                    <strong>이메일:</strong>{" "}
-                    <input
-                      type="email"
-                      name="memberEmail"
-                      value={editData.memberEmail}
-                      onChange={handleInputChange}
-                    />
-                  </p>
-                  <p>
-                    <strong>성별:</strong>{" "}
-                    <select
-                      name="memberGender"
-                      value={editData.memberGender ? "true" : "false"}
-                      onChange={(e) =>
-                        setEditData((prev) => ({
-                          ...prev,
-                          memberGender: e.target.value === "true",
-                        }))
-                      }
-                    >
-                      <option value="true">남성</option>
-                      <option value="false">여성</option>
-                    </select>
-                  </p>
-                  <p>
-                    <strong>연락처:</strong>{" "}
-                    <input
-                      type="text"
-                      name="memberPhone"
-                      value={editData.memberPhone}
-                      onChange={handleInputChange}
-                    />
-                  </p>
-                  <p>
-                    <strong>주소:</strong>{" "}
-                    <input
-                      type="text"
-                      name="memberAddress"
-                      value={editData.memberAddress}
-                      onChange={handleInputChange}
-                    />
-                  </p>
-                  <p>
-                    <strong>권한:</strong>{" "}
-                    <select
-                      name="memberRole"
-                      value={editData.memberRole}
-                      onChange={handleInputChange}
-                    >
-                      <option value="USER">user</option>
-                      <option value="MEMBER">member</option>
-                      <option value="ADMIN">admin</option>
-                    </select>
-                  </p>
-                  <p>
-                    <strong>포인트:</strong>{" "}
-                    <input
-                      type="number"
-                      name="memberPoint"
-                      value={editData.memberPoint}
-                      onChange={handleInputChange}
-                    />
-                  </p>
-                  <p>
-                    <strong>가입일:</strong> {formatDate(editData.regDate)}
-                  </p>
-                  <p>
-                    <strong>상태:</strong>{" "}
-                    <select
-                      name="enable"
-                      value={editData.enable ? "true" : "false"}
-                      onChange={(e) =>
-                        setEditData((prev) => ({
-                          ...prev,
-                          enable: e.target.value === "true",
-                        }))
-                      }
-                    >
-                      <option value="true">활성</option>
-                      <option value="false">비활성</option>
-                    </select>
-                  </p>
-                  <p>
-                    <strong>등급:</strong>{" "}
-                    <select
-                      name="grade"
-                      value={editData.grade || ""}
-                      onChange={handleInputChange}
-                    >
-                      <option value="V">VIP</option>
-                      <option value="G">Gold</option>
-                      <option value="S">Silver</option>
-                      <option value="N">일반</option>
-                    </select>
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p>
-                    <strong>회원번호:</strong> {selectedMember.memberNo}
-                  </p>
-                  <p>
-                    <strong>아이디:</strong> {selectedMember.memberId}
-                  </p>
-                  <p>
-                    <strong>이름:</strong> {selectedMember.memberName}
-                  </p>
-                  <p>
-                    <strong>이메일:</strong> {selectedMember.memberEmail}
-                  </p>
-                  <p>
-                    <strong>성별:</strong>{" "}
-                    {getGenderText(selectedMember.memberGender)}
-                  </p>
-                  <p>
-                    <strong>연락처:</strong> {selectedMember.memberPhone}
-                  </p>
-                  <p>
-                    <strong>주소:</strong> {selectedMember.memberAddress}
-                  </p>
-                  <p>
-                    <strong>권한:</strong> {selectedMember.memberRole}
-                  </p>
-                  <p>
-                    <strong>포인트:</strong> {selectedMember.memberPoint}
-                  </p>
-                  <p>
-                    <strong>가입일:</strong>{" "}
-                    {formatDate(selectedMember.regDate)}
-                  </p>
-                  <p>
-                    <strong>상태:</strong>{" "}
-                    {selectedMember.enable ? "활성" : "비활성"}
-                  </p>
-                  <p>
-                    <strong>등급:</strong> {getGradeText(selectedMember.grade)}
-                  </p>
-                </>
-              )}
+              <p>
+                <strong>회원번호:</strong> {selectedMember.memberNo}
+              </p>
+              <p>
+                <strong>아이디:</strong> {selectedMember.memberId}
+              </p>
+              <p>
+                <strong>이름:</strong> {selectedMember.memberName}
+              </p>
+              <p>
+                <strong>이메일:</strong> {selectedMember.memberEmail}
+              </p>
+              <p>
+                <strong>성별:</strong>{" "}
+                {getGenderText(selectedMember.memberGender)}
+              </p>
+              <p>
+                <strong>연락처:</strong> {selectedMember.memberPhone}
+              </p>
+              <p>
+                <strong>주소:</strong> {selectedMember.memberAddress}
+              </p>
+              <p>
+                <strong>포인트:</strong> {selectedMember.memberPoint}
+              </p>
+              <p>
+                <strong>가입일:</strong> {formatDate(selectedMember.regDate)}
+              </p>
+              <p>
+                <strong>상태:</strong>{" "}
+                {selectedMember.enable ? "활성" : "비활성"}
+              </p>
+              <p>
+                <strong>등급:</strong>{" "}
+                {getMemberLevel(memberPurchaseCount)?.name || "미지정"} (
+                {memberPurchaseCount}회 구매)
+              </p>
             </ModalBody>
-            <ModalFooter>
-              {editMode ? (
-                <>
-                  <ActionButton edit onClick={handleSave}>
-                    저장
-                  </ActionButton>
-                  <ActionButton delete onClick={() => setEditMode(false)}>
-                    취소
-                  </ActionButton>
-                </>
-              ) : (
-                <>
-                  <ActionButton edit onClick={handleEditClick}>
-                    수정
-                  </ActionButton>
-                  <ActionButton delete onClick={handleDelete}>
-                    삭제
-                  </ActionButton>
-                </>
-              )}
-            </ModalFooter>
           </ModalContent>
         </ModalOverlay>
       )}
