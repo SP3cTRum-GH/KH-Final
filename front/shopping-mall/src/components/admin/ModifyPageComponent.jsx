@@ -158,7 +158,6 @@ export default function ModifyPageComponent() {
 
         {/* 버튼 */}
         <ButtonGroup>
-          <Button type="button">임시 저장</Button>
           <Button type="submit" variant="primary">
             수정 완료
           </Button>

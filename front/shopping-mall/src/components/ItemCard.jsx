@@ -61,8 +61,17 @@ const ItemCard = ({ page, dtoList }) => {
           const isExpired =
             product.endDate && new Date(product.endDate) < new Date();
 
+          const isSoldOut =
+            page === "shopdetail" &&
+            product.sizes &&
+            product.sizes.length > 0 &&
+            product.sizes.every((size) => size.stock === 0);
+
           return (
-            <ProductContainer key={product.productNo}>
+            <ProductContainer
+              key={product.productNo}
+              style={{ position: "relative" }}
+            >
               <img
                 src={
                   product.img ||
@@ -70,25 +79,27 @@ const ItemCard = ({ page, dtoList }) => {
                 }
                 alt=""
                 onClick={() => {
-                  if (!isExpired) {
+                  if (!isExpired && !isSoldOut) {
                     navigate(`/${page}/${product.productNo}`);
                     window.scrollTo(0, 0);
                   }
                 }}
                 style={{
-                  cursor: isExpired ? "not-allowed" : "pointer",
-                  opacity: isExpired ? 0.6 : 1,
+                  cursor: isExpired || isSoldOut ? "not-allowed" : "pointer",
+                  opacity: isExpired || isSoldOut ? 0.6 : 1,
                 }}
               />
               <Wrap>
                 <div
                   onClick={() => {
-                    if (!isExpired) {
+                    if (!isExpired && !isSoldOut) {
                       navigate(`/${page}/${product.productNo}`);
                       window.scrollTo(0, 0);
                     }
                   }}
-                  style={{ cursor: isExpired ? "not-allowed" : "pointer" }}
+                  style={{
+                    cursor: isExpired || isSoldOut ? "not-allowed" : "pointer",
+                  }}
                 >
                   <p>
                     {product.productName?.length < 8
@@ -96,6 +107,27 @@ const ItemCard = ({ page, dtoList }) => {
                       : product.productName?.slice(0, 7) + "..."}
                   </p>
                   <h4>{Number(product.price).toLocaleString()}원</h4>
+
+                  {/* shop 상품이면 품절 여부 표시 */}
+                  {page === "shopdetail" && isSoldOut && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "42%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        color: "white",
+                        padding: "10px 20px",
+                        borderRadius: "8px",
+                        fontSize: "1.2rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      품절
+                    </div>
+                  )}
+
                   {/* deal일 경우 endDate 표시 */}
                   {page === "dealdetail" && product.endDate && (
                     <p style={{ fontSize: "0.9rem", color: "#ef4444" }}>

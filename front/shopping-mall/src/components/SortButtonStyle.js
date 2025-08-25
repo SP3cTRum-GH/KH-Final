@@ -21,18 +21,17 @@ export const BtnContainer = styled.div`
 
     p {
         cursor: pointer;
-        border: 1px solid black;
+        border: 1px solid #ccc;
         padding: 8px;
-        border-radius: 100px;
-        font-weight: 700;
+        border-radius: 5px;
+        color: gray;
     }
 
     p:hover{
         cursor: pointer;
-        border: 1px solid black;
+        border: 1px solid #ccc;
         padding: 8px;
-        border-radius: 100px;
-        font-weight: 700;
+        border-radius: 5px;
         background-color: black;
         color: white;
     }
