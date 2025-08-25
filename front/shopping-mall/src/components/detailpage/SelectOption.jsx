@@ -93,6 +93,8 @@ const SelectOption = ({
     productBuy(fd, getCookie("member").memberId);
 
     alert("구매 완료");
+
+    location.reload(true);
   };
 
   const handleCartClick = () => {

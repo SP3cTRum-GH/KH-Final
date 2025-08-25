@@ -19,6 +19,8 @@ import com.kh.finalProject.tables.product.entity.Product;
 import com.kh.finalProject.tables.product.repository.ProductRepository;
 import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import com.kh.finalProject.tables.productImages.repository.ProductImagesRepository;
+import com.kh.finalProject.tables.productsize.entity.Productsize;
+import com.kh.finalProject.tables.productsize.repository.ProductSizeRepository;
 import com.kh.finalProject.tables.purchaseLog.dto.BuyNowDTO;
 import com.kh.finalProject.tables.purchaseLog.dto.purchaseLogResponseDTO;
 import com.kh.finalProject.tables.purchaseLog.entity.PurchaseLog;
@@ -39,6 +41,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 	private final CartItemRepository cartItemRepository; // CartItem 조회/삭제용
 	private final PurchaseLogRepository purchaseLogRepository; // purchase_log 저장용
 	private final ProductImagesRepository productImagesRepository;
+	private final ProductSizeRepository productSizeRepository;
 	private final ProductConverter productConverter;
 
 	// 체크아웃 확정: 카트 → purchase_log 복사 + 카트 비우기
@@ -63,6 +66,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		return logs.size();
 	}
 
+	@Transactional
 	@Override
 	public int checkoutSelected(String memberId, List<Long> cartItemNo) {
 		Cart cart = cartRepository.findByMember_MemberId(memberId)
@@ -76,6 +80,20 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		for (CartItem i : items) {
 			log.info(i);
 		}
+		for (CartItem item : items) {
+		    Product product = item.getProduct();
+		    String targetSize = item.getSize();
+
+		    if (product != null && product.getProductsizeList() != null) {
+		        for (Productsize ps : product.getProductsizeList()) {
+		            if (ps.getProductSize().equals(targetSize)) {
+		                ps.setStock(ps.getStock() - item.getQuantity()); 
+		                break; 
+		            }
+		        }
+		    }
+		}
+		
 		List<PurchaseLog> logs = items.stream()
 				.map(ci -> PurchaseLog.builder().memberId(memberId).productNo(ci.getProduct().getProductNo())
 						.productName(ci.getProduct().getProductName()).size(ci.getSize()).quantity(ci.getQuantity())
@@ -83,7 +101,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 						.isReviewed(false).build())
 				.toList();
 		purchaseLogRepository.saveAll(logs);
-		// todo product stok 수정 ;
+		
 		cartItemRepository.deleteAll(items);
 
 		return logs.size();
@@ -109,6 +127,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		}).collect(java.util.stream.Collectors.toList());
 	}
 
+	@Transactional
 	@Override
 	public purchaseLogResponseDTO buyNow(String memberId, BuyNowDTO req) {
 		Product p = productRepository.findById(req.getProductNo())
@@ -117,6 +136,15 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		// 단가 × 수량
 		int unitPrice = p.getPrice(); // 필드명이 다르면 맞게 변경
 		int lineTotal = Math.toIntExact((long) unitPrice * req.getQuantity());
+		
+		if (p != null && p.getProductsizeList() != null) {
+	        for (Productsize ps : p.getProductsizeList()) {
+	            if (ps.getProductSize().equals(req.getSize())) {
+	                ps.setStock(ps.getStock() - req.getQuantity()); 
+	                break; 
+	            }
+	        }
+	    }
 
 		PurchaseLog saved = purchaseLogRepository.save(
 				PurchaseLog.builder().productNo(p.getProductNo()).memberId(memberId).productName(p.getProductName())
