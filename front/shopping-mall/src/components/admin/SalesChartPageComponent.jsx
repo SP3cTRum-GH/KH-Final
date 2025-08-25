@@ -23,22 +23,60 @@ import { API_SERVER_HOST } from "../../api/HostUrl";
 
 export default function SalesDashboard() {
   const [period, setPeriod] = useState("day"); // day | week | month
-  const [selectedDate, setSelectedDate] = useState("2025-08-01");
+  const today = new Date();
+  const formattedToday = today.toISOString().slice(0, 10);
+  const [selectedDate, setSelectedDate] = useState(formattedToday);
+
   const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        let fromDate = selectedDate;
+        let toDate = selectedDate;
+
+        const baseDate = new Date(selectedDate);
+
+        if (period === "week") {
+          // 월요일 시작
+          const day = baseDate.getDay(); // 0(일)~6(토)
+          const diffToMonday = day === 0 ? -6 : 1 - day; // 일요일이면 -6, 나머지 월~토 계산
+          const monday = new Date(baseDate);
+          monday.setDate(baseDate.getDate() + diffToMonday);
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+
+          fromDate = monday.toISOString().slice(0, 10);
+          toDate = sunday.toISOString().slice(0, 10);
+        }
+
+        if (period === "month") {
+          const firstDay = new Date(
+            baseDate.getFullYear(),
+            baseDate.getMonth(),
+            1
+          );
+          const lastDay = new Date(
+            baseDate.getFullYear(),
+            baseDate.getMonth() + 1,
+            0
+          );
+
+          fromDate = firstDay.toISOString().slice(0, 10);
+          toDate = lastDay.toISOString().slice(0, 10);
+        }
+
         const res = await axios.get(
-          "http://localhost:8080/api/purchase/sales/date-category",
+          `${API_SERVER_HOST}/api/purchase/sales/date-category`,
           {
             params: {
-              from: selectedDate,
-              to: selectedDate, // 기본은 하루만
+              from: fromDate,
+              to: toDate,
             },
           }
         );
-        setData(res.data); // [{date, amount, category}, ...]
+
+        setData(res.data);
         console.log("📌 응답 데이터:", res.data);
       } catch (err) {
         console.error("데이터 불러오기 실패:", err);
@@ -46,44 +84,41 @@ export default function SalesDashboard() {
     };
 
     fetchData();
-  }, [selectedDate]);
+  }, [selectedDate, period]);
 
   // ======= 필터링된 데이터 계산 =======
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
 
-    const baseDate = parseISO(selectedDate); // selectedDate: "2025-08-01"
+    const baseDate = parseISO(selectedDate); // selectedDate: "YYYY-MM-DD"
 
     if (period === "day") {
       return data.filter((item) => {
         const itemDate = parseISO(item.date);
-        return (
-          itemDate.getFullYear() === baseDate.getFullYear() &&
-          itemDate.getMonth() === baseDate.getMonth() &&
-          itemDate.getDate() === baseDate.getDate()
-        );
+        return isSameDay(itemDate, baseDate);
       });
     }
 
     if (period === "week") {
-      const startWeek = startOfWeek(baseDate, { weekStartsOn: 1 });
+      const startWeek = startOfWeek(baseDate, { weekStartsOn: 1 }); // 월요일 시작
+      const endWeek = new Date(startWeek);
+      endWeek.setDate(startWeek.getDate() + 6); // 일요일까지
       return data.filter((item) => {
         const itemDate = parseISO(item.date);
-        return (
-          itemDate >= startWeek &&
-          itemDate < new Date(startWeek.getTime() + 7 * 86400000)
-        );
+        return itemDate >= startWeek && itemDate <= endWeek;
       });
     }
 
     if (period === "month") {
       const startMonth = startOfMonth(baseDate);
+      const endMonth = new Date(
+        startMonth.getFullYear(),
+        startMonth.getMonth() + 1,
+        0
+      ); // 해당 달 마지막 날
       return data.filter((item) => {
         const itemDate = parseISO(item.date);
-        return (
-          itemDate.getFullYear() === startMonth.getFullYear() &&
-          itemDate.getMonth() === startMonth.getMonth()
-        );
+        return itemDate >= startMonth && itemDate <= endMonth;
       });
     }
 

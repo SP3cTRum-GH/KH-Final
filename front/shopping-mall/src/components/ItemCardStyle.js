@@ -9,49 +9,68 @@ export const Wrapper = styled.div`
 `;
 
 export const Container = styled.div`
-  display: flex;
+  /* display: flex;
   flex-wrap: wrap;
   gap: 15px;
   justify-content: flex-start;
   align-items: center;
   width: 100%;
   max-width: 1200px;
-  margin-left: 100px;
+  margin-left: 100px; */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+gap: 20px;
+width: 100%;
+max-width: 1200px;
+margin: 0 auto;  // 가운데 정렬
 
   @media (max-width: 430px) {
-    margin-left: 40px;
-    gap: 50px;
+    /* margin-left: 40px;
+    gap: 50px; */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
   }
 
     @media (max-width: 414px) {
-    margin-left: 25px;
-    gap: 50px;
+    /* margin-left: 25px;
+    gap: 50px; */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
   }
 
   @media (max-width: 390px) {
     margin-left: 10px;
     gap: 50px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
   }
 
     @media (max-width: 375px) {
     margin-left: 5px;
     gap: 40px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
   }
 
 
 `;
 
 export const ProductContainer = styled.div`
-    width: 200px;
+    /* width: 200px; */
+    width: 100%;
     cursor: pointer;
     
 
     img {
-        width: 200px;
-        height: 200px;
-        background-size: cover;
+        /* width: 200px;
+        height: 200px; */
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        /* background-size: cover;
         background-position: center;
-        background-image: none;
+        background-image: none; */
     }
 
     div {

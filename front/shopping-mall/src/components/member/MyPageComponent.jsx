@@ -92,22 +92,10 @@ const MyPageComponent = () => {
       100
     : 100;
 
-  const handleReview = (itemId) => {
-    alert("리뷰 작성이 완료되었습니다");
-    setPurchaseHistory((prevHistory) =>
-      prevHistory.map((item) =>
-        item.id === itemId ? { ...item, reviewed: true } : item
-      )
-    );
-  };
-
-  const handleProfileUpdate = (e) => {
-    e.preventDefault();
-    navigate("/modifymypage");
-  };
-
   const paymentCompletedCount = purchaseHistory.length;
-  const reviewedCount = purchaseHistory.filter((item) => item.reviewed).length;
+  const reviewedCount = purchaseHistory.filter(
+    (item) => item.isReviewed
+  ).length;
   const toReviewCount = purchaseHistory.filter(
     (item) => !item.isReviewed
   ).length;

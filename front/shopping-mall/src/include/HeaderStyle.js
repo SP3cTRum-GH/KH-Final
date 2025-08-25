@@ -22,6 +22,7 @@ export const Nav = styled.div`
     margin-bottom: 0;
 
       img {
+        width: 30%;
         display: block;
         cursor: pointer;
       }
@@ -124,7 +125,7 @@ export const Menu = styled.ul`
   margin: 0 auto;
 
   img {
-    width: 150px;
+    width: 14%;
     height: auto;
     cursor: pointer;
   }
