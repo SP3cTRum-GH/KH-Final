@@ -205,7 +205,7 @@ const root = createBrowserRouter([
     ),
   },
   {
-    path: "/reviewmodify",
+    path: "/reviewmodify/:reviewNo",
     element: (
       <Suspense fallback={<Loading />}>
         <ReviewModifyPage />

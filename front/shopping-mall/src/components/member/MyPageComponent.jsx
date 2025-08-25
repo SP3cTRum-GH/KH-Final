@@ -36,8 +36,10 @@ import {
   ProgressFill,
   LevelRange,
   ProfileBtnWrapper,
+  ReviewBtn,
 } from "./MyPageStyle";
 import { getPuchaseList } from "../../api/purchaseApi";
+import { deleteReview, getUserReviewList } from "../../api/reviewApi";
 
 const MyPageComponent = () => {
   const navigate = useNavigate();
@@ -58,17 +60,28 @@ const MyPageComponent = () => {
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [user, setUser] = useState({ email: "", name: "" });
+  const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
   const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
   const purchaseCount = purchaseHistory.length;
   const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [reviews, setReviews] = useState([]); // 리뷰 목록
+  const [reviewCount, setReviewCount] = useState(0);
+
+  const member = getCookie("member");
 
   useEffect(() => {
     getPuchaseList(getCookie("member").memberId).then((data) => {
       setPurchaseHistory(data);
     });
+
+    if (member) {
+      getUserReviewList(member.memberId).then((data) => {
+        setReviewCount(data.length);
+        setReviews(data); // state에 저장
+      });
+    }
   }, []);
 
   const levelInfo = [
@@ -93,7 +106,9 @@ const MyPageComponent = () => {
     : 100;
 
   const paymentCompletedCount = purchaseHistory.length;
-  const reviewedCount = purchaseHistory.filter((item) => item.reviewed).length;
+  const reviewedCount = purchaseHistory.filter(
+    (item) => item.isReviewed
+  ).length;
   const toReviewCount = purchaseHistory.filter(
     (item) => !item.isReviewed
   ).length;
@@ -112,6 +127,7 @@ const MyPageComponent = () => {
   // 쿠키 기반으로 사용자 정보 세팅
   useEffect(() => {
     const member = getCookie("member");
+    console.log("🍪 쿠키 값:", member);
 
     if (!member) {
       console.error("❌ member 쿠키가 없습니다.");
@@ -169,6 +185,31 @@ const MyPageComponent = () => {
       setErrorMsg("❌ 비밀번호가 일치하지 않습니다.");
     }
   };
+
+  const handleReviewDelete = async (reviewNo) => {
+    if (!reviewNo) return;
+
+    // 1) 낙관적 업데이트: 화면에서 먼저 제거
+    setReviews((prev) => prev.filter((r) => r.reviewNo !== reviewNo));
+
+    try {
+      // 2) 서버 삭제 완료를 보장
+      await deleteReview(reviewNo);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      // 3) 서버 상태와 동기화
+      if (member?.memberId) {
+        try {
+          const data = await getUserReviewList(member.memberId);
+          setReviews(data);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  };
+
   return (
     <>
       <ProfileBox>
@@ -214,43 +255,105 @@ const MyPageComponent = () => {
             style={{ cursor: "pointer" }}
           >
             <StatusLabel>작성된 리뷰</StatusLabel>
-            <StatusValue>{reviewedCount}</StatusValue>
+            <StatusValue>{reviewCount}</StatusValue>
           </StatusItem>
         </StatusBox>
 
-        {displayedItems.map((item) => (
-          <ListItem key={item.productNo}>
-            <ProductImage src={item.img} alt={item.name} />
-            <ProductInfo>
-              <ProductName>{item.productName}</ProductName>
-              <ProductSize>
-                사이즈 : {item.size} <br /> 구매 수량 : {item.quantity}개
-              </ProductSize>
-            </ProductInfo>
-            <ProductMeta>
-              <ProductDate>
-                {item.regDate.split("-").join(".").slice(0, 10)}
-              </ProductDate>
-              <ProductStatus>
-                결제 완료
-                {item.isReviewed ? (
-                  <ReviewStatus as="span">리뷰 완료</ReviewStatus>
+        {filterType === "reviewed" ? (
+          <>
+            {reviews.length === 0 ? (
+              <p>아직 작성된 리뷰가 없습니다.</p>
+            ) : (
+              reviews.map((review, idx) => (
+                <ListItem key={review.reviewNo ?? idx}>
+                  <ProductInfo>
+                    <ProductName>{review.productName}</ProductName>
+                    <ProductSize>
+                      평점 : {review.rating} 점
+                      <br />
+                      내용 : {review.content}
+                    </ProductSize>
+                  </ProductInfo>
+                  <ProductMeta>
+                    <ReviewBtn>
+                      <p
+                        onClick={() =>
+                          navigate(`/reviewmodify/${review.reviewNo}`, {
+                            state: {
+                              type: review.type,
+                              productNo: review.productNo,
+                            },
+                          })
+                        }
+                      >
+                        수정
+                      </p>
+                      <p onClick={() => handleReviewDelete(review.reviewNo)}>
+                        삭제
+                      </p>
+                    </ReviewBtn>
+                  </ProductMeta>
+                </ListItem>
+              ))
+            )}
+          </>
+        ) : (
+          <>
+            {displayedItems.map((item, idx) => (
+              <ListItem
+                key={
+                  item.logNo ?? `${item.productNo}-${item.regDate ?? ""}-${idx}`
+                }
+              >
+                {item.img ? (
+                  <ProductImage
+                    src={item.img}
+                    alt={item.productName || "product"}
+                    onError={(e) => {
+                      e.currentTarget.style.visibility = "hidden";
+                    }}
+                  />
                 ) : (
-                  <ReviewStatus
-                    as={Link}
-                    to={`/review/${item.productNo}`}
-                    state={{ type: item.type, logNo: item.logNo }}
-                  >
-                    리뷰 올리기
-                  </ReviewStatus>
+                  <div
+                    style={{ width: 60, height: 60, background: "#f2f2f2" }}
+                  />
                 )}
-              </ProductStatus>
-            </ProductMeta>
-          </ListItem>
-        ))}
+                <ProductInfo>
+                  <ProductName>{item.productName}</ProductName>
+                  <ProductSize>
+                    사이즈 : {item.size} <br /> 구매 수량 : {item.quantity}개
+                  </ProductSize>
+                </ProductInfo>
+                <ProductMeta>
+                  <ProductDate>
+                    {item.regDate
+                      ? item.regDate.split("-").join(".").slice(0, 10)
+                      : "-"}
+                  </ProductDate>
+                  <ProductStatus>
+                    결제 완료
+                    {item.isReviewed ? (
+                      <ReviewStatus>리뷰 완료</ReviewStatus>
+                    ) : (
+                      <ReviewStatus
+                        as={Link}
+                        to={`/review/${item.productNo}`}
+                        state={{ type: item.type, logNo: item.logNo }}
+                      >
+                        리뷰 올리기
+                      </ReviewStatus>
+                    )}
+                  </ProductStatus>
+                </ProductMeta>
+              </ListItem>
+            ))}
 
-        {!showAll && purchaseHistory.length > 5 && (
-          <ViewAllBtn onClick={() => setShowAll(true)}>전체 보기</ViewAllBtn>
+            {!showAll && purchaseHistory.length > 5 && (
+              <ViewAllBtn onClick={() => setShowAll(true)}>
+                전체 보기
+              </ViewAllBtn>
+            )}
+          </>
         )}
       </Section>
 

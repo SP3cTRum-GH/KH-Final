@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import StarRating from "./StarRating";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getShopOne } from "../../api/productShopApi";
 import { getDealOne } from "../../api/productDealApi";
-import { postReview } from "../../api/reviewApi";
+import { getReviewOne, postReview, updateReview } from "../../api/reviewApi";
 import { getCookie } from "../../util/cookieUtil";
 
 const ReviewModifyComponent = () => {
@@ -14,22 +14,48 @@ const ReviewModifyComponent = () => {
   });
   const memberId = getCookie("member").memberId;
 
-  const [formData, setFormData] = useState({
-    reviewImg: "null",
-    rating: 0,
-    content: "",
-    productNo: 0,
-    memberId: memberId,
-    logNo: 0,
-  });
-
   const [reviewText, setReviewText] = useState("");
   const [files, setFiles] = useState([]);
   const [rating, setRating] = useState(0);
-  const { productNo } = useParams();
+  const [currentImage, setCurrentImage] = useState(null);
+  const { reviewNo } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
+
   const isType = !!location.state?.type;
+  const productNo = location.state?.productNo;
   const isLogNo = location.state?.logNo;
+
+  useEffect(() => {
+    if (!reviewNo) return;
+    getReviewOne(reviewNo)
+      .then((data) => {
+        if (!data) return;
+        setReviewText(data.content ?? "");
+        setRating(Number(data.rating ?? 0));
+        setCurrentImage(data.reviewImg || null);
+        // productNo or logNo 보완: 라우트 state가 없으면 응답값 사용
+        if (!location.state?.productNo && data.productNo) {
+          // 제품 정보 갱신을 위해 location state 대체값을 임시로 세팅
+          // 단, 아래 제품 조회 useEffect는 productNo 의존이므로 별도 상태로 보완
+        }
+      })
+      .catch((e) => console.error("Failed to load review:", e));
+  }, [reviewNo]);
+
+  useEffect(() => {
+    if (!productNo) return;
+    const fetch = isType ? getDealOne : getShopOne;
+    fetch(productNo)
+      .then((data) => {
+        if (!data) return;
+        setProduct({
+          productName: data.productName ?? "",
+          price: data.price ?? 0,
+        });
+      })
+      .catch((err) => console.error("Failed to load product:", err));
+  }, [productNo, isType]);
 
   const handleTextChange = (e) => {
     const value = e.target.value;
@@ -46,38 +72,25 @@ const ReviewModifyComponent = () => {
     setRating(value || 0);
   };
 
-  useEffect(() => {
-    if (!productNo) return;
-
-    const fetch = isType ? getDealOne : getShopOne;
-
-    fetch(productNo)
-      .then((data) => {
-        if (data) {
-          setProduct({
-            productName: data.productName ?? "",
-            price: data.price ?? 0,
-          });
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load product:", err);
-      });
-  }, [productNo, isType]);
-
   const handleSubmit = () => {
     const sendData = {
-      reviewImg: files[0]?.name || null,
+      reviewImg: files[0]?.name || currentImage || null,
       rating: rating,
       content: reviewText,
       productNo: parseInt(productNo),
       memberId: memberId,
       logNo: isLogNo,
+      reviewNo: parseInt(reviewNo),
     };
 
-    postReview(sendData).then((data) => {
-      console.log(data);
-    });
+    updateReview(reviewNo, sendData)
+      .then((data) => {
+        alert("수정완료");
+        navigate("/mypage"), { state: { value: "reviewed" } };
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -93,10 +106,11 @@ const ReviewModifyComponent = () => {
           <h2>{product.productName}</h2>
           <p>가격 : {product.price.toLocaleString()}원</p>
           <StarRating
+            key={`rate-${rating}`}
             max={5}
             size={40}
             color={"#fcc419"}
-            defaultRate={0}
+            defaultRate={rating}
             onSetRate={handleRateChange}
           />
         </div>
@@ -111,9 +125,14 @@ const ReviewModifyComponent = () => {
         />
       </ReviewInputSection>
       <input type="file" multiple onChange={handleFileChange} />
+      {currentImage && files.length === 0 && (
+        <p style={{ marginTop: 8, color: "#666" }}>
+          현재 이미지: {currentImage}
+        </p>
+      )}
 
       <ReviewSubmitSection>
-        <button onClick={handleSubmit}>등록하기</button>
+        <button onClick={handleSubmit}>수정하기</button>
       </ReviewSubmitSection>
     </ReviewContainer>
   );
