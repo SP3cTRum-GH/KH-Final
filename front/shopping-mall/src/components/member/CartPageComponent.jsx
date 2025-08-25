@@ -189,6 +189,27 @@ const CartPageComponent = () => {
     });
   };
 
+  // Shop 섹션 전체 선택 (토글 동작)
+  const handleCheckAllShop = () => {
+    setCheckedMap((prev) => {
+      const next = { ...prev };
+      // 현재 Shop 아이템들이 모두 체크되어 있는지 판단
+      const allShopAlreadyChecked =
+        shopCart.length > 0 && shopCart.every((it) => !!prev[it.cartItemNo]);
+      // 모두 체크되어 있었다면 해제, 아니었다면 모두 체크
+      const shouldCheck = !allShopAlreadyChecked;
+      for (const it of shopCart) {
+        next[it.cartItemNo] = shouldCheck;
+      }
+      // 전체 선택 여부 동기화
+      setAllChecked(
+        cartItems.length > 0 &&
+          cartItems.every((item) => !!next[item.cartItemNo])
+      );
+      return next;
+    });
+  };
+
   // ===== 옵션 변경 모달 =====
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -292,6 +313,9 @@ const CartPageComponent = () => {
 
   const checkedCount = Object.values(checkedMap).filter(Boolean).length;
   const expectedPoints = Math.floor(totalPrice * 0.01);
+  // Shop 섹션이 모두 체크되어 있는지(버튼 라벨 토글용)
+  const allShopChecked =
+    shopCart.length > 0 && shopCart.every((it) => !!checkedMap[it.cartItemNo]);
 
   // 구매 버튼 핸들러
   const handlePurchase = async () => {
@@ -448,7 +472,16 @@ const CartPageComponent = () => {
         {/* === SHOP 섹션 (type === false) === */}
         {viewMode !== "deal" && (
           <DeliveryGroup>
-            <SectionHeader>Shop</SectionHeader>
+            <SectionHeader>
+              Shop
+              <FilterButton
+                type="button"
+                style={{ marginLeft: 12 }}
+                onClick={handleCheckAllShop}
+              >
+                {allShopChecked ? "전체 해제" : "전체 선택"}
+              </FilterButton>
+            </SectionHeader>
             {shopCart.length > 0 ? (
               shopCart.map((item) => renderShopCard(item))
             ) : (

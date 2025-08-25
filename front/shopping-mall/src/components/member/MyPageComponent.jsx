@@ -254,7 +254,7 @@ const MyPageComponent = () => {
                   <ReviewStatus
                     as={Link}
                     to={`/review/${item.productNo}`}
-                    state={{ type: item.type }}
+                    state={{ type: item.type, logNo: item.logNo }}
                   >
                     리뷰 올리기
                   </ReviewStatus>

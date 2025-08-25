@@ -15,7 +15,6 @@ const MainPage = () => {
 
   useEffect(() => {
     bestItems().then((data) => {
-      console.log(data);
       setListData(data);
     });
   }, []);
