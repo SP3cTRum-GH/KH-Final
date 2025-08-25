@@ -5,7 +5,10 @@ import { Container } from "../../components/Container";
 import Header from "../../include/Header";
 import Footer from "../../include/Footer";
 import useCustomMove from "../../hooks/useCustomMove";
-import { getShopProductList } from "../../api/productShopApi";
+import {
+  getFilterProductList,
+  getShopProductList,
+} from "../../api/productShopApi";
 import PageComponent from "../../components/common/PageComponent";
 
 const initData = {
@@ -25,16 +28,25 @@ const ShopPage = () => {
   const [listData, setListData] = useState(initData);
 
   useEffect(() => {
+    getList();
+  }, [page, size]);
+
+  const getList = () =>
     getShopProductList({ page, size }).then((data) => {
       setListData(data);
     });
-  }, [page, size]);
+
+  const filterBtn = (value) => {
+    getFilterProductList({ page, size }, value).then((data) => {
+      setListData(data);
+    });
+  };
 
   return (
     <div>
       <Header />
       <Container>
-        <SortButton menu={"판매순"} />
+        <SortButton menu={"판매순"} filterBtn={filterBtn} getList={getList} />
         <ItemCard
           page={"shopdetail"}
           dtoList={listData.dtoList}
