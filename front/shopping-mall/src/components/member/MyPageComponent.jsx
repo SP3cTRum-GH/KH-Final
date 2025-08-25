@@ -58,7 +58,7 @@ const MyPageComponent = () => {
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
+  const [user, setUser] = useState({ email: "", name: "" });
   const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
   const purchaseCount = purchaseHistory.length;
   const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
@@ -92,20 +92,6 @@ const MyPageComponent = () => {
       100
     : 100;
 
-  const handleReview = (itemId) => {
-    alert("리뷰 작성이 완료되었습니다");
-    setPurchaseHistory((prevHistory) =>
-      prevHistory.map((item) =>
-        item.id === itemId ? { ...item, reviewed: true } : item
-      )
-    );
-  };
-
-  const handleProfileUpdate = (e) => {
-    e.preventDefault();
-    navigate("/modifymypage");
-  };
-
   const paymentCompletedCount = purchaseHistory.length;
   const reviewedCount = purchaseHistory.filter((item) => item.reviewed).length;
   const toReviewCount = purchaseHistory.filter(
@@ -126,7 +112,6 @@ const MyPageComponent = () => {
   // 쿠키 기반으로 사용자 정보 세팅
   useEffect(() => {
     const member = getCookie("member");
-    console.log("🍪 쿠키 값:", member);
 
     if (!member) {
       console.error("❌ member 쿠키가 없습니다.");

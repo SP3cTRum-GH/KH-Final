@@ -17,6 +17,12 @@ export const getReviewOne = async (productNo) => {
   return res.data;
 };
 
+// 유저 리뷰 리스트
+export const getUserReviewList = async (memberId) => {
+  const res = await axios.get(`${prefix}/list?memberId=${memberId}`);
+  return res.data;
+};
+
 // 페이징 리스트
 export const getReviewList = async (pageParam, productNo) => {
   const { page, size } = pageParam;
