@@ -1,10 +1,18 @@
 package com.kh.finalProject.tables.product.service.impl;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.product.component.ProductConverter;
-import com.kh.finalProject.tables.product.dto.MainPageDTO;
+import com.kh.finalProject.tables.product.dto.BidDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
@@ -15,24 +23,15 @@ import com.kh.finalProject.tables.product.service.ProductService;
 import com.kh.finalProject.tables.productImages.component.ProductImagesConverter;
 import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
 import com.kh.finalProject.tables.productImages.entity.ProductImages;
-import com.kh.finalProject.tables.productImages.repository.ProductImagesRepository;
 import com.kh.finalProject.tables.productsize.component.ProductSizeConverter;
 import com.kh.finalProject.tables.productsize.dto.ProductSizeDTO;
 import com.kh.finalProject.tables.productsize.entity.Productsize;
-import com.kh.finalProject.tables.productsize.repository.ProductSizeRepository;
 import com.kh.finalProject.tables.purchaseLog.repository.PurchaseLogRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Log4j2
@@ -256,6 +255,16 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(productNo);           // orphanRemoval로 이미지 row 삭제
         if (!names.isEmpty()) fileUtil.deleteFiles(names); // 디스크 파일 삭제(썸네일 포함)
     }
+
+	@Override
+	public Integer bid(BidDTO bid) {
+		Product p = productRepository.findById(bid.getProductNo()).orElseThrow(null);
+		p.setDealCount(p.getDealCount()+1);
+		p.setDealCurrent(bid.getPrice());
+		
+		productRepository.save(p);
+		return p.getDealCurrent();
+	}
     
 
 }
