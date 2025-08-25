@@ -213,7 +213,9 @@ const MyPageComponent = () => {
             <ProductImage src={item.img} alt={item.name} />
             <ProductInfo>
               <ProductName>{item.productName}</ProductName>
-              <ProductSize>사이즈 : {item.size}</ProductSize>
+              <ProductSize>
+                사이즈 : {item.size} <br /> 구매 수량 : {item.quantity}개
+              </ProductSize>
             </ProductInfo>
             <ProductMeta>
               <ProductDate>

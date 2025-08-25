@@ -1,19 +1,20 @@
 package com.kh.finalProject.tables.product.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
-import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import com.kh.finalProject.tables.productsize.dto.ProductSizeDTO;
-import com.kh.finalProject.tables.productsize.entity.Productsize;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor
+@ToString
 @AllArgsConstructor
 @Builder
 public class ProductShopResponseDTO {

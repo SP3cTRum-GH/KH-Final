@@ -102,7 +102,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 					.map(this::normalizeImageUrl).orElse(null);
 
 			return purchaseLogResponseDTO.builder().logNo(pl.getLogNo()).regDate(pl.getRegDate())
-					.isReviewed(pl.getIsReviewed()).productNo(pl.getProductNo())
+					.quantity(pl.getQuantity()).isReviewed(pl.getIsReviewed()).productNo(pl.getProductNo())
 					.productName(p != null ? p.getProductName() : pl.getProductName())
 					.type(p != null ? p.getType() : null).size(pl.getSize()).price(pl.getPrice()).img(imgUrl)
 					.memberId(pl.getMemberId()).build();
@@ -118,14 +118,15 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		int unitPrice = p.getPrice(); // 필드명이 다르면 맞게 변경
 		int lineTotal = Math.toIntExact((long) unitPrice * req.getQuantity());
 
-		PurchaseLog saved = purchaseLogRepository.save(PurchaseLog.builder().productNo(p.getProductNo()).memberId(memberId)
-				.productName(p.getProductName()).size(req.getSize()).quantity(req.getQuantity()).price(lineTotal) // 서버계산값저장
-				.isReviewed(false).build());
+		PurchaseLog saved = purchaseLogRepository.save(
+				PurchaseLog.builder().productNo(p.getProductNo()).memberId(memberId).productName(p.getProductName())
+						.size(req.getSize()).quantity(req.getQuantity()).price(lineTotal) // 서버계산값저장
+						.isReviewed(false).build());
 
-		return purchaseLogResponseDTO.builder().logNo(saved.getLogNo()).memberId(saved.getMemberId()).regDate(saved.getRegDate())
-				.isReviewed(saved.getIsReviewed()).productNo(saved.getProductNo()).productName(saved.getProductName())
-				.type(p.getType()).size(saved.getSize()).price(saved.getPrice()).img(null).memberId(saved.getMemberId())
-				.build();
+		return purchaseLogResponseDTO.builder().logNo(saved.getLogNo()).memberId(saved.getMemberId())
+				.regDate(saved.getRegDate()).isReviewed(saved.getIsReviewed()).productNo(saved.getProductNo())
+				.productName(saved.getProductName()).type(p.getType()).size(saved.getSize()).price(saved.getPrice())
+				.img(null).memberId(saved.getMemberId()).build();
 	}
 
 	@Override

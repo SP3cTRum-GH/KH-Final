@@ -17,3 +17,9 @@ export const productBuy = async (product, memberId) => {
   );
   return res.data;
 };
+
+// main best5 불러오기
+export const bestItems = async () => {
+  const res = await axios.get(`${prefix}/main`);
+  return res.data;
+};
