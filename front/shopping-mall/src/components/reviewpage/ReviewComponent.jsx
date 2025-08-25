@@ -20,6 +20,7 @@ const ReviewComponent = () => {
     content: "",
     productNo: 0,
     memberId: memberId,
+    logNo: 0,
   });
   const [reviewText, setReviewText] = useState("");
   const [files, setFiles] = useState([]);
@@ -27,6 +28,7 @@ const ReviewComponent = () => {
   const { productNo } = useParams();
   const location = useLocation();
   const isType = !!location.state?.type;
+  const isLogNo = location.state?.logNo;
 
   const handleTextChange = (e) => {
     const value = e.target.value;
@@ -69,6 +71,7 @@ const ReviewComponent = () => {
       content: reviewText,
       productNo: parseInt(productNo),
       memberId: memberId,
+      logNo: isLogNo,
     };
 
     postReview(sendData).then((data) => {
