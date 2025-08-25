@@ -123,7 +123,7 @@ const Header = () => {
               </MenuItem>
             </div>
           </MenuGroup>
-          <img src="" alt="메인 로고" onClick={() => navigate("/")} />
+          <img src={logo} alt="메인 로고" onClick={() => navigate("/")} />
           {loginState.memberId ? (
             <div className="MenuItemRight">
               <MenuItem>

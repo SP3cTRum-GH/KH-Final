@@ -124,7 +124,7 @@ export const Menu = styled.ul`
   margin: 0 auto;
 
   img {
-    width: 100px;
+    width: 150px;
     height: auto;
     cursor: pointer;
   }
