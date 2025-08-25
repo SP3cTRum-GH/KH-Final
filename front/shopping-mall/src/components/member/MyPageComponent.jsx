@@ -60,7 +60,7 @@ const MyPageComponent = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
   const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
-  const purchaseCount = 7; // 예시 값 (props나 API로 받아오도록 나중에 변경 가능)
+  const purchaseCount = purchaseHistory.length;
   const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -106,19 +106,19 @@ const MyPageComponent = () => {
     navigate("/modifymypage");
   };
 
-  const paymentCompletedCount = purchaseHistory.filter(
-    (item) => item.status === "결제 완료"
-  ).length;
+  const paymentCompletedCount = purchaseHistory.length;
   const reviewedCount = purchaseHistory.filter((item) => item.reviewed).length;
-  const toReviewCount = paymentCompletedCount - reviewedCount;
+  const toReviewCount = purchaseHistory.filter(
+    (item) => !item.isReviewed
+  ).length;
 
   const filteredHistory = purchaseHistory.filter((item) => {
     if (filterType === "all") {
       return true;
     } else if (filterType === "toReview") {
-      return item.status === "결제 완료" && !item.reviewed;
+      return !item.isReviewed;
     } else if (filterType === "reviewed") {
-      return item.reviewed;
+      return item.isReviewed;
     }
     return true;
   });
@@ -138,6 +138,24 @@ const MyPageComponent = () => {
       memberName: member.memberName || "",
       memberEmail: member.memberEmail || "",
     });
+
+    const fetchPurchaseHistory = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/api/purchase/logs", {
+          params: { memberId: member.memberId },
+        });
+
+        // memberId와 일치하는 데이터만 필터링
+        const filtered = res.data.filter(
+          (item) => item.memberId === member.memberId
+        );
+        setPurchaseHistory(filtered);
+      } catch (err) {
+        console.error("구매 내역 불러오기 실패:", err);
+      }
+    };
+
+    fetchPurchaseHistory();
   }, []);
 
   if (!user) return <div>로딩 중...</div>;
@@ -180,7 +198,7 @@ const MyPageComponent = () => {
         </Header>
 
         <InfoBox onClick={() => setIsModalOpen(true)}>
-          Lv. 1 <Highlight>브론즈</Highlight>
+          Lv. {currentLevel.level} <Highlight>{currentLevel.name}</Highlight>
         </InfoBox>
 
         <ReviewInfo>
@@ -206,6 +224,13 @@ const MyPageComponent = () => {
             <StatusLabel>리뷰 올리기</StatusLabel>
             <StatusValue>{toReviewCount}</StatusValue>
           </StatusItem>
+          <StatusItem
+            onClick={() => setFilterType("reviewed")}
+            style={{ cursor: "pointer" }}
+          >
+            <StatusLabel>작성된 리뷰</StatusLabel>
+            <StatusValue>{reviewedCount}</StatusValue>
+          </StatusItem>
         </StatusBox>
 
         {displayedItems.map((item) => (
@@ -222,7 +247,7 @@ const MyPageComponent = () => {
                 {item.regDate.split("-").join(".").slice(0, 10)}
               </ProductDate>
               <ProductStatus>
-                결재 완료
+                결제 완료
                 {item.isReviewed ? (
                   <ReviewStatus as="span">리뷰 완료</ReviewStatus>
                 ) : (
