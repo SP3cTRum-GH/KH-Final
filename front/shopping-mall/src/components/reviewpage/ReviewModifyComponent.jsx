@@ -7,7 +7,7 @@ import { getDealOne } from "../../api/productDealApi";
 import { postReview } from "../../api/reviewApi";
 import { getCookie } from "../../util/cookieUtil";
 
-const ReviewComponent = () => {
+const ReviewModifyComponent = () => {
   const [product, setProduct] = useState({
     productName: "",
     price: 0,
@@ -22,6 +22,7 @@ const ReviewComponent = () => {
     memberId: memberId,
     logNo: 0,
   });
+
   const [reviewText, setReviewText] = useState("");
   const [files, setFiles] = useState([]);
   const [rating, setRating] = useState(0);
@@ -118,7 +119,7 @@ const ReviewComponent = () => {
   );
 };
 
-export default ReviewComponent;
+export default ReviewModifyComponent;
 
 const ReviewContainer = styled.div`
   max-width: 50%;

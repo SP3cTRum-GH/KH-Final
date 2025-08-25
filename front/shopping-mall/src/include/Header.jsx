@@ -10,6 +10,7 @@ import {
   MenuGroup,
 } from "./HeaderStyle";
 import useCustomLogin from "../hooks/useCustomLogin";
+import logo from "../assets/seleur.png";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
@@ -28,7 +29,7 @@ const Header = () => {
 
   return (
     <Nav>
-      <img src="" alt="메인 로고" onClick={() => navigate("/")} />
+      <img src={logo} alt="메인 로고" onClick={() => navigate("/")} />
       <MenuToggle onClick={() => setOpen(!open)} open={open}>
         <span></span>
         <span></span>
@@ -122,7 +123,7 @@ const Header = () => {
               </MenuItem>
             </div>
           </MenuGroup>
-          <img src="" alt="메인 로고" onClick={() => navigate("/")} />
+          <img src={logo} alt="메인 로고" onClick={() => navigate("/")} />
           {loginState.memberId ? (
             <div className="MenuItemRight">
               <MenuItem>

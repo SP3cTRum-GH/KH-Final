@@ -44,6 +44,7 @@ const SignUpPage = lazy(() => import("../pages/member/SignUpPage"));
 
 // review 페이지
 const ReviewPage = lazy(() => import("../pages/member/ReviewPage"));
+const ReviewModifyPage = lazy(() => import("../pages/member/ReviewModifyPage"));
 
 // 카카오 리다이렉트 페이지
 const KakaoRedirect = lazy(() => import("../pages/member/KakaoRedirectPage"));
@@ -200,6 +201,14 @@ const root = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <ReviewPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/reviewmodify",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ReviewModifyPage />
       </Suspense>
     ),
   },

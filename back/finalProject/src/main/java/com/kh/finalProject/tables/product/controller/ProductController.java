@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
+import com.kh.finalProject.tables.product.dto.BidDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
@@ -173,6 +174,9 @@ public class ProductController {
         return Map.of("RESULT", "SUCCESS");
     }
     
-    
+    @PostMapping("/bid")
+    public ResponseEntity<Integer>bidding(@RequestBody BidDTO bid){
+    	return ResponseEntity.ok(productService.bid(bid));
+    }
     
 }
