@@ -1,13 +1,25 @@
 package com.kh.finalProject.tables.review.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.review.dto.ReviewRequestDTO;
 import com.kh.finalProject.tables.review.dto.ReviewResponseDTO;
 import com.kh.finalProject.tables.review.service.ReviewService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -46,5 +58,10 @@ public class ReviewController {
     @DeleteMapping("/{reviewNo}")
     public void delete(@PathVariable Long reviewNo) {
         reviewService.delete(reviewNo);
+    }
+    
+    @GetMapping
+    public List<ReviewResponseDTO> getReviewForMember(@RequestParam String memberId) {
+    	return reviewService.getReviewForMember(memberId);
     }
 }
