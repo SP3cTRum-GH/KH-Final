@@ -6,6 +6,7 @@ import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 import com.kh.finalProject.tables.product.entity.Product;
 import com.kh.finalProject.tables.productImages.component.ProductImagesConverter;
+import com.kh.finalProject.tables.productImages.entity.ProductImages;
 import com.kh.finalProject.tables.productsize.component.ProductSizeConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,12 +15,12 @@ import java.util.ArrayList;
 
 @Component
 public class ProductConverter {
-    ProductImagesConverter pic = new  ProductImagesConverter();
-    ProductSizeConverter psc = new  ProductSizeConverter();
+    ProductImagesConverter pic = new ProductImagesConverter();
+    ProductSizeConverter psc = new ProductSizeConverter();
 
     // ---------- CREATE ----------
     public Product toEntityFromDeal(ProductDealRequestDTO dto) {
-        return Product.builder()
+        Product product = Product.builder()
                 .productName(dto.getProductName())
                 .category(dto.getCategory())
                 .price(dto.getPrice())
@@ -30,10 +31,28 @@ public class ProductConverter {
                 .productImagesList(new ArrayList<>())
                 .productsizeList(new ArrayList<>())
                 .build();
+
+        // 이미지 추가
+        if (dto.getImageFileNames() != null) {
+            dto.getImageFileNames().forEach(fileName -> {
+                product.addImages(ProductImages.builder()
+                        .img(fileName)
+                        .product(product)
+                        .build());
+            });
+        }
+
+        if (dto.getSizes() != null) {
+            dto.getSizes().forEach(size ->
+                    product.addSize(psc.toEntityFromProductSize(size, product))
+            );
+        }
+
+        return product;
     }
 
     public Product toEntityFromShop(ProductShopRequestDTO dto) {
-        return Product.builder()
+        Product product = Product.builder()
                 .productName(dto.getProductName())
                 .category(dto.getCategory())
                 .price(dto.getPrice())
@@ -44,6 +63,23 @@ public class ProductConverter {
                 .productImagesList(new ArrayList<>())
                 .productsizeList(new ArrayList<>())
                 .build();
+        // 이미지 추가
+        if (dto.getImageFileNames() != null) {
+            dto.getImageFileNames().forEach(fileName -> {
+                product.addImages(ProductImages.builder()
+                        .img(fileName)
+                        .product(product)
+                        .build());
+            });
+        }
+
+        if (dto.getSizes() != null) {
+            dto.getSizes().forEach(size ->
+                    product.addSize(psc.toEntityFromProductSize(size, product))
+            );
+        }
+
+        return product;
     }
 
     // ---------- UPDATE (재조립) ----------
@@ -110,7 +146,8 @@ public class ProductConverter {
     }
 
     // ---------- util ----------
-    private static <T> T nvl(T v, T defVal) { return v != null ? v : defVal; }
-    
-    
+    private static <T> T nvl(T v, T defVal) {
+        return v != null ? v : defVal;
+    }
+
 }
