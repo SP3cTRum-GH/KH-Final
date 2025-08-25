@@ -1,25 +1,31 @@
 package com.kh.finalProject.tables.product.dto;
 
-import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
 import com.kh.finalProject.tables.productsize.dto.ProductSizeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ProductShopRequestDTO {
+    private Long productNo;
+
     private String productName;
     private String category;
     private Integer price;
     private Boolean type;
-    private List<ProductImagesDTO> images;
     private List<ProductSizeDTO> sizes;
+
+    @Builder.Default
+    private List<MultipartFile> uploadFiles = new ArrayList<>();
+
+    @Builder.Default
+    private List<String> imageFileNames = new ArrayList<>();
 }
