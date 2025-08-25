@@ -49,10 +49,9 @@ public class ProductServiceImpl implements ProductService {
 
     // Paging
     @Override
-    public PageResponseDTO<ProductDealResponseDTO> pageDeal(PageRequestDTO req) {
-        Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize(),
-                Sort.by(Sort.Direction.DESC, "productNo")); // 필요하면 regDate로
-        Page<Product> page = productRepository.findByType(true, pageable);
+    public PageResponseDTO<ProductDealResponseDTO> pageDeal(String category, PageRequestDTO req) {
+        Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize()); 
+        Page<Product> page = productRepository.findByType(true,category, pageable);
 
         List<ProductDealResponseDTO> list = page.getContent().stream()
                 .map(productConverter::toDealResponse)
@@ -66,10 +65,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PageResponseDTO<ProductShopResponseDTO> pageShop(PageRequestDTO req) {
+    public PageResponseDTO<ProductShopResponseDTO> pageShop(String category, PageRequestDTO req) {
         Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize(),
                 Sort.by(Sort.Direction.DESC, "productNo"));
-        Page<Product> page = productRepository.findByType(false, pageable);
+        Page<Product> page = productRepository.findByType(false,category, pageable);
 
         List<ProductShopResponseDTO> list = page.getContent().stream()
                 .map(productConverter::toShopResponse)
@@ -253,8 +252,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(productNo);           // orphanRemoval로 이미지 row 삭제
         if (!names.isEmpty()) fileUtil.deleteFiles(names); // 디스크 파일 삭제(썸네일 포함)
     }
-
-	
     
 
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class ReviewRequestDTO {
+	private Long logNo;
     private String reviewImg;
     private double rating;
     private String content;

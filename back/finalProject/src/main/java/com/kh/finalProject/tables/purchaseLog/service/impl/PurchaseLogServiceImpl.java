@@ -196,7 +196,6 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 	@Override
 	public MainPageDTO bestItem() {
 		List<Long> bestItemNo = purchaseLogRepository.findBestProduct();
-
 		List<ProductDealResponseDTO> dealProducts = productRepository.findByProductNoInAndType(bestItemNo, true)
 				.stream().limit(5).map(productConverter::toDealResponse).collect(Collectors.toList());
 		List<ProductShopResponseDTO> shopProducts = productRepository.findByProductNoInAndType(bestItemNo, false)
