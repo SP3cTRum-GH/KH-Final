@@ -104,6 +104,11 @@ public class ProductController {
             PageRequestDTO pageRequestDTO) {
         return productService.pageDeal(category, pageRequestDTO);
     }
+    
+    @GetMapping("/deal/popular")
+    public PageResponseDTO<ProductDealResponseDTO> popularDeal(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
+        return productService.popularDeal(category,pageRequestDTO);
+    }
 
     // ====== SHOP(일반) ======
     @PostMapping("/shop")
@@ -168,6 +173,10 @@ public class ProductController {
             PageRequestDTO pageRequestDTO) {
         return productService.pageShop(category, pageRequestDTO);
     }
+    @GetMapping("/shop/popular")
+    public PageResponseDTO<ProductShopResponseDTO> popularShop(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
+        return productService.popularShop(category, pageRequestDTO);
+    }
 
     // 공통 삭제
     @DeleteMapping("/{id}")
@@ -177,8 +186,8 @@ public class ProductController {
     }
 
     @PostMapping("/bid")
-    public ResponseEntity<Integer> bidding(@RequestBody BidDTO bid) {
-        return ResponseEntity.ok(productService.bid(bid));
+    public ResponseEntity<Integer> bidding(@RequestBody BidDTO bid){
+    	return ResponseEntity.ok(productService.bid(bid));
     }
 
 }

@@ -15,6 +15,8 @@ public interface ProductService {
     // Paging
     PageResponseDTO<ProductDealResponseDTO> pageDeal(String category, PageRequestDTO req);
     PageResponseDTO<ProductShopResponseDTO> pageShop(String category, PageRequestDTO req);
+    PageResponseDTO<ProductDealResponseDTO> popularDeal(String category, PageRequestDTO req);
+    PageResponseDTO<ProductShopResponseDTO> popularShop(String category, PageRequestDTO req);
 
     // CREATE
     Long createDeal(ProductDealRequestDTO dto);

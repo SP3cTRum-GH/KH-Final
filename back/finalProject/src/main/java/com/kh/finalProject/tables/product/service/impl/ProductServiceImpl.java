@@ -85,6 +85,40 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    @Override
+	public PageResponseDTO<ProductDealResponseDTO> popularDeal(String category, PageRequestDTO req) {
+    	 Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize() ,
+        		 Sort.unsorted());
+        Page<Product> page = productRepository.findPopular(true,category, pageable);
+
+        List<ProductDealResponseDTO> list = page.getContent().stream()
+                .map(productConverter::toDealResponse)
+                .toList();
+
+        return PageResponseDTO.<ProductDealResponseDTO>withAll()
+                .dtoList(list)
+                .pageRequestDTO(req)
+                .totalCount(page.getTotalElements())
+                .build();
+	}
+
+	@Override
+	public PageResponseDTO<ProductShopResponseDTO> popularShop(String category, PageRequestDTO req) {
+		 Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize(),
+	                Sort.unsorted());
+	        Page<Product> page = productRepository.findPopular(false,category, pageable);
+
+	        List<ProductShopResponseDTO> list = page.getContent().stream()
+	                .map(productConverter::toShopResponse)
+	                .toList();
+
+	        return PageResponseDTO.<ProductShopResponseDTO>withAll()
+	                .dtoList(list)
+	                .pageRequestDTO(req)
+	                .totalCount(page.getTotalElements())
+	                .build();
+	}
+    
     // CREATE
     @Override
     public Long createDeal(ProductDealRequestDTO dto) {
@@ -220,6 +254,5 @@ public class ProductServiceImpl implements ProductService {
 		productRepository.save(p);
 		return p.getDealCurrent();
 	}
-    
 
 }
