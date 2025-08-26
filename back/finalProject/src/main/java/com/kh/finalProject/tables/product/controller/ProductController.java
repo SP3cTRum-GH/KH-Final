@@ -6,6 +6,7 @@ import java.util.Map;
 import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -175,8 +176,8 @@ public class ProductController {
     }
     
     @PostMapping("/bid")
-    public ResponseEntity<Integer>bidding(@RequestBody BidDTO bid){
+    public ResponseEntity<Integer> bidding(@RequestBody BidDTO bid){
     	return ResponseEntity.ok(productService.bid(bid));
     }
-    
+
 }

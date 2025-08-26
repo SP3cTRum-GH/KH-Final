@@ -2,15 +2,9 @@ package com.kh.finalProject.tables.review.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.kh.finalProject.common.file.CustomFileUtil;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
@@ -20,6 +14,7 @@ import com.kh.finalProject.tables.review.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.web.multipart.MultipartFile;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -27,6 +22,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/api/review")
 public class ReviewController {
     private final ReviewService reviewService;
+    private final CustomFileUtil fileUtil;
 
     @GetMapping("/list")//전체 리뷰개수 count를 주거나 전체리스트를 다주거
     public PageResponseDTO<ReviewResponseDTO> list(PageRequestDTO pageRequestDTO,
@@ -37,11 +33,16 @@ public class ReviewController {
     }
 
     // Create
-    @PostMapping
-    public ReviewResponseDTO create(@RequestBody ReviewRequestDTO reviewRequestDTO) {
-        return reviewService.create(reviewRequestDTO);
-    }
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ReviewResponseDTO create(@ModelAttribute ReviewRequestDTO dto) {
+        MultipartFile file = dto.getUploadFile();
 
+        if (file != null && !file.isEmpty()) {
+            List<String> names = fileUtil.saveFiles(java.util.List.of(file));
+            if (!names.isEmpty()) dto.setReviewImg(names.get(0));
+        }
+        return reviewService.create(dto);
+    }
     // Read
     @GetMapping("/{reviewNo}")
     public ReviewResponseDTO get(@PathVariable Long reviewNo) {
@@ -49,9 +50,18 @@ public class ReviewController {
     }
 
     // Update
-    @PutMapping("/{reviewNo}")
-    public ReviewResponseDTO update(@PathVariable Long reviewNo, @RequestBody ReviewRequestDTO reviewRequestDTO) {
-        return reviewService.update(reviewNo, reviewRequestDTO);
+    @PutMapping(value = "/{reviewNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ReviewResponseDTO update(@PathVariable Long reviewNo, @ModelAttribute ReviewRequestDTO dto) {
+        MultipartFile file = dto.getUploadFile();
+
+        if (file != null && !file.isEmpty()) {
+            List<String> names = fileUtil.saveFiles(java.util.List.of(file));
+            if (!names.isEmpty()) dto.setReviewImg(names.get(0));
+        } else {
+            // 새 업로드 없으면 null 그대로 두고 Service에서 기존 img 유지
+            dto.setReviewImg(null);
+        }
+        return reviewService.update(reviewNo, dto);
     }
 
     // Delete
