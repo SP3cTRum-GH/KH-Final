@@ -3,9 +3,8 @@ package com.kh.finalProject.tables.product.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.kh.finalProject.common.file.CustomFileUtil;
-import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
 import com.kh.finalProject.tables.product.dto.BidDTO;
@@ -24,10 +25,10 @@ import com.kh.finalProject.tables.product.dto.ProductDealResponseDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopRequestDTO;
 import com.kh.finalProject.tables.product.dto.ProductShopResponseDTO;
 import com.kh.finalProject.tables.product.service.ProductService;
+import com.kh.finalProject.tables.productImages.dto.ProductImagesDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.multipart.MultipartFile;
 
 @Log4j2
 @RestController
@@ -99,8 +100,9 @@ public class ProductController {
     }
 
     @GetMapping("/deal/list")
-    public PageResponseDTO<ProductDealResponseDTO> pageDeal(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
-        return productService.pageDeal(category,pageRequestDTO);
+    public PageResponseDTO<ProductDealResponseDTO> pageDeal(@RequestParam(required = false) String category,
+            PageRequestDTO pageRequestDTO) {
+        return productService.pageDeal(category, pageRequestDTO);
     }
 
     // ====== SHOP(일반) ======
@@ -161,9 +163,9 @@ public class ProductController {
         return Map.of("RESULT", "SUCCESS");
     }
 
-
     @GetMapping("/shop/list")
-    public PageResponseDTO<ProductShopResponseDTO> pageShop(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<ProductShopResponseDTO> pageShop(@RequestParam(required = false) String category,
+            PageRequestDTO pageRequestDTO) {
         return productService.pageShop(category, pageRequestDTO);
     }
 
@@ -173,10 +175,10 @@ public class ProductController {
         productService.delete(id);
         return Map.of("RESULT", "SUCCESS");
     }
-    
+
     @PostMapping("/bid")
-    public ResponseEntity<Integer>bidding(@RequestBody BidDTO bid){
-    	return ResponseEntity.ok(productService.bid(bid));
+    public ResponseEntity<Integer> bidding(@RequestBody BidDTO bid) {
+        return ResponseEntity.ok(productService.bid(bid));
     }
-    
+
 }
