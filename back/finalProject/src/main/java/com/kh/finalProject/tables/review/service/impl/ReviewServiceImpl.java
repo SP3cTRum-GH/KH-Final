@@ -62,6 +62,7 @@ public class ReviewServiceImpl implements ReviewService {
                         .content(r.getContent())
                         .productNo(r.getProduct().getProductNo())
                         .type(r.getProduct().getType())
+                        .memberNo(r.getMember().getMemberNo())
                         .memberId(r.getMember().getMemberId())
                         .regDate(r.getRegDate())
                         .build())
@@ -76,18 +77,38 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewResponseDTO create(ReviewRequestDTO dto) {
-        Product product = productRepository.findById(dto.getProductNo())
-                .orElseThrow(() -> new IllegalArgumentException("product not found"));
-        Member member = memberRepository.getWithRoles(dto.getMemberId());
+        // 1) 로그 먼저
         PurchaseLog log = purchaseLogRepository.findById(dto.getLogNo())
-        		.orElseThrow(() -> new IllegalArgumentException("log not found"));
-        
+                .orElseThrow(() -> new IllegalArgumentException("log not found"));
+
+        // 2) 로그에서 productNo 가져와 상품 로드
+        Long productNo = log.getProductNo();
+        Product product = productRepository.findById(productNo)
+                .orElseThrow(() -> new IllegalArgumentException("product not found"));
+
+        // (옵션) 클라가 productNo 보냈다면 검증
+        if (dto.getProductNo() != null && !dto.getProductNo().equals(productNo)) {
+            throw new IllegalArgumentException("mismatched productNo for logNo");
+        }
+
+        // 3) 멤버
+        Member member = memberRepository.getWithRoles(dto.getMemberId());
+
+        // 4) 로그 플래그
         log.setIsReviewed(true);
         purchaseLogRepository.save(log);
 
-        Review review = reviewConverter.toEntity(dto, product, member); // 새 엔티티 생성
-        Review saved = reviewRepository.save(review);                   // 저장
-        return reviewConverter.toDto(saved);                            // DTO로 반환
+        // 5) 리뷰 저장
+        Review review = Review.builder()
+                .reviewImg(dto.getReviewImg()) // 컨트롤러에서 업로드 후 파일명 세팅됨
+                .rating(dto.getRating())
+                .content(dto.getContent())
+                .product(product)
+                .member(member)
+                .build();
+
+        Review saved = reviewRepository.saveAndFlush(review);
+        return reviewConverter.toDto(saved);
     }
 
     @Override
@@ -106,14 +127,23 @@ public class ReviewServiceImpl implements ReviewService {
         String oldFile = review.getReviewImg();      // 기존 파일명
         String newFile = dto.getReviewImg();         // 새 파일명(없으면 null 가능)
 
-        review.setReviewImg(newFile);
+        // 이미지 교체: 새 파일명 있을 때만 교체
+        if(newFile != null && !newFile.isBlank()){                  // new 파일이 null이 아니고 비어있지 않다면
+            review.setReviewImg(newFile);                           // review 객체에 newFile의 정보를 담는다.
+            if(oldFile != null && !oldFile.equals(newFile)){        // oldFile이 null이 아니고 newFile과 동일하다면
+                fileUtil.deleteFiles(java.util.List.of(oldFile));   // deleteFiles가 List<String>만 받으므로
+                                                                    // 단일 원소 리스트(List.of(oldFile))로 감싸서 전달해 삭제
+            }
+        }
+        // 새 업로드가 없으면 기존 이미지 유지
+
         review.setRating(dto.getRating());
         review.setContent(dto.getContent());
 
-        // 파일이 변경되었으면 디스크에서 삭제
-        if (oldFile != null && !oldFile.equals(newFile)) {
-            fileUtil.deleteFiles(java.util.List.of(oldFile)); // 썸네일까지 같이 지움
-        }
+//        // 파일이 변경되었으면 디스크에서 삭제
+//        if (oldFile != null && !oldFile.equals(newFile)) {
+//            fileUtil.deleteFiles(java.util.List.of(oldFile)); // 썸네일까지 같이 지움
+//        }
         return reviewConverter.toDto(review);
     }
 
@@ -121,9 +151,16 @@ public class ReviewServiceImpl implements ReviewService {
     public void delete(Long reviewNo) {
         Review r = reviewRepository.findById(reviewNo)
                 .orElseThrow(() -> new IllegalArgumentException("review not found"));
+
         String name = r.getReviewImg();
+        if (name != null && !name.isBlank()) {
+
+            int idx = name.lastIndexOf('/');
+            if (idx != -1) name = name.substring(idx + 1);
+
+            fileUtil.deleteFiles(java.util.List.of(name));
+        }
         reviewRepository.delete(r);
-        if (name != null && !name.isBlank()) fileUtil.deleteFiles(java.util.List.of(name));
     }
 
     private String toUrl(String fileName) {
