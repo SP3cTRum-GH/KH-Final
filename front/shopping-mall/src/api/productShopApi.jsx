@@ -30,6 +30,16 @@ export const getFilterProductList = async (pageParam, filter) => {
   return res.data;
 };
 
+// // 상품 필터링(판매순)
+// export const getFilterProductList = async (pageParam, filter) => {
+//   const { page, size } = pageParam;
+//   const res = await axios.get(`${prefix}/popular?category=${filter}`, {
+//     params: { page, size },
+//   });
+
+//   return res.data;
+// };
+
 // shop 상품 등록
 export const postShopProductItem = async (product) => {
   const res = await axios.post(`${prefix}`, product);

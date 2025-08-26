@@ -2,10 +2,17 @@ import axios from "axios";
 import { API_SERVER_HOST } from "./HostUrl";
 
 const prefix = `${API_SERVER_HOST}/api/product/deal`;
+const dealfix = `${API_SERVER_HOST}/api/product`;
 
 // 상품 1개 가져오기
 export const getDealOne = async (productNo) => {
   const res = await axios.get(`${prefix}/${productNo}`);
+  return res.data;
+};
+
+// 경매 입찰 기능
+export const productBid = async (data) => {
+  const res = await axios.post(`${dealfix}/bid`, data);
   return res.data;
 };
 

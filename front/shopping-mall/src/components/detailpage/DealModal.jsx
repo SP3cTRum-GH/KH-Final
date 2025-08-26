@@ -8,9 +8,45 @@ import {
   ButtonRow,
   Button,
 } from "./DealModalStyle";
+import { productBid } from "../../api/productDealApi";
+import { addCart } from "../../api/cartApi";
+import { getCookie } from "../../util/cookieUtil";
+import { useNavigate } from "react-router-dom";
 
-const DealModal = ({ currentPrice = 10000, onConfirm, onCancel }) => {
+const DealModal = ({ currentPrice = 10000, onConfirm, onCancel, param }) => {
   const [bidAmount, setBidAmount] = useState("");
+  const navigate = useNavigate();
+
+  const fd = {
+    productNo: param.productNo,
+    quantity: 1,
+    size: "deal",
+  };
+
+  const handleBid = () => {
+    const bidData = { productNo: fd.productNo, price: bidAmount };
+    console.log(bidData);
+
+    productBid(bidData)
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        return;
+      });
+
+    addCart(getCookie("member").memberId, fd)
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        return;
+      });
+
+    navigate("/cart");
+  };
 
   return (
     <ModalOverlay>
@@ -28,7 +64,10 @@ const DealModal = ({ currentPrice = 10000, onConfirm, onCancel }) => {
         <ButtonRow>
           <Button
             className="confirm"
-            onClick={() => onConfirm && onConfirm(Number(bidAmount))}
+            onClick={() => {
+              onConfirm?.(fd); // 부모 콜백 실행
+              handleBid(); // API 실행
+            }}
           >
             입찰
           </Button>

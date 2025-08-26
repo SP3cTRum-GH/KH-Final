@@ -62,13 +62,12 @@ const DealDetailComponent = () => {
   };
 
   const handleConfirmBid = (amount) => {
-    const currentPrice = dealProductData.price;
-    if (amount < currentPrice) {
+    const currentPrice = dealProductData.dealCurrent;
+    if (amount <= currentPrice) {
       alert(`입찰가는 ${currentPrice.toLocaleString()}원 보다 높아야 합니다.`);
       return;
     }
 
-    console.log("입찰 금액 : ", amount);
     setResult(false);
   };
 
@@ -113,9 +112,10 @@ const DealDetailComponent = () => {
 
       {result && (
         <DealModal
-          currentPrice={dealProductData.price}
+          currentPrice={dealProductData.dealCurrent}
           onConfirm={handleConfirmBid}
           onCancel={handleCloseModal}
+          param={param}
         />
       )}
     </>

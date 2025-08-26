@@ -55,7 +55,7 @@ public class CartServiceImpl implements CartService {
                             .size(cartItem.getSize())
                             .startDate(cartItem.getProduct().getRegDate())
                             .endDate(cartItem.getProduct().getEndDate())
-                            .dealCurrent(cartItem.getProduct().getPrice())
+                            .dealCurrent(cartItem.getProduct().getDealCurrent())
                             .type(cartItem.getProduct().getType())
                             .imgUrl(imageUrl)
                             .build();

@@ -376,6 +376,7 @@ const CartPageComponent = () => {
             {(Number(item.price ?? 0) / item.quantity).toLocaleString()} 원 /
             최고 가격 : {Number(item.dealCurrent).toLocaleString()}원{" "}
           </Price>
+          {console.log(item)}
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
               옵션 변경

@@ -29,7 +29,13 @@ const SortButton = ({ menu, filterBtn, getList }) => {
       </div>
       <SortBtn>
         <p onClick={() => getList()}>최신순</p>
-        <p>{menu}</p>
+        <p
+          onClick={() => {
+            filterBtn();
+          }}
+        >
+          {menu}
+        </p>
       </SortBtn>
     </BtnContainer>
   );
