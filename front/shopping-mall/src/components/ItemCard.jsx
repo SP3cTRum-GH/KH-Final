@@ -124,7 +124,11 @@ const ItemCard = ({ page, dtoList }) => {
                       ? product.productName
                       : product.productName?.slice(0, 7) + "..."}
                   </p>
-                  <h4>{Number(product.price).toLocaleString()}원</h4>
+                  {product.type ? (
+                    <h4>{Number(product.dealCurrent).toLocaleString()}원</h4>
+                  ) : (
+                    <h4>{Number(product.price).toLocaleString()}원</h4>
+                  )}
 
                   {page === "shopdetail" && isSoldOut && (
                     <div

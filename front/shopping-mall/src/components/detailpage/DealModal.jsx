@@ -24,7 +24,6 @@ const DealModal = ({ currentPrice = 10000, onConfirm, onCancel }) => {
             value={bidAmount}
             onChange={(e) => setBidAmount(e.target.value)}
           />
-          <span> 원</span>
         </div>
         <ButtonRow>
           <Button

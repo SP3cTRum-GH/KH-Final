@@ -62,8 +62,8 @@ const DealDetailComponent = () => {
   };
 
   const handleConfirmBid = (amount) => {
-    const currentPrice = 47200;
-    if (amount <= currentPrice) {
+    const currentPrice = dealProductData.price;
+    if (amount < currentPrice) {
       alert(`입찰가는 ${currentPrice.toLocaleString()}원 보다 높아야 합니다.`);
       return;
     }

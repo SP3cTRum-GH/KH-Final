@@ -24,6 +24,7 @@ const SelectOption = ({
 }) => {
   const name = productData?.productName ?? "";
   const price = productData?.price ?? 0;
+  const culPrice = productData?.dealCurrent ?? 0;
   const sizes = Array.isArray(productData?.sizes) ? productData.sizes : [];
   const reviewCount = Array.isArray(reviewListCount)
     ? reviewListCount.length
@@ -60,6 +61,36 @@ const SelectOption = ({
     if (v < 1) return setQty(1);
     if (v > stock) return setQty(stock);
     setQty(v);
+  };
+
+  const isDeal = productData?.type === true;
+
+  // 버튼(구매/입찰) 클릭 시 타입에 따라 분기
+  const handlePrimaryClick = () => {
+    if (isDeal) {
+      // 딜(경매)일 때: 모달 오픈(상위에서 주입된 핸들러 사용)
+      if (!selectedSize) {
+        alert("사이즈를 선택해주세요.");
+        return;
+      }
+      if (stock === 0) {
+        alert("해당 사이즈는 품절입니다.");
+        return;
+      }
+      if (typeof handleOpenModal === "function") {
+        handleOpenModal({
+          type: "deal",
+          productNo: param.productNo,
+          size: selectedSize,
+          quantity: qty,
+          currentPrice: productData?.price ?? 0,
+        });
+      }
+      return;
+    }
+
+    // 일반(shop)일 때 기존 구매 로직 실행
+    handleBuyClick();
   };
 
   const handleBuyClick = () => {
@@ -149,7 +180,7 @@ const SelectOption = ({
 
       <PriceContainer>
         <PriceBox>
-          <SalePrice>{Number(price).toLocaleString()} 원</SalePrice>
+          <SalePrice>{Number(culPrice).toLocaleString()} 원</SalePrice>
         </PriceBox>
 
         <ReviewBox>
@@ -222,10 +253,10 @@ const SelectOption = ({
         </SelectWrapper>
 
         <BuyButton
-          onClick={handleBuyClick}
+          onClick={handlePrimaryClick}
           disabled={!selectedSize || stock === 0}
         >
-          구매하기
+          {isDeal ? "입찰하기" : "구매하기"}
         </BuyButton>
 
         <InterestBox onClick={handleCartClick}>장바구니</InterestBox>
