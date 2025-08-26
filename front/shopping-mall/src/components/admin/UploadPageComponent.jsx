@@ -69,19 +69,20 @@ export default function UploadPageComponent() {
     }
 
     // 사이즈/재고
-    let sizes = [];
     if (product.salesType === "true") {
       // 경매 상품: 사이즈는 항상 'deal', 수량은 1개만
-      sizes = [{ productSize: "deal", stock: 1 }];
+      formData.append("sizes[0].productSize", "deal");
+      formData.append("sizes[0].stock", 1);
     } else {
       // 일반 상품: 선택된 사이즈별 재고
-      sizes = selectedSizes.map((size) => ({
-        productSize: size,
-        stock: Number(stockBySize?.[size] ?? 0),
-      }));
+      selectedSizes.forEach((size, idx) => {
+        formData.append(`sizes[${idx}].productSize`, size);
+        formData.append(
+          `sizes[${idx}].stock`,
+          Number(stockBySize?.[size] ?? 0)
+        );
+      });
     }
-    // 서버가 JSON 문자열로 사이즈 목록을 받는 경우
-    formData.append("sizes", JSON.stringify(sizes));
 
     // 이미지 파일 추가 (previewImages가 File 또는 {file: File} 혼재해도 처리)
     previewImages.forEach((img) => {
