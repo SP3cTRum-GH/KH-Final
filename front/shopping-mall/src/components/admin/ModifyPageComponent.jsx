@@ -15,7 +15,7 @@ export default function ModifyPageComponent() {
     category: "",
     price: "",
     stock: "",
-    dealCount: "",
+    // dealCount: "",
     dealCurrent: "",
     endDate: "",
   });
@@ -152,6 +152,7 @@ export default function ModifyPageComponent() {
 
         {/* 이미지 업로드 */}
         <ImageUploader
+          proudct={product}
           previewImages={previewImages}
           setPreviewImages={setPreviewImages}
         />

@@ -4,13 +4,16 @@ export const BtnContainer = styled.div`
     width: 100%;
     display: flex;
     justify-content: space-between;
-    margin: 0 100px;
+    /* margin: 0 100px; */
     margin-bottom: 10px;
+    margin-left: 10px;
+    margin-top: 10px;
 
     @media (max-width: 500px) {
         display: flex;
         flex-direction: column;
         gap: 10px;
+        margin-top: 10px;
     }
 
     div {
@@ -38,5 +41,6 @@ export const BtnContainer = styled.div`
 `
 
 export const SortBtn = styled.div`
-    margin-right: 200px;
+    margin-right: 20px;
+    display: flex;
 `

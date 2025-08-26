@@ -18,7 +18,7 @@ export const Container = styled.div`
   max-width: 1200px;
   margin-left: 100px; */
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
 gap: 20px;
 width: 100%;
 max-width: 1200px;
@@ -112,8 +112,8 @@ export const PlusContainer = styled.div`
   font-size: 2rem;
   font-weight: bold;
   color: #666;
-  min-height: 250px;
-  width: 200px;
+  /* min-height: 250px;
+  width: 200px; */
   transition: all 0.2s ease;
 
   &:hover {

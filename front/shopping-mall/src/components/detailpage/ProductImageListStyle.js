@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const ImgContainer = styled.div`
     display: flex;
     height: auto;
-    
+    gap: 10px;
     align-items: center;
     flex-direction: column;
     margin-bottom: 80px;

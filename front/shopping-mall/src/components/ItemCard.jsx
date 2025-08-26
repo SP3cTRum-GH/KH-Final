@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Wrap,
@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { deleteProductItem } from "../api/productShopApi";
+import axios from "axios";
 
 const ItemCard = ({ page, dtoList }) => {
   const navigate = useNavigate();
@@ -20,8 +21,33 @@ const ItemCard = ({ page, dtoList }) => {
   const [items, setItems] = useState(dtoList || []);
 
   useEffect(() => {
-    setItems(dtoList || []);
-  }, [dtoList]);
+    const fetchFirstImages = async () => {
+      if (!dtoList) return;
+
+      const updatedItems = await Promise.all(
+        dtoList.map(async (product) => {
+          try {
+            const type = page === "dealdetail" ? "deal" : "shop";
+            const res = await axios.get(
+              `http://localhost:8080/api/product/${type}/${product.productNo}`
+            );
+            const firstImg =
+              res.data.images && res.data.images.length > 0
+                ? res.data.images[0].img
+                : null;
+            return { ...product, img: firstImg };
+          } catch (err) {
+            console.error("이미지 로드 실패", err);
+            return product;
+          }
+        })
+      );
+
+      setItems(updatedItems);
+    };
+
+    fetchFirstImages();
+  }, [dtoList, page]);
 
   const handleDelete = async (productNo) => {
     try {
@@ -32,22 +58,18 @@ const ItemCard = ({ page, dtoList }) => {
         return;
       }
 
-      // Optimistic UI update: remove the item locally
       setItems((prev) => prev.filter((p) => p.productNo !== productNo));
     } catch (err) {
       console.error("Delete failed", err);
-      // Optional: show toast/alert
     }
   };
 
   return (
     <Wrapper>
       <Container>
-        {/* ADMIN이면 맨 앞에 + 카드 추가 */}
         {isAdmin && (
           <PlusContainer
             onClick={() => {
-              console.log("page:", page);
               navigate("/admin/upload", {
                 state: { salesType: page === "dealdetail" },
               });
@@ -60,7 +82,6 @@ const ItemCard = ({ page, dtoList }) => {
         {items.map((product) => {
           const isExpired =
             product.endDate && new Date(product.endDate) < new Date();
-
           const isSoldOut =
             page === "shopdetail" &&
             product.sizes &&
@@ -73,10 +94,7 @@ const ItemCard = ({ page, dtoList }) => {
               style={{ position: "relative" }}
             >
               <img
-                src={
-                  product.img ||
-                  "https://static.lookpin.co.kr/20230522103305-7865/b5d83dcf8c9a2ace9fbb76650fe33c8b.JPG"
-                }
+                src={product.img ? `http://localhost:8080${product.img}` : null}
                 alt=""
                 onClick={() => {
                   if (!isExpired && !isSoldOut) {
@@ -108,7 +126,6 @@ const ItemCard = ({ page, dtoList }) => {
                   </p>
                   <h4>{Number(product.price).toLocaleString()}원</h4>
 
-                  {/* shop 상품이면 품절 여부 표시 */}
                   {page === "shopdetail" && isSoldOut && (
                     <div
                       style={{
@@ -128,7 +145,6 @@ const ItemCard = ({ page, dtoList }) => {
                     </div>
                   )}
 
-                  {/* deal일 경우 endDate 표시 */}
                   {page === "dealdetail" && product.endDate && (
                     <p style={{ fontSize: "0.9rem", color: "#ef4444" }}>
                       {isExpired
