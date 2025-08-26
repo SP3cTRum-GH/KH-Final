@@ -1,5 +1,5 @@
 // Review.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import {
   ReviewTitle,
@@ -19,8 +19,7 @@ import { deleteReview, updateReview } from "../../api/reviewApi";
 import { getCookie } from "../../util/cookieUtil";
 import { API_SERVER_HOST } from "../../api/HostUrl";
 
-// Helper: resolve image src (handles blob/http/data or server-relative)
-const getImageSrc = (img) => {
+const getImageSrc = (img, nonce) => {
   if (!img) return null;
   const s = String(img);
   if (
@@ -31,8 +30,16 @@ const getImageSrc = (img) => {
   ) {
     return s;
   }
-  return `${API_SERVER_HOST}${s}`;
+  const q = nonce ? (s.includes("?") ? `&t=${nonce}` : `?t=${nonce}`) : "";
+  return `${API_SERVER_HOST}${s}${q}`;
 };
+
+async function urlToFile(url) {
+  const res = await fetch(url, { credentials: "include" });
+  const blob = await res.blob();
+  const name = url.split("/").pop() || "image.jpg";
+  return new File([blob], name, { type: blob.type || "image/jpeg" });
+}
 
 const Review = ({ reviewList }) => {
   const initialItems = reviewList?.dtoList ?? [];
@@ -43,6 +50,10 @@ const Review = ({ reviewList }) => {
     setRows(reviewList?.dtoList ?? []);
     setCount(reviewList?.totalCount ?? 0);
   }, [reviewList]);
+
+  // cache-busting per review image
+  const [imgNonceMap, setImgNonceMap] = useState({}); // { [reviewNo]: number }
+  const imgRetryRef = useRef({}); // { [reviewNo]: 1 } to avoid infinite retries
 
   // --- 편집 관련 상태 ---
   const [editingId, setEditingId] = useState(null);
@@ -98,6 +109,7 @@ const Review = ({ reviewList }) => {
     const reviewNo = review.reviewNo ?? review.id;
     const fd = new FormData();
 
+    // 텍스트/숫자 필드
     fd.append("content", draftContent ?? "");
     fd.append("rating", String(draftRating ?? 0));
 
@@ -105,45 +117,53 @@ const Review = ({ reviewList }) => {
       fd.append("productNo", String(review.productNo));
     }
 
+    // 서버에서 memberId를 기대한다면 memberId로 전송
     const memberCookie = getCookie("member");
     if (memberCookie?.memberId) {
-      fd.append("memberNo", memberCookie.memberId); // 서버 요구사항 확인 필요
+      fd.append("memberId", memberCookie.memberId);
     }
 
-    // 이미지 동작 전송값: 'new' | 'delete' | 'keep'
-    const imageAction = draftFile ? "new" : deleteImg ? "delete" : "keep";
-    fd.append("imageAction", imageAction);
-
-    // 호환: 서버가 deleteImage(boolean)만 읽는 경우를 위한 추가 플래그
-    if (imageAction === "delete") {
+    // 이미지 처리
+    // 1) 새 파일이 있으면 그 파일 업로드
+    if (draftFile instanceof File) {
+      fd.append("uploadFile", draftFile);
+    } else if (!deleteImg) {
+      // 2) 삭제가 아니고 기존 이미지가 있으면 기존 이미지를 파일로 변환하여 다시 업로드
+      const current = review.reviewImg;
+      if (current) {
+        const absoluteUrl = String(current).startsWith("http")
+          ? String(current)
+          : `${API_SERVER_HOST}${current}`;
+        try {
+          const file = await urlToFile(absoluteUrl);
+          fd.append("uploadFile", file);
+        } catch (e) {
+          console.error("urlToFile failed:", e);
+        }
+      }
+    } else {
+      // 3) 삭제 요청의 명시가 필요한 서버일 경우 플래그를 함께 보냄
       fd.append("deleteImage", "true");
     }
-
-    if (imageAction === "new" && draftFile) {
-      // 새 파일 업로드
-      fd.append("uploadFile", draftFile); // 서버에서 기대하는 파라미터명
-    }
-
-    // 디버깅
-    // for (const [k, v] of fd.entries()) {
-    //   console.log("[updateReview fd]", k, v);
-    // }
 
     try {
       await updateReview(reviewNo, fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // 로컬 상태 반영 (임시)
+      // 로컬 상태 반영
       setRows((prev) =>
         prev.map((r) => {
           const match = (r.reviewNo ?? r.id) === reviewNo;
           if (!match) return r;
-          const nextImg = deleteImg
-            ? ""
-            : draftFile
-            ? imagePreview
-            : r.reviewImg;
+
+          let nextImg = r.reviewImg;
+          if (deleteImg) {
+            nextImg = "";
+          } else if (draftFile && imagePreview) {
+            // 새 파일 미리보기 즉시 반영
+            nextImg = imagePreview;
+          }
           return {
             ...r,
             content: draftContent,
@@ -152,6 +172,15 @@ const Review = ({ reviewList }) => {
           };
         })
       );
+
+      // 캐시 버스터 갱신
+      setImgNonceMap((prev) => ({ ...prev, [reviewNo]: Date.now() }));
+
+      if (deleteImg || draftFile) {
+        // No reload, just update local state as above
+      } else {
+        location.reload(true);
+      }
 
       cancelEdit({ revoke: false });
     } catch (err) {
@@ -224,9 +253,8 @@ const Review = ({ reviewList }) => {
                 {(isEditing ? imagePreview : review.reviewImg) ? (
                   isEditing ? (
                     <ImgWrap>
-                      {console.log(imagePreview)}
                       <ReviewImage
-                        src={getImageSrc(imagePreview)}
+                        src={getImageSrc(imagePreview, imgNonceMap[id])}
                         alt="제품 리뷰 사진"
                       />
                       <ImgDeleteBtn
@@ -239,8 +267,17 @@ const Review = ({ reviewList }) => {
                     </ImgWrap>
                   ) : (
                     <ReviewImage
-                      src={getImageSrc(review.reviewImg)}
+                      src={getImageSrc(review.reviewImg, imgNonceMap[id])}
                       alt="제품 리뷰 사진"
+                      onError={() => {
+                        if (!imgRetryRef.current[id]) {
+                          imgRetryRef.current[id] = 1;
+                          setImgNonceMap((prev) => ({
+                            ...prev,
+                            [id]: Date.now(),
+                          }));
+                        }
+                      }}
                     />
                   )
                 ) : null}
