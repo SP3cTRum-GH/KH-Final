@@ -67,3 +67,24 @@ export const ActionBtnBox = styled.div`
         color:rgb(200, 200, 200);
     }
 `
+
+export const ImgWrap = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+export const ImgDeleteBtn = styled.button`
+  position: absolute;
+  top: 6px;
+  left: 5px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 16px;
+  line-height: 26px;
+  text-align: center;
+`;

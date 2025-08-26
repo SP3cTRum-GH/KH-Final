@@ -6,22 +6,16 @@ import { getShopOne } from "../../api/productShopApi";
 import { getDealOne } from "../../api/productDealApi";
 import { postReview } from "../../api/reviewApi";
 import { getCookie } from "../../util/cookieUtil";
+import { API_SERVER_HOST } from "../../api/HostUrl";
 
 const ReviewComponent = () => {
   const [product, setProduct] = useState({
     productName: "",
     price: 0,
+    images: [],
   });
   const memberId = getCookie("member").memberId;
 
-  const [formData, setFormData] = useState({
-    reviewImg: "null",
-    rating: 0,
-    content: "",
-    productNo: 0,
-    memberId: memberId,
-    logNo: 0,
-  });
   const [reviewText, setReviewText] = useState("");
   const [files, setFiles] = useState([]);
   const [rating, setRating] = useState(0);
@@ -56,6 +50,7 @@ const ReviewComponent = () => {
           setProduct({
             productName: data.productName ?? "",
             price: data.price ?? 0,
+            images: data.images ?? [],
           });
         }
       })
@@ -65,14 +60,22 @@ const ReviewComponent = () => {
   }, [productNo, isType]);
 
   const handleSubmit = () => {
-    const sendData = {
-      reviewImg: files[0]?.name || null,
-      rating: rating,
-      content: reviewText,
-      productNo: parseInt(productNo),
-      memberId: memberId,
-      logNo: isLogNo,
-    };
+    const sendData = new FormData();
+
+    if (files[0]) {
+      sendData.append("uploadFile", files[0]);
+    }
+    sendData.append("rating", rating);
+    sendData.append("content", reviewText);
+    sendData.append("productNo", parseInt(productNo));
+    sendData.append("memberId", memberId);
+    sendData.append("logNo", isLogNo);
+
+    // For debugging: log FormData contents
+    for (let pair of sendData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+      console.log(typeof pair[0]);
+    }
 
     postReview(sendData).then((data) => {
       console.log(data);
@@ -83,10 +86,12 @@ const ReviewComponent = () => {
     <ReviewContainer>
       <ReviewProductInfo>
         <div className="product-image">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/7596/7596292.png"
-            alt="제품 이미지"
-          />
+          {product.images?.[0]?.img && (
+            <img
+              src={`${API_SERVER_HOST}${product.images[0].img}`}
+              alt="제품 이미지"
+            />
+          )}
         </div>
         <div className="product-details">
           <h2>{product.productName}</h2>
@@ -109,7 +114,7 @@ const ReviewComponent = () => {
           onChange={handleTextChange}
         />
       </ReviewInputSection>
-      <input type="file" multiple onChange={handleFileChange} />
+      <input type="file" onChange={handleFileChange} />
 
       <ReviewSubmitSection>
         <button onClick={handleSubmit}>등록하기</button>
