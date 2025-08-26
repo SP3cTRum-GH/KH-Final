@@ -24,6 +24,32 @@ export const getDealProductList = async (pageParam) => {
   return res.data;
 };
 
+// 상품 필터링(상의, 하의, 신발)
+export const getDealFilterProductList = async (pageParam, filter) => {
+  const { page, size } = pageParam;
+  const res = await axios.get(`${prefix}/list?category=${filter}`, {
+    params: { page, size },
+  });
+
+  return res.data;
+};
+
+// // 상품 필터링(판매순)
+export const getDealPopularProductList = async (pageParam, filter) => {
+  const { page, size } = pageParam;
+  if (filter.length === 0) {
+    const res = await axios.get(`${prefix}/popular`, {
+      params: { page, size },
+    });
+    return res.data;
+  } else {
+    const res = await axios.get(`${prefix}/popular?category=${filter}`, {
+      params: { page, size },
+    });
+    return res.data;
+  }
+};
+
 // deal 상품 등록
 export const postDealProductItem = async (product) => {
   const res = await axios.post(`${prefix}`, product);

@@ -6,7 +6,8 @@ import Header from "../../include/Header";
 import Footer from "../../include/Footer";
 import useCustomMove from "../../hooks/useCustomMove";
 import {
-  getFilterProductList,
+  getShopFilterProductList,
+  getShopPopularProductList,
   getShopProductList,
 } from "../../api/productShopApi";
 import PageComponent from "../../components/common/PageComponent";
@@ -37,7 +38,13 @@ const ShopPage = () => {
     });
 
   const filterBtn = (value) => {
-    getFilterProductList({ page, size }, value).then((data) => {
+    getShopFilterProductList({ page, size }, value).then((data) => {
+      setListData(data);
+    });
+  };
+
+  const handlePopular = async (category) => {
+    await getShopPopularProductList({ page, size }, category).then((data) => {
       setListData(data);
     });
   };
@@ -46,7 +53,12 @@ const ShopPage = () => {
     <div>
       <Header />
       <Container>
-        <SortButton menu={"판매순"} filterBtn={filterBtn} getList={getList} />
+        <SortButton
+          menu={"판매순"}
+          filterBtn={filterBtn}
+          getList={getList}
+          handlePopular={handlePopular}
+        />
         <ItemCard
           page={"shopdetail"}
           dtoList={listData.dtoList}

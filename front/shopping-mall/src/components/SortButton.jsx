@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { BtnContainer, SortBtn } from "./SortButtonStyle";
 
-const SortButton = ({ menu, filterBtn, getList }) => {
+const SortButton = ({ menu, filterBtn, getList, handlePopular }) => {
+  const [category, setCategory] = useState("");
+
   return (
     <BtnContainer>
       <div>
         <p
           onClick={() => {
             filterBtn("top");
+            setCategory("top");
           }}
         >
           상의
@@ -15,6 +18,7 @@ const SortButton = ({ menu, filterBtn, getList }) => {
         <p
           onClick={() => {
             filterBtn("bottom");
+            setCategory("bottom");
           }}
         >
           하의
@@ -22,16 +26,24 @@ const SortButton = ({ menu, filterBtn, getList }) => {
         <p
           onClick={() => {
             filterBtn("shoes");
+            setCategory("shoes");
           }}
         >
           신발
         </p>
       </div>
       <SortBtn>
-        <p onClick={() => getList()}>최신순</p>
         <p
           onClick={() => {
-            filterBtn();
+            getList();
+            setCategory("");
+          }}
+        >
+          최신순
+        </p>
+        <p
+          onClick={() => {
+            handlePopular(category);
           }}
         >
           {menu}
