@@ -28,20 +28,20 @@ class FinalProjectApplicationTests {
 	@Autowired
 	private PasswordEncoder pe;
 
-	@Test
+//	@Test
 	public void testInsertMember() {
 
 		Member member = Member.builder()
 				.memberId("admin")
 				.memberPw(pe.encode("1234"))
 				.memberName("admin")
-				.memberEmail("fuckyou@gmail.com")
+				.memberEmail("admin@gmail.com")
 				.memberGender(true)
 				.memberPhone("010-1111-1111")
 				.memberPoint(0)
 				.enable(true)
 				.grade('F')
-				.memberAddress("니맘속")
+				.memberAddress("관리자")
 				.build(); 
 		member.addRole(MemberRole.USER);
 		member.addRole(MemberRole.ADMIN);

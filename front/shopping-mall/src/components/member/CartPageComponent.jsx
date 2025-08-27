@@ -42,7 +42,22 @@ import {
 import { getCookie } from "../../util/cookieUtil";
 import { getDealOne, productBid } from "../../api/productDealApi";
 import { getShopOne } from "../../api/productShopApi";
+
 import { API_SERVER_HOST } from "../../api/HostUrl";
+import { productBuy } from "../../api/purchaseApi";
+
+// 현재 시간
+const nowString = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mi = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+};
 
 const initData = [
   // type === true : Deal 아이템 (예: 경매/딜)
@@ -390,6 +405,38 @@ const CartPageComponent = () => {
     setCartItems(fresh);
   };
 
+  // 단일 Deal(경매) 아이템 결제 핸들러
+  const handleDealConfirm = async (item) => {
+    try {
+      // (선택) 내가 최고가가 아닐 경우 방지
+      if (Number(item.price ?? 0) < Number(item.dealCurrent ?? 0)) {
+        alert("현재 최고가가 아닙니다. 입찰 금액을 확인해 주세요.");
+        return;
+      }
+
+      const ok = confirm("해당 딜 상품을 즉시 결제하시겠습니까?");
+      if (!ok) return;
+
+      const memberId = getCookie("member")?.memberId;
+      if (!memberId) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      // cartPay는 cartItemNo 배열을 받도록 백엔드와 계약되어 있음
+      await cartPay(memberId, { cartItemNo: [item.cartItemNo] });
+
+      alert("결제가 완료되었습니다.");
+
+      // 결제 후 장바구니 최신화
+      const fresh = await getCart(memberId);
+      setCartItems(fresh);
+    } catch (err) {
+      console.error(err);
+      alert("결제 처리 중 오류가 발생했습니다.");
+    }
+  };
+
   // ====== type에 따라 카드 UI를 다르게 렌더링하는 함수 ======
   const renderDealCard = (item) => {
     return (
@@ -440,7 +487,15 @@ const CartPageComponent = () => {
           <CartDeleteButton onClick={() => handleDeleteCart(item.cartItemNo)}>
             삭제
           </CartDeleteButton>
-          <FilterButton type="button">구매 확정</FilterButton>
+
+          {item.endDate.slice(0, 10) < nowString().slice(0, 10) &&
+          item.price === item.dealCurrent ? (
+            <FilterButton onClick={() => handleDealConfirm(item)} type="button">
+              구매 확정
+            </FilterButton>
+          ) : (
+            <></>
+          )}
         </RightBtns>
       </ItemBox>
     );

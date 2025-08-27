@@ -65,6 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
                         .memberNo(r.getMember().getMemberNo())
                         .memberId(r.getMember().getMemberId())
                         .regDate(r.getRegDate())
+                        .enable(r.isEnable())
                         .build())
                 .toList();
 
