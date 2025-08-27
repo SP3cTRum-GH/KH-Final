@@ -30,10 +30,17 @@ import {
   SectionHeader,
   CartDeleteButton,
   DealTime,
+  RightBtns,
 } from "./CartPageStyle";
-import { cartPay, deleteCart, getCart, updateCart } from "../../api/cartApi";
+import {
+  addCart,
+  cartPay,
+  deleteCart,
+  getCart,
+  updateCart,
+} from "../../api/cartApi";
 import { getCookie } from "../../util/cookieUtil";
-import { getDealOne } from "../../api/productDealApi";
+import { getDealOne, productBid } from "../../api/productDealApi";
 import { getShopOne } from "../../api/productShopApi";
 import { API_SERVER_HOST } from "../../api/HostUrl";
 
@@ -99,7 +106,6 @@ const CartPageComponent = () => {
     setTotalPrice(total);
   }, [checkedMap, cartItems]);
 
-  // --- sizes normalizer: unify to [{value,label,stock?,id?}] ---
   const normalizeSizes = (raw) => {
     const arr = Array.isArray(raw) ? raw : [];
     const norm = arr
@@ -233,11 +239,13 @@ const CartPageComponent = () => {
     setModalQuantity((prev) => Math.max(1, prev + amount));
   };
 
+  const sameId = (a, b) => Number(a) === Number(b);
+
   const handleOptionChange = async () => {
     try {
       const memberId = getCookie("member").memberId;
 
-      // 딜(경매) 상품은 최소 호가 이상인지 검사
+      // Deal(경매)일 때 최소 입찰가 검사
       if (selectedItem?.type) {
         const minAllow = Number(currentPrice ?? 0);
         if (Number(bidPrice) < minAllow) {
@@ -248,33 +256,77 @@ const CartPageComponent = () => {
         }
       }
 
-      // PATCH payload
-      const payload = selectedItem?.type
-        ? { quantity: modalQuantity, price: Number(bidPrice) } // 딜은 입찰가 포함
-        : { quantity: modalQuantity }; // 샵은 수량만
+      // 1) 화면 즉시 반영
+      const localOverride = {
+        quantity: modalQuantity,
+        size: modalSize,
+        ...(selectedItem?.type ? { price: Number(bidPrice) } : {}),
+        __local: true, // 병합 시 식별용 플래그
+      };
 
-      // 1) 서버에 반영
-      await updateCart(memberId, selectedItem.cartItemNo, payload);
-
-      // 2) 서버 최신 장바구니 재조회 → 상태 갱신(리렌더링 보장)
-      const fresh = await getCart(memberId);
-      setCartItems(fresh);
-
-      // 클라이언트 상태 반영 (딜이면 price도 갱신)
       setCartItems((prev) =>
         prev.map((it) =>
           it.cartItemNo === selectedItem.cartItemNo
-            ? {
-                ...it,
-                quantity: modalQuantity,
-                size: modalSize,
-                ...(selectedItem?.type ? { price: Number(bidPrice) } : {}),
-              }
+            ? { ...it, ...localOverride }
             : it
         )
       );
+
+      // 2) 서버 PATCH (서버가 price를 무시하더라도 진행)
+      const payload = selectedItem?.type
+        ? { quantity: modalQuantity, price: Number(bidPrice) }
+        : { quantity: modalQuantity };
+      await updateCart(memberId, selectedItem.cartItemNo, payload);
+
+      const bidData = {
+        productNo: selectedItem.productNo,
+        price: Number(bidPrice),
+      };
+
+      productBid(bidData)
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err) => {
+          console.log(err);
+          return;
+        });
+
+      const fd = {
+        productNo: selectedItem.productNo,
+        quantity: 1,
+        size: "deal",
+        price: Number(bidPrice),
+      };
+
+      addCart(getCookie("member").memberId, fd)
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err) => {
+          console.log(err);
+          return;
+        });
+
+      // 3) fresh 받아와서 "안전 병합" - 방금의 로컬 변경값을 우선시
+      const fresh = await getCart(memberId);
+      setCartItems((prev) => {
+        const local = prev.find(
+          (p) => p.cartItemNo === selectedItem.cartItemNo && p.__local
+        );
+        return fresh.map((it) => {
+          if (it.cartItemNo !== selectedItem.cartItemNo) return it;
+          return {
+            ...it,
+            quantity: local?.quantity ?? it.quantity,
+            size: local?.size ?? it.size,
+            ...(selectedItem?.type ? { price: local?.price ?? it.price } : {}),
+          };
+        });
+      });
     } catch (err) {
       console.error("옵션 변경 실패:", err);
+      // 필요 시 여기에서 롤백(getCart 호출) 처리 가능
     } finally {
       closeModal();
     }
@@ -375,20 +427,21 @@ const CartPageComponent = () => {
             );
           })()}
           <Price>
-            나의 입찰 가격 :{" "}
-            {(Number(item.price ?? 0) / item.quantity).toLocaleString()} 원 /
+            나의 입찰 가격 : {Number(item.price ?? 0).toLocaleString()} 원 /
             최고 가격 : {Number(item.dealCurrent).toLocaleString()}원{" "}
           </Price>
-          {console.log(item)}
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
               옵션 변경
             </OptionButton>
           </ItemOptions>
         </ItemInfo>
-        <CartDeleteButton onClick={() => handleDeleteCart(item.cartItemNo)}>
-          삭제
-        </CartDeleteButton>
+        <RightBtns>
+          <CartDeleteButton onClick={() => handleDeleteCart(item.cartItemNo)}>
+            삭제
+          </CartDeleteButton>
+          <FilterButton type="button">구매 확정</FilterButton>
+        </RightBtns>
       </ItemBox>
     );
   };
@@ -564,11 +617,11 @@ const CartPageComponent = () => {
                 <span> 원</span>
               </div>
             )}
-            <QuantityControl>
+            {/* <QuantityControl>
               <button onClick={() => handleModalQuantityChange(-1)}>-</button>
               <span>{modalQuantity}</span>
               <button onClick={() => handleModalQuantityChange(1)}>+</button>
-            </QuantityControl>
+            </QuantityControl> */}
             <PriceDisplay>
               {selectedItem?.type ? (
                 <>입찰 가격: {Number(bidPrice ?? 0).toLocaleString()}원</>

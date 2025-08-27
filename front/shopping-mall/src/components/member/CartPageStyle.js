@@ -281,6 +281,8 @@ export const FilterButton = styled.button`
     color: #fff;
     border-color: #111;
   }
+
+  
 `;
 
 export const SectionHeader = styled.h3`
@@ -290,6 +292,7 @@ export const SectionHeader = styled.h3`
 `;
 
 export const CartDeleteButton = styled.p`
+  text-align: end;
   font-size: 14px;
   cursor: pointer;
   color: rgb(136, 136, 136)
@@ -299,4 +302,17 @@ export const DealTime = styled.p`
   font-size: 12px;
   color: rgb(201, 201, 201);
   margin-bottom: 5px;
+`
+
+export const RightBtns = styled.div`
+  height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
+  button:hover {
+  font-family: 600;
+  background-color: black;
+  color: white;
+ }
 `

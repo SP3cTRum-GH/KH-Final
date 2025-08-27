@@ -13,7 +13,7 @@ import { addCart } from "../../api/cartApi";
 import { getCookie } from "../../util/cookieUtil";
 import { useNavigate } from "react-router-dom";
 
-const DealModal = ({ currentPrice = 10000, onConfirm, onCancel, param }) => {
+const DealModal = ({ currentPrice, onConfirm, onCancel, param }) => {
   const [bidAmount, setBidAmount] = useState("");
   const navigate = useNavigate();
 
@@ -21,11 +21,11 @@ const DealModal = ({ currentPrice = 10000, onConfirm, onCancel, param }) => {
     productNo: param.productNo,
     quantity: 1,
     size: "deal",
+    price: bidAmount,
   };
 
   const handleBid = () => {
     const bidData = { productNo: fd.productNo, price: bidAmount };
-    console.log(bidData);
 
     productBid(bidData)
       .then((data) => {
@@ -46,6 +46,7 @@ const DealModal = ({ currentPrice = 10000, onConfirm, onCancel, param }) => {
       });
 
     navigate("/cart");
+    location.reload(true);
   };
 
   return (
