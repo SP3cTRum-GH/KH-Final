@@ -67,7 +67,7 @@ public class ReviewController {
     }
 
     // Delete
-    @DeleteMapping("/{reviewNo}")
+    @PostMapping("/{reviewNo}")
     public void delete(@PathVariable Long reviewNo) {
         reviewService.delete(reviewNo);
     }

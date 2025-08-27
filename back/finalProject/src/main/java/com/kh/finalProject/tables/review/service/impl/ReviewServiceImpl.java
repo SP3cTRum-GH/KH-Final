@@ -135,10 +135,10 @@ public class ReviewServiceImpl implements ReviewService {
                                                                     // 단일 원소 리스트(List.of(oldFile))로 감싸서 전달해 삭제
             }
         }else {
-        	review.setReviewImg(newFile);
+        	review.setReviewImg(oldFile);
         }
         // 새 업로드가 없으면 기존 이미지 유지
-
+        
         review.setRating(dto.getRating());
         review.setContent(dto.getContent());
 
@@ -162,7 +162,8 @@ public class ReviewServiceImpl implements ReviewService {
 
             fileUtil.deleteFiles(java.util.List.of(name));
         }
-        reviewRepository.delete(r);
+        r.setEnable(false);
+        reviewRepository.save(r);
     }
 
     private String toUrl(String fileName) {
