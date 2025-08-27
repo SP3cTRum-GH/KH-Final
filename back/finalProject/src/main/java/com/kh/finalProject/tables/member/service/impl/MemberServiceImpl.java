@@ -8,9 +8,12 @@ import java.util.Optional;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,12 +23,14 @@ import com.kh.finalProject.tables.member.MemberRole;
 import com.kh.finalProject.tables.member.component.MemberConvertor;
 import com.kh.finalProject.tables.member.dto.MemberRequestDTO;
 import com.kh.finalProject.tables.member.dto.MemberResponseDTO;
+import com.kh.finalProject.tables.member.dto.NaverTokenResponse;
 import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.member.repository.MemberRepository;
 import com.kh.finalProject.tables.member.service.MemberService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 
 @Service
@@ -64,6 +69,36 @@ public class MemberServiceImpl implements MemberService {
 		return memberConvertor.toEntity(memberRepository.save(member));
 	}
 
+	private final RestTemplate restTemplate = new RestTemplate();
+    private String clientId = "9hz3nxGqt8IQqeYhCY5k";
+    private String clientSecret = "8k37V3m02A";
+    private String redirectUri = "http://localhost:5173/member/naver";
+	
+	public String getAccessToken(String code, String state) {
+        String tokenUrl = "https://nid.naver.com/oauth2.0/token";
+        log.info(code);
+        log.info(state);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("code", code);
+        params.add("state", state);
+        params.add("redirect_uri", redirectUri);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        ResponseEntity<NaverTokenResponse> response = restTemplate.postForEntity(
+                tokenUrl, request, NaverTokenResponse.class);
+
+        log.info("응답 상태: {}", response.getStatusCode());
+        log.info("응답 본문: {}", response.getBody());
+        log.info("응답 전체: {}", response);
+        return response.getBody().getAccessToken();
+    }
+	
 	@Override
 	public CustomUser getSocialMember(String accessToken, int social) {
 		String email = getEmailFromSocialAccessToken(accessToken, social);
@@ -99,7 +134,9 @@ public class MemberServiceImpl implements MemberService {
 			getUserURL = "https://www.googleapis.com/oauth2/v3/userinfo";
 			getAccount = "email";
 			break;
-
+		case 3:
+			getUserURL = "https://openapi.naver.com/v1/nid/me";
+			getAccount = "response";
 		}
 
 		if (accessToken == null) {

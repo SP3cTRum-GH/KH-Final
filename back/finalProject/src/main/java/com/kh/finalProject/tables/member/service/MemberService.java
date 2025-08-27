@@ -18,8 +18,10 @@ public interface MemberService {
 	MemberResponseDTO memberUpdatePw (String memeberId, String newPw);
 	
 	MemberResponseDTO socialMemberUpdate(MemberRequestDTO memberRequestDTO);
+	
+	public String getAccessToken(String code, String state);
 
-	CustomUser getSocialMember(String accessToken, int social);//1.kakao 2.google
+	CustomUser getSocialMember(String accessToken, int social);//1.kakao 2.google 3.naver
 
 	default CustomUser entityToDTO(Member member) {
 		CustomUser dto = new CustomUser(member.getMemberId(), member.getMemberPw(),member.getMemberName(), member.getMemberEmail(),

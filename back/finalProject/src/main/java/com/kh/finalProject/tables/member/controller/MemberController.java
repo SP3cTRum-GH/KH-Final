@@ -79,6 +79,18 @@ public class MemberController {
 		claims.put("refreshToken", jwtRefreshToken);
 		return claims;
 	}
+	@GetMapping("/naver")
+	public Map<String, Object> getMemberFromNaver(@RequestParam String code,
+            @RequestParam String state) {
+		String accessToken = memberService.getAccessToken(code, state);
+		CustomUser user = memberService.getSocialMember(accessToken, 3);
+		Map<String, Object> claims = user.getClaims();
+		String jwtAccessToken = JWTUtil.generateToken(claims, 10);
+		String jwtRefreshToken = JWTUtil.generateToken(claims, 60 * 24);
+		claims.put("accessToken", jwtAccessToken);
+		claims.put("refreshToken", jwtRefreshToken);
+		return claims;
+	}
 
 	@GetMapping("/google")
 	public Map<String, Object> getMemberFromGoogle(String accessToken) {
