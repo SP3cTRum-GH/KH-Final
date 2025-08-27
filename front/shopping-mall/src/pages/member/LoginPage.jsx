@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { getKakaoLoginLink } from "../../api/social/KakaoApi";
 import { getGoogleLoginLink } from "../../api/social/GoogleApi";
+import { getNaverLoginLink } from "../../api/social/NaverApi";
 
 const initState = { memberId: "", pw: "" };
 
@@ -80,6 +81,7 @@ const LoginPage = () => {
   const { doLogin, moveToPath } = useCustomLogin();
   const kakaoLink = getKakaoLoginLink();
   const googleLink = getGoogleLoginLink();
+  const naverLink = getNaverLoginLink();
 
   const handleChange = (e) => {
     loginParam[e.target.name] = e.target.value;
@@ -148,7 +150,12 @@ const LoginPage = () => {
               </Link>
             </SocialButton>
             <SocialButton style={{ backgroundColor: "#03C75A" }}>
-              네이버 로그인
+              <Link
+                to={naverLink}
+                style={{ textDecoration: "none", color: "black" }}
+              >
+                네이버 로그인
+              </Link>
             </SocialButton>
             <SocialButton style={{ backgroundColor: "#FEE500", color: "#000" }}>
               <Link

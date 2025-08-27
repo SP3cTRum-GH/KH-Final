@@ -9,4 +9,5 @@ public class CartRequestDTO {
     private Long productNo;
     private int quantity;
     private String size;
+    private int price;
 }

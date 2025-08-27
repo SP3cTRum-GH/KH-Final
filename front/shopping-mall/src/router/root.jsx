@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Header from "./../include/Header";
 import Footer from "./../include/Footer";
 import GoogleRedirectPage from "../pages/member/GoogleRedirectPage";
+import NaverRedirectPage from "../pages/member/NaverRedirectPage";
 
 // 메인 페이지
 const MainPage = lazy(() => import("../pages/MainPage"));
@@ -225,6 +226,14 @@ const root = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <GoogleRedirectPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/member/naver",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <NaverRedirectPage />
       </Suspense>
     ),
   },

@@ -1,5 +1,6 @@
 package com.kh.finalProject.tables.product.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,13 +70,14 @@ public class ProductController {
     }
 
     @PutMapping("/deal/{id}")
-    public Map<String, String> modifyDeal(@PathVariable Long id, ProductDealRequestDTO dto) {
+    public Map<String, String> modifyDeal(@PathVariable Long id, ProductDealRequestDTO dto,
+    		@RequestParam(value = "existingFiles", required = false) List<String> existingFiles) {
         dto.setProductNo(id);
 
         // 기존 상품 DTO 불러오기
         ProductDealResponseDTO oldDTO = productService.getDeal(id);
 
-        // 기존 파일명들 (삭제해야 할 대상)
+        // 기존 파일명들
         List<String> oldFileNames = oldDTO.getImages()
                 .stream()
                 .map(ProductImagesDTO::getImg)
@@ -83,18 +85,29 @@ public class ProductController {
 
         // 새 업로드 파일 저장
         List<MultipartFile> files = dto.getUploadFiles();
-        List<String> newFileNames = fileUtil.saveFiles(files);
+        List<String> currentUploadFileNames = fileUtil.saveFiles(files);
+        
+        // 최종 파일 목록 = 기존 유지 + 새 업로드
+ 		List<String> finalFileNames = new ArrayList<>();
+ 		if (existingFiles != null) {
+ 			finalFileNames.addAll(existingFiles); // 사용자가 유지 선택한 기존 파일들
+ 		}
+ 		if (currentUploadFileNames != null) {
+ 			finalFileNames.addAll(currentUploadFileNames); // 새 업로드된 파일들
+ 		}
 
-        // DTO에 새로운 파일명 세팅
-        dto.setImageFileNames(newFileNames);
+ 		dto.setImageFileNames(finalFileNames);
+
+ 		// oldFileNames 중에서 existingFiles에 없는 파일은 실제 삭제
+ 		if (oldFileNames != null && !oldFileNames.isEmpty()) {
+ 			List<String> toDelete = oldFileNames.stream()
+ 					.filter(name -> existingFiles == null || !existingFiles.contains(name))
+ 					.toList();
+ 			fileUtil.deleteFiles(toDelete);
+ 		}
 
         // DB 수정
         productService.updateDeal(dto);
-
-        // 서버에서 옛날 파일 삭제
-        if (oldFileNames != null && !oldFileNames.isEmpty()) {
-            fileUtil.deleteFiles(oldFileNames);
-        }
 
         return Map.of("RESULT", "SUCCESS");
     }
@@ -138,13 +151,14 @@ public class ProductController {
     }
 
     @PutMapping("/shop/{id}")
-    public Map<String, String> modifyShop(@PathVariable Long id, ProductShopRequestDTO dto) {
+    public Map<String, String> modifyShop(@PathVariable Long id, ProductShopRequestDTO dto,
+    		@RequestParam(value = "existingFiles", required = false) List<String> existingFiles) {
         dto.setProductNo(id);
 
         // 기존 상품 DTO 불러오기
         ProductShopResponseDTO oldDTO = productService.getShop(id);
 
-        // 기존 파일명들 (삭제해야 할 대상)
+        // 기존 파일명들 
         List<String> oldFileNames = oldDTO.getImages()
                 .stream()
                 .map(ProductImagesDTO::getImg)
@@ -152,18 +166,28 @@ public class ProductController {
 
         // 새 업로드 파일 저장
         List<MultipartFile> files = dto.getUploadFiles();
-        List<String> newFileNames = fileUtil.saveFiles(files);
+        List<String> currentUploadFileNames = fileUtil.saveFiles(files);
+        
+        // 최종 파일 목록 = 기존 유지 + 새 업로드
+ 		List<String> finalFileNames = new ArrayList<>();
+ 		if (existingFiles != null) {
+ 			finalFileNames.addAll(existingFiles); // 사용자가 유지 선택한 기존 파일들
+ 		}
+ 		if (currentUploadFileNames != null) {
+ 			finalFileNames.addAll(currentUploadFileNames); // 새 업로드된 파일들
+ 		}
 
-        // DTO에 새로운 파일명 세팅
-        dto.setImageFileNames(newFileNames);
+ 		dto.setImageFileNames(finalFileNames);
 
+ 		// oldFileNames 중에서 existingFiles에 없는 파일은 실제 삭제
+ 		if (oldFileNames != null && !oldFileNames.isEmpty()) {
+ 			List<String> toDelete = oldFileNames.stream()
+ 					.filter(name -> existingFiles == null || !existingFiles.contains(name))
+ 					.toList();
+ 			fileUtil.deleteFiles(toDelete);
+ 		}
         // DB 수정
         productService.updateShop(dto);
-
-        // 서버에서 옛날 파일 삭제
-        if (oldFileNames != null && !oldFileNames.isEmpty()) {
-            fileUtil.deleteFiles(oldFileNames);
-        }
 
         return Map.of("RESULT", "SUCCESS");
     }

@@ -55,6 +55,7 @@ public class CartController {
                 .productNo(cartRequestDTO.getProductNo())
                 .quantity(cartRequestDTO.getQuantity())
                 .size(cartRequestDTO.getSize())
+                .price(cartRequestDTO.getPrice())
                 .build());
         return ResponseEntity.ok().build();
     }
