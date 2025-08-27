@@ -38,6 +38,12 @@ export const BtnContainer = styled.div`
         background-color: black;
         color: white;
     }
+
+    .active {
+        background-color: black;
+        color: white;
+        border: 1px solid #ccc;
+    }
 `
 
 export const SortBtn = styled.div`
