@@ -24,6 +24,7 @@ const SelectOption = ({
 }) => {
   const name = productData?.productName ?? "";
   const price = productData?.price ?? 0;
+  const culPrice = productData?.dealCurrent ?? 0;
   const sizes = Array.isArray(productData?.sizes) ? productData.sizes : [];
   const reviewCount = Array.isArray(reviewListCount)
     ? reviewListCount.length
@@ -62,6 +63,28 @@ const SelectOption = ({
     setQty(v);
   };
 
+  const isDeal = productData?.type === true;
+
+  // 버튼(구매/입찰) 클릭 시 타입에 따라 분기
+  const handlePrimaryClick = () => {
+    if (isDeal) {
+      // 딜(경매): 사이즈/수량 선택 없이 모달만 오픈
+      if (typeof handleOpenModal === "function") {
+        handleOpenModal({
+          type: "deal",
+          productNo: param.productNo,
+          currentPrice: productData?.dealCurrent ?? productData?.price ?? 0,
+          defaultSize: "deal",
+          defaultQty: 1,
+        });
+      }
+      return;
+    }
+
+    // 일반(shop)일 때 기존 구매 로직 실행
+    handleBuyClick();
+  };
+
   const handleBuyClick = () => {
     if (!selectedSize) {
       alert("사이즈를 선택해주세요.");
@@ -98,6 +121,13 @@ const SelectOption = ({
   };
 
   const handleCartClick = () => {
+    if (isDeal) {
+      alert(
+        "딜(경매) 상품은 장바구니를 사용할 수 없습니다. 입찰하기를 이용해주세요."
+      );
+      return;
+    }
+
     if (!selectedSize) {
       alert("사이즈를 선택해주세요.");
       return;
@@ -130,15 +160,17 @@ const SelectOption = ({
       size: selectedSize,
     };
 
+    if (!selectCart) {
+      setQty(1);
+      setSelectedSize("");
+      return;
+    }
+
     addCart(getCookie("member").memberId, fd).then((data) => {
       console.log("장바구니 추가 완료:", data);
 
       if (selectCart) {
         navigate("/cart", { replace: true }); // 완료 후 이동
-      } else {
-        alert("감사합니다.");
-        setQty(1);
-        setSelectedSize("");
       }
     });
   };
@@ -149,7 +181,12 @@ const SelectOption = ({
 
       <PriceContainer>
         <PriceBox>
-          <SalePrice>{Number(price).toLocaleString()} 원</SalePrice>
+          <SalePrice>
+            {isDeal
+              ? Number(culPrice).toLocaleString()
+              : Number(price).toLocaleString()}{" "}
+            원
+          </SalePrice>
         </PriceBox>
 
         <ReviewBox>
@@ -167,68 +204,88 @@ const SelectOption = ({
 
       <OptionBox>
         <SelectWrapper>
-          <label htmlFor="sizeSelect">사이즈</label>
+          {isDeal ? <></> : <label htmlFor="sizeSelect">사이즈</label>}
+
           {endDateText && <p>기간 : {endDateText}</p>}
-          <select
-            id="sizeSelect"
-            value={selectedSize}
-            onChange={handleSizeChange}
-          >
-            <option value="" disabled>
-              선택
-            </option>
-            {sizes.map((size, idx) => (
-              <option key={size.productSize ?? idx} value={size.productSize}>
-                {size.productSize}
-              </option>
-            ))}
-          </select>
-          <p>
-            {selectedSize
-              ? stock > 0
-                ? `재고 ${stock}개`
-                : "품절"
-              : "사이즈를 선택하세요"}
-          </p>
+          {isDeal ? (
+            <></>
+          ) : (
+            <>
+              <select
+                id="sizeSelect"
+                value={selectedSize}
+                onChange={handleSizeChange}
+              >
+                <option value="" disabled>
+                  선택
+                </option>
+                {sizes.map((size, idx) => (
+                  <option
+                    key={size.productSize ?? idx}
+                    value={size.productSize}
+                  >
+                    {size.productSize}
+                  </option>
+                ))}
+              </select>
+              <p>
+                {selectedSize
+                  ? stock > 0
+                    ? `재고 ${stock}개`
+                    : "품절"
+                  : "사이즈를 선택하세요"}
+              </p>
+            </>
+          )}
         </SelectWrapper>
 
         <SelectWrapper>
-          <label htmlFor="qtyInput">수량</label>
-          <div>
-            <button
-              type="button"
-              disabled={!selectedSize || stock === 0 || qty <= 1}
-              onClick={() => setQty((prev) => Math.max(1, prev - 1))}
-            >
-              -
-            </button>
-            <input
-              id="qtyInput"
-              type="number"
-              min={1}
-              max={stock || 1}
-              value={qty}
-              onChange={handleQtyChange}
-              disabled={!selectedSize || stock === 0}
-            />
-            <button
-              type="button"
-              disabled={!selectedSize || stock === 0 || qty >= stock}
-              onClick={() => setQty((prev) => Math.min(stock || 1, prev + 1))}
-            >
-              +
-            </button>
-          </div>
+          {isDeal ? (
+            <></>
+          ) : (
+            <>
+              <label htmlFor="qtyInput">수량</label>
+              <div>
+                <button
+                  type="button"
+                  disabled={!selectedSize || stock === 0 || qty <= 1}
+                  onClick={() => setQty((prev) => Math.max(1, prev - 1))}
+                >
+                  -
+                </button>
+                <input
+                  id="qtyInput"
+                  type="number"
+                  min={1}
+                  max={stock || 1}
+                  value={qty}
+                  onChange={handleQtyChange}
+                  disabled={!selectedSize || stock === 0}
+                />
+                <button
+                  type="button"
+                  disabled={!selectedSize || stock === 0 || qty >= stock}
+                  onClick={() =>
+                    setQty((prev) => Math.min(stock || 1, prev + 1))
+                  }
+                >
+                  +
+                </button>
+              </div>
+            </>
+          )}
         </SelectWrapper>
 
         <BuyButton
-          onClick={handleBuyClick}
-          disabled={!selectedSize || stock === 0}
+          onClick={handlePrimaryClick}
+          disabled={isDeal ? false : !selectedSize || stock === 0}
         >
-          구매하기
+          {isDeal ? "입찰하기" : "구매하기"}
         </BuyButton>
 
-        <InterestBox onClick={handleCartClick}>장바구니</InterestBox>
+        {!isDeal && (
+          <InterestBox onClick={handleCartClick}>장바구니</InterestBox>
+        )}
       </OptionBox>
     </OptionContainer>
   );

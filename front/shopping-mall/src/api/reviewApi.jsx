@@ -5,9 +5,7 @@ const prefix = `${API_SERVER_HOST}/api/review`;
 
 // 리뷰 등록
 export const postReview = async (product) => {
-  console.log(product);
   const res = await axios.post(`${prefix}`, product);
-  console.log(res);
   return res.data;
 };
 

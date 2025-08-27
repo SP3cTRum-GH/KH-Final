@@ -35,6 +35,7 @@ import { cartPay, deleteCart, getCart, updateCart } from "../../api/cartApi";
 import { getCookie } from "../../util/cookieUtil";
 import { getDealOne } from "../../api/productDealApi";
 import { getShopOne } from "../../api/productShopApi";
+import { API_SERVER_HOST } from "../../api/HostUrl";
 
 const initData = [
   // type === true : Deal 아이템 (예: 경매/딜)
@@ -49,8 +50,6 @@ const initData = [
     imgUrl: null,
   },
 ];
-
-const itemData = [{}];
 
 const CartPageComponent = () => {
   const [cartItems, setCartItems] = useState(initData);
@@ -343,7 +342,11 @@ const CartPageComponent = () => {
   const renderDealCard = (item) => {
     return (
       <ItemBox key={`deal-${item.cartItemNo}`}>
-        <ItemImage src={item.img || item.imgUrl || ""} alt={item.productName} />
+        <ItemImage
+          src={`${API_SERVER_HOST}/api/image/${item.imgUrl}`}
+          alt={item.productName}
+        />
+
         <ItemInfo>
           <ItemName>
             {item.productName}{" "}
@@ -376,6 +379,7 @@ const CartPageComponent = () => {
             {(Number(item.price ?? 0) / item.quantity).toLocaleString()} 원 /
             최고 가격 : {Number(item.dealCurrent).toLocaleString()}원{" "}
           </Price>
+          {console.log(item)}
           <ItemOptions>
             <OptionButton type="button" onClick={() => openModal(item)}>
               옵션 변경
@@ -397,7 +401,10 @@ const CartPageComponent = () => {
           checked={!!checkedMap[item.cartItemNo]}
           onChange={() => handleSingleCheck(item.cartItemNo)}
         />
-        <ItemImage src={item.img || item.imgUrl || ""} alt={item.productName} />
+        <ItemImage
+          src={`${API_SERVER_HOST}/api/image/${item.imgUrl}`}
+          alt={item.productName}
+        />
         <ItemInfo>
           <ItemName>
             {item.productName}{" "}

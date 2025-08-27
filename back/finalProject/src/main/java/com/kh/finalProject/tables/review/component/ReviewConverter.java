@@ -10,6 +10,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReviewConverter {
     public Review toEntity(ReviewRequestDTO dto, Product product, Member member) {
+    	if(dto.getUploadFile()==null) {
+    		 return Review.builder()
+    	                .rating(dto.getRating())
+    	                .content(dto.getContent())
+    	                .product(product)
+    	                .member(member)
+    	                .build();
+    	}
         return Review.builder()
                 .reviewImg(dto.getReviewImg())
                 .rating(dto.getRating())

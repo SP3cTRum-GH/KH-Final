@@ -26,6 +26,7 @@ export default function CategorySizeManager({
   stockBySize,
   setStockBySize,
 }) {
+  const isAuction = product?.salesType === "true";
   const [isAllShoesSelected, setIsAllShoesSelected] = useState(false);
 
   // 화면용 라벨 ↔ 서버로 보낼 코드값
@@ -34,6 +35,8 @@ export default function CategorySizeManager({
     { code: "bottom", label: "하의" },
     { code: "shoes", label: "신발" },
   ];
+
+  const categoriesToShow = categories;
 
   // 카테고리별 사이즈 옵션 (코드 기준)
   const sizeOptions = useMemo(
@@ -104,7 +107,8 @@ export default function CategorySizeManager({
     setIsAllShoesSelected(!isAllShoesSelected);
   };
 
-  const availableSizes = currentCategory ? sizeOptions[currentCategory] : [];
+  const availableSizes =
+    !isAuction && currentCategory ? sizeOptions[currentCategory] : [];
 
   return (
     <Section>
@@ -118,7 +122,7 @@ export default function CategorySizeManager({
             <option value="" disabled>
               카테고리 선택
             </option>
-            {categories.map((c) => (
+            {categoriesToShow.map((c) => (
               <option key={c.code} value={c.code}>
                 {c.label}
               </option>
@@ -127,44 +131,47 @@ export default function CategorySizeManager({
         </Label>
       </FormGroup>
 
-      {/* 사이즈 관리 */}
-      <Label>사이즈 관리</Label>
-      {currentCategory === "shoes" && (
-        <SelectButtons>
-          <SelectButton onClick={toggleAllShoes} type="button">
-            {isAllShoesSelected ? "전체 해제" : "전체 선택"}
-          </SelectButton>
-          <SelectButton onClick={selectShoes10} type="button">
-            10단위 선택
-          </SelectButton>
-          <SelectButton onClick={selectShoes5} type="button">
-            5단위 선택
-          </SelectButton>
-        </SelectButtons>
-      )}
+      {!isAuction && (
+        <>
+          <Label>사이즈 관리</Label>
+          {currentCategory === "shoes" && (
+            <SelectButtons>
+              <SelectButton onClick={toggleAllShoes} type="button">
+                {isAllShoesSelected ? "전체 해제" : "전체 선택"}
+              </SelectButton>
+              <SelectButton onClick={selectShoes10} type="button">
+                10단위 선택
+              </SelectButton>
+              <SelectButton onClick={selectShoes5} type="button">
+                5단위 선택
+              </SelectButton>
+            </SelectButtons>
+          )}
 
-      <SizeContainer>
-        {availableSizes.map((size) => (
-          <SizeItem key={size}>
-            <label>
-              <input
-                type="checkbox"
-                checked={selectedSizes.includes(size)}
-                onChange={() => toggleSize(size)}
-              />
-              {size}
-            </label>
-            {selectedSizes.includes(size) && (
-              <StockInput
-                type="number"
-                placeholder="재고"
-                value={stockBySize[size] ?? 0}
-                onChange={(e) => handleStockChange(size, e.target.value)}
-              />
-            )}
-          </SizeItem>
-        ))}
-      </SizeContainer>
+          <SizeContainer>
+            {availableSizes.map((size) => (
+              <SizeItem key={size}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedSizes.includes(size)}
+                    onChange={() => toggleSize(size)}
+                  />
+                  {size}
+                </label>
+                {selectedSizes.includes(size) && (
+                  <StockInput
+                    type="number"
+                    placeholder="재고"
+                    value={stockBySize[size] ?? 0}
+                    onChange={(e) => handleStockChange(size, e.target.value)}
+                  />
+                )}
+              </SizeItem>
+            ))}
+          </SizeContainer>
+        </>
+      )}
     </Section>
   );
 }

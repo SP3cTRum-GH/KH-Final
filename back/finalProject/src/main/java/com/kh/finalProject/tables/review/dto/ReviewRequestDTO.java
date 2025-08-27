@@ -1,6 +1,8 @@
 package com.kh.finalProject.tables.review.dto;
 
 import lombok.*;
+
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 @Builder
@@ -15,5 +17,6 @@ public class ReviewRequestDTO {
     private String memberId;
 
     private String reviewImg;
+    @Nullable
     private MultipartFile uploadFile;
 }

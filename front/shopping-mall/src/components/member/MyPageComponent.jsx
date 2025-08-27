@@ -40,6 +40,7 @@ import {
 } from "./MyPageStyle";
 import { getPuchaseList } from "../../api/purchaseApi";
 import { deleteReview, getUserReviewList } from "../../api/reviewApi";
+import { API_SERVER_HOST } from "../../api/HostUrl";
 
 const MyPageComponent = () => {
   const navigate = useNavigate();
@@ -307,7 +308,7 @@ const MyPageComponent = () => {
               >
                 {item.img ? (
                   <ProductImage
-                    src={item.img}
+                    src={`${API_SERVER_HOST}${item.img}`}
                     alt={item.productName || "product"}
                     onError={(e) => {
                       e.currentTarget.style.visibility = "hidden";

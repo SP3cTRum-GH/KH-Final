@@ -35,12 +35,14 @@ public class ReviewController {
     // Create
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ReviewResponseDTO create(@ModelAttribute ReviewRequestDTO dto) {
-        MultipartFile file = dto.getUploadFile();
+      
+    	MultipartFile file = dto.getUploadFile();
 
         if (file != null && !file.isEmpty()) {
             List<String> names = fileUtil.saveFiles(java.util.List.of(file));
             if (!names.isEmpty()) dto.setReviewImg(names.get(0));
         }
+      
         return reviewService.create(dto);
     }
     // Read

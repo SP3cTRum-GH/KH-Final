@@ -134,6 +134,8 @@ public class ReviewServiceImpl implements ReviewService {
                 fileUtil.deleteFiles(java.util.List.of(oldFile));   // deleteFiles가 List<String>만 받으므로
                                                                     // 단일 원소 리스트(List.of(oldFile))로 감싸서 전달해 삭제
             }
+        }else {
+        	review.setReviewImg(newFile);
         }
         // 새 업로드가 없으면 기존 이미지 유지
 
