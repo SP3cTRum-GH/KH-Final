@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useSelector } from "react-redux";
 import {
   PageContainer,
@@ -19,6 +18,8 @@ import {
 } from "./ModifyMyPageStyle";
 import { getCookie } from "../../util/cookieUtil";
 import { useNavigate } from "react-router-dom";
+import { updateMemberInfo } from "../../api/memberApi";
+import { updateMemberPassword } from "../../api/memberApi";
 
 const ModifyMyPageComponent = () => {
   const loginState = useSelector((state) => state.loginSlice);
@@ -110,24 +111,11 @@ const ModifyMyPageComponent = () => {
     try {
       const memberId = user.memberId;
       if (modalType === "info") {
-        const res = await axios.put(
-          `http://localhost:8080/api/member/update?memberId=${user.memberId}`,
-          form,
-          { withCredentials: true }
-        );
-        setUser(res.data);
+        const updatedUser = await updateMemberInfo(memberId, form);
+        setUser(updatedUser);
       } else if (modalType === "password") {
-        const res = await axios.put(
-          `http://localhost:8080/api/member/updatepw?memberId=${memberId}`,
-          form.newPassword,
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log("비밀번호 변경 완료:", res.data);
+        await updateMemberPassword(memberId, form.newPassword);
+        console.log("비밀번호 변경 완료");
       }
       closeModal();
     } catch (err) {

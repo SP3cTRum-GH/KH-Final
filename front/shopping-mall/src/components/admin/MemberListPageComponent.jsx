@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Container,
   Table,
@@ -14,6 +13,8 @@ import {
   CloseButton,
   ActionButton,
 } from "./MemberListPageStyle";
+import { getAllMembers } from "../../api/memberApi";
+import { getPurchaseList } from "../../api/purchaseApi";
 
 export default function MemberListPageComponent() {
   const [members, setMembers] = useState([]);
@@ -25,14 +26,9 @@ export default function MemberListPageComponent() {
   const [searchName, setSearchName] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/member/all", { withCredentials: true })
-      .then((res) => {
-        setMembers(res.data);
-      })
-      .catch((err) => {
-        console.error("회원 불러오기 실패:", err);
-      });
+    getAllMembers()
+      .then((data) => setMembers(data))
+      .catch((err) => console.error("회원 불러오기 실패:", err));
   }, []);
 
   // 검색 필터
@@ -51,14 +47,8 @@ export default function MemberListPageComponent() {
 
     // 구매 내역 API 호출
     try {
-      const res = await axios.get("http://localhost:8080/api/purchase/logs", {
-        params: { memberId: member.memberId },
-      });
-
-      const filtered = res.data.filter(
-        (item) => item.memberId === member.memberId
-      );
-
+      const data = await getPurchaseList(member.memberId);
+      const filtered = data.filter((item) => item.memberId === member.memberId);
       setMemberPurchaseCount(filtered.length);
     } catch (err) {
       console.error("구매 내역 불러오기 실패:", err);

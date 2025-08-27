@@ -18,6 +18,7 @@ const initState = {
   content: "",
   startDate: "",
   endDate: "",
+  enable: false,
 };
 
 export default function AddComponent() {
@@ -31,6 +32,11 @@ export default function AddComponent() {
       ...event,
       [e.target.name]: e.target.value,
     });
+  };
+
+  // 이미지 삭제 처리
+  const handleRemoveImage = (url) => {
+    setPreviewImages((prev) => prev.filter((img) => img.url !== url));
   };
 
   const handleClickAdd = async () => {
@@ -54,14 +60,23 @@ export default function AddComponent() {
     formData.append("content", event.content);
     formData.append("startDate", formatDateTime(event.startDate));
     formData.append("endDate", formatDateTime(event.endDate));
+    formData.append("enable", event.enable); // 새 이벤트는 기본적으로 enable = false
 
-    // 모든 이미지 업로드
-    previewImages.forEach((img) => {
-      formData.append("uploadFiles", img.file);
-    });
+    // 새 업로드된 파일만 FormData에 추가
+    previewImages
+      .filter(
+        (img) => img.type === "local" || (img.type === "file" && img.file)
+      )
+      .forEach((img) => formData.append("uploadFiles", img.file));
+
+    // ====== FormData 내용 콘솔 확인 ======
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+    // ====================================
 
     try {
-      const data = await postAdd(formData);
+      const data = await postAdd(formData); // axios 호출
       setResult(data.result);
       moveToEventList();
     } catch (err) {
@@ -127,6 +142,7 @@ export default function AddComponent() {
       <ImageUploader
         previewImages={previewImages}
         setPreviewImages={setPreviewImages}
+        onRemoveImage={handleRemoveImage}
       />
 
       <ButtonGroup>

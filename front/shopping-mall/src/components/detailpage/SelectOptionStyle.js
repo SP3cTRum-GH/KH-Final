@@ -55,6 +55,7 @@ export const ReviewBox = styled.div`
   a {
     text-decoration: underline;
     cursor: pointer;
+    color: gray;
   }
 `;
 

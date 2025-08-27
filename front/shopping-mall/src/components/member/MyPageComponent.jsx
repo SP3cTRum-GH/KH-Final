@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getCookie } from "../../util/cookieUtil";
-import axios from "axios";
 import {
   ProfileBox,
   Header,
@@ -38,9 +37,10 @@ import {
   ProfileBtnWrapper,
   ReviewBtn,
 } from "./MyPageStyle";
-import { getPuchaseList } from "../../api/purchaseApi";
+import { getPurchaseList } from "../../api/purchaseApi";
 import { deleteReview, getUserReviewList } from "../../api/reviewApi";
 import { API_SERVER_HOST } from "../../api/HostUrl";
+import { checkPassword } from "../../api/memberApi";
 
 const MyPageComponent = () => {
   const navigate = useNavigate();
@@ -73,7 +73,7 @@ const MyPageComponent = () => {
   const member = getCookie("member");
 
   useEffect(() => {
-    getPuchaseList(getCookie("member").memberId).then((data) => {
+    getPurchaseList(getCookie("member").memberId).then((data) => {
       setPurchaseHistory(data);
     });
 
@@ -141,23 +141,9 @@ const MyPageComponent = () => {
       memberEmail: member.memberEmail || "",
     });
 
-    const fetchPurchaseHistory = async () => {
-      try {
-        const res = await axios.get("http://localhost:8080/api/purchase/logs", {
-          params: { memberId: member.memberId },
-        });
-
-        // memberId와 일치하는 데이터만 필터링
-        const filtered = res.data.filter(
-          (item) => item.memberId === member.memberId
-        );
-        setPurchaseHistory(filtered);
-      } catch (err) {
-        console.error("구매 내역 불러오기 실패:", err);
-      }
-    };
-
-    fetchPurchaseHistory();
+    getPurchaseList(member.memberId).then((data) => {
+      setPurchaseHistory(data);
+    });
   }, []);
 
   if (!user) return <div>로딩 중...</div>;
@@ -170,20 +156,12 @@ const MyPageComponent = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        `http://localhost:8080/api/member/checkpw?memberId=${user.memberId}`,
-        password,
-        {
-          headers: { "Content-Type": "text/plain" },
-          withCredentials: true,
-        }
-      );
-
-      if (res.data === true) {
+      const result = await checkPassword(user.memberId, password);
+      if (result === true) {
         navigate("/modifymypage");
       }
     } catch (err) {
-      setErrorMsg("❌ 비밀번호가 일치하지 않습니다.");
+      setErrorMsg("비밀번호가 일치하지 않습니다.");
     }
   };
 
@@ -305,6 +283,15 @@ const MyPageComponent = () => {
                 key={
                   item.logNo ?? `${item.productNo}-${item.regDate ?? ""}-${idx}`
                 }
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  navigate(
+                    item.type
+                      ? `/dealdetail/${item.productNo}`
+                      : `/shopdetail/${item.productNo}`
+                  );
+                  window.scrollTo(0, 0);
+                }}
               >
                 {item.img ? (
                   <ProductImage
@@ -340,6 +327,10 @@ const MyPageComponent = () => {
                         as={Link}
                         to={`/review/${item.productNo}`}
                         state={{ type: item.type, logNo: item.logNo }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.scrollTo(0, 0);
+                        }}
                       >
                         리뷰 올리기
                       </ReviewStatus>

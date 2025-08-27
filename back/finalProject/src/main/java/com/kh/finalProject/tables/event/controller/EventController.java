@@ -115,4 +115,16 @@ public class EventController {
 		}
 		return Map.of("RESULT", "SUCCESS");
 	}
+
+	@PutMapping("/soft-delete/{no}")
+	public Map<String, String> softDelete(@PathVariable Long no) {
+		EventDTO event = eventService.get(no);
+		if (event == null)
+			return Map.of("RESULT", "FAIL", "MESSAGE", "이벤트 없음");
+
+		event.setEnable(true);
+		eventService.modify(event); // 기존 modify 로 업데이트
+		return Map.of("RESULT", "SUCCESS");
+	}
+
 }

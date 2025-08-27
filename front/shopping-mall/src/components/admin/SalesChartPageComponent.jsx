@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from "react";
-import axios from "axios";
 import {
   LineChart,
   Line,
@@ -19,7 +18,7 @@ import {
   startOfWeek,
   startOfMonth,
 } from "date-fns";
-import { API_SERVER_HOST } from "../../api/HostUrl";
+import { getSalesByDateCategory } from "../../api/purchaseApi";
 
 export default function SalesDashboard() {
   const [period, setPeriod] = useState("day"); // day | week | month
@@ -66,18 +65,9 @@ export default function SalesDashboard() {
           toDate = lastDay.toISOString().slice(0, 10);
         }
 
-        const res = await axios.get(
-          `${API_SERVER_HOST}/api/purchase/sales/date-category`,
-          {
-            params: {
-              from: fromDate,
-              to: toDate,
-            },
-          }
-        );
-
-        setData(res.data);
-        console.log("📌 응답 데이터:", res.data);
+        const res = await getSalesByDateCategory(fromDate, toDate);
+        setData(res);
+        console.log("응답 데이터:", res);
       } catch (err) {
         console.error("데이터 불러오기 실패:", err);
       }

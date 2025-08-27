@@ -109,40 +109,41 @@ const ListComponent = ({ page }) => {
           </CardContainer>
         )}
 
-        {events.map((event) => {
-          // 가장 최신 이미지 URL로 변경
-          const imageUrl =
-            event.imageFileNames?.length > 0
-              ? `${host}/api/events/view/${encodeURIComponent(
-                  event.imageFileNames[0]
-                )}`
-              : "https://via.placeholder.com/150";
+        {events
+          .filter((event) => !event.enable) // enable이 true인 이벤트는 숨김
+          .map((event) => {
+            const imageUrl =
+              event.imageFileNames?.length > 0
+                ? `${host}/api/events/view/${encodeURIComponent(
+                    event.imageFileNames[0]
+                  )}`
+                : null;
 
-          return (
-            <CardContainer key={event.no}>
-              <Card
-                onClick={() => {
-                  moveToEventRead(event.no);
-                  window.scrollTo(0, 0);
-                }}
-              >
-                <CardImage alt="event" src={imageUrl} />
-              </Card>
-              <CardBody>
-                <CardTitle>{event.title}</CardTitle>
-                <CardContent>
-                  {event.startDate
-                    ? event.startDate.split("-").join(".").substring(2, 10)
-                    : ""}{" "}
-                  ~{" "}
-                  {event.endDate
-                    ? event.endDate.split("-").join(".").substring(2, 10)
-                    : ""}
-                </CardContent>
-              </CardBody>
-            </CardContainer>
-          );
-        })}
+            return (
+              <CardContainer key={event.no}>
+                <Card
+                  onClick={() => {
+                    moveToEventRead(event.no);
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  <CardImage alt="event" src={imageUrl} />
+                </Card>
+                <CardBody>
+                  <CardTitle>{event.title}</CardTitle>
+                  <CardContent>
+                    {event.startDate
+                      ? event.startDate.split("-").join(".").substring(2, 10)
+                      : ""}{" "}
+                    ~{" "}
+                    {event.endDate
+                      ? event.endDate.split("-").join(".").substring(2, 10)
+                      : ""}
+                  </CardContent>
+                </CardBody>
+              </CardContainer>
+            );
+          })}
       </Row>
     </>
   );

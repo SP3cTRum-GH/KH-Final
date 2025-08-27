@@ -5,11 +5,9 @@ const host = `${API_SERVER_HOST}/api/events`;
 export const postAdd = async (formData) => {
   try {
     const res = await axios.post(`${host}/`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
-    return res.data; // {result: no}
+    return res.data;
   } catch (err) {
     console.error("이벤트 등록 실패:", err);
     throw err;
@@ -27,13 +25,32 @@ export const getOne = async (no) => {
 };
 
 export const putOne = async (no, formData) => {
-  const res = await axios.put(`${host}/${no}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return res.data;
+  try {
+    const res = await axios.put(`${host}/${no}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  } catch (err) {
+    console.error(`이벤트 수정 실패 (no: ${no}):`, err);
+    throw err;
+  }
 };
 
 export const deleteOne = async (no) => {
   const res = await axios.delete(`${host}/${no}`);
   return res.data;
+};
+
+export const softDeleteOne = async (no) => {
+  try {
+    // enable을 true로 변경
+    const formData = new FormData();
+    formData.append("enable", true);
+
+    const res = await putOne(no, formData);
+    return res;
+  } catch (err) {
+    console.error("이벤트 삭제 실패(soft delete):", err);
+    throw err;
+  }
 };
