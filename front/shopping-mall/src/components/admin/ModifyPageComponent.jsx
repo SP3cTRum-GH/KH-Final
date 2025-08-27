@@ -1,51 +1,52 @@
-import React, { useEffect, useState } from "react";
+// ModifyPageComponent.jsx
+import React, { useState, useEffect } from "react";
 import { PageWrapper, ButtonGroup, Button } from "./ModifyPageStyle";
 import ModifyBasicInfo from "./ProductBasicInfo";
 import CategorySizeManager from "./CategorySizeManager";
 import ImageUploader from "./ImageUploader";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import axios from "axios";
+import { API_SERVER_HOST } from "../../api/HostUrl";
 import { getShopOne, updateShopProduct } from "../../api/productShopApi";
 import { getDealOne, updateDealProduct } from "../../api/productDealApi";
-import { useLocation } from "react-router-dom";
 
 export default function ModifyPageComponent() {
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const { productNo } = useParams();
+  const isDeal = state?.type === true || state?.type === "true";
+
   const [product, setProduct] = useState({
     name: "",
-    salesType: "",
+    salesType: "false",
     category: "",
     price: "",
-    stock: "",
-    // dealCount: "",
     dealCurrent: "",
     endDate: "",
   });
 
-  const param = useParams();
-  const navigate = useNavigate();
-  const { state } = useLocation();
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [stockBySize, setStockBySize] = useState({});
+  const [previewImages, setPreviewImages] = useState([]);
+  const [deletedImageIds, setDeletedImageIds] = useState([]);
 
+  // --- 초기 데이터 불러오기 ---
   useEffect(() => {
-    const resFunc = state?.type ? getDealOne : getShopOne;
-
-    resFunc(param.productNo).then((data) => {
-      // normalize API -> form state
+    const fetchData = isDeal ? getDealOne : getShopOne;
+    fetchData(productNo).then((data) => {
       setProduct({
         name: data.productName ?? "",
-        // API has boolean `type`; form uses string 'true' | 'false'
         salesType:
           typeof data.type === "boolean"
             ? String(data.type)
             : data.salesType ?? "",
         category: data.category ?? "",
         price: data.price ?? "",
-        stock: "", // per-size stock managed separately
-        dealCount: data.dealCount ?? "",
         dealCurrent: data.dealCurrent ?? "",
-        // If server sends 'YYYY-MM-DDTHH:mm:ss', trim seconds for datetime-local input
         endDate: data.endDate ? String(data.endDate).slice(0, 10) : "",
       });
 
-      // initialize sizes and stock map if present
+      // 기존 사이즈/재고
       const sizes = Array.isArray(data.sizes) ? data.sizes : [];
       setSelectedSizes(sizes.map((s) => s.productSize));
       setStockBySize(
@@ -55,109 +56,117 @@ export default function ModifyPageComponent() {
         }, {})
       );
 
-      // initialize images preview if present (keep as string urls/filenames)
+      // 기존 이미지 유지
       const imgs = Array.isArray(data.images)
-        ? data.images.map((i) => i.img).filter(Boolean)
+        ? data.images.map((i) => ({
+            type: "server",
+            url: `${API_SERVER_HOST}${i.img}`,
+            productImageNo: i.productImageNo,
+          }))
         : [];
       setPreviewImages(imgs);
     });
-  }, [param.productNo, state?.type]);
+  }, [productNo, isDeal]);
 
-  // 사이즈, 재고 상태
-  const [selectedSizes, setSelectedSizes] = useState([]);
-  const [stockBySize, setStockBySize] = useState({});
-  const [previewImages, setPreviewImages] = useState([]);
-
-  // state.type may be boolean or string. Avoid Boolean("false") === true pitfall.
-  const isDeal = state?.type === true || state?.type === "true";
-
-  const toBackendDateTime = (v) => {
-    if (!v) return null;
-    // If only date is provided, append midnight time for LocalDateTime
-    if (v.length === 10) return `${v}T00:00:00`;
-    // If minute precision, append seconds
-    if (v.length === 16) return `${v}:00`;
-    // If it already includes seconds or any other valid ISO string, send as-is
-    return v;
-  };
-
-  const toNumberOr = (val, fallback = 0) => {
-    const n = Number(val);
-    return Number.isFinite(n) ? n : fallback;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const submitData = {
-      productName: product.name,
-      category: product.category,
-      price: toNumberOr(product.price),
-      type: product.salesType === "true",
-      images: (previewImages || [])
-        .map((img) => ({ img }))
-        .filter((o) => !!o.img),
-      sizes: selectedSizes.map((size) => ({
-        productSize: size,
-        stock: toNumberOr(stockBySize[size]),
-      })),
-      ...(isDeal && {
-        dealCount: toNumberOr(product.dealCount),
-        dealCurrent: toNumberOr(product.dealCurrent),
-        endDate: toBackendDateTime(product.endDate),
-      }),
-    };
-
-    const updateFn = isDeal ? updateDealProduct : updateShopProduct;
-    console.log(
-      "updateFn:",
-      isDeal ? "updateDealProduct" : "updateShopProduct"
-    );
-    updateFn(submitData, param.productNo)
-      .then((data) => {
-        alert(isDeal ? "deal 수정완료" : "shop 수정완료");
-        navigate("/");
-      })
-      .catch((err) => {
-        // Axios error diagnostics
-        const status = err?.response?.status;
-        const data = err?.response?.data;
-        const msg = err?.message;
-        console.error(
-          "[update error] status:",
-          status,
-          "data:",
-          data,
-          "msg:",
-          msg
-        );
-        alert(`수정 실패 (코드: ${status ?? "?"})`);
+  // 이미지 삭제 시 처리
+  const handleRemoveImage = (url) => {
+    setPreviewImages((prev) => {
+      const updated = prev.filter((img) => {
+        if (img.url === url) {
+          if (img.type === "server" && img.productImageNo) {
+            setDeletedImageIds((prevDeleted) => [
+              ...prevDeleted,
+              img.productImageNo,
+            ]);
+          }
+          return false;
+        }
+        return true;
       });
+      console.log("이미지 삭제 후: ", updated);
+      return updated;
+    });
+  };
+
+  // --- FormData 전송 ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+
+    formData.append("productName", product.name);
+    formData.append("category", product.category);
+    formData.append("price", product.price);
+    formData.append("type", product.salesType === "true");
+
+    // 사이즈 + 재고
+    selectedSizes.forEach((size, idx) => {
+      formData.append(`sizes[${idx}].productSize`, size);
+      formData.append(`sizes[${idx}].stock`, stockBySize[size] ?? 0);
+    });
+
+    // 삭제될 서버 이미지 ID
+    deletedImageIds.forEach((id) => formData.append("deleteImageIds", id));
+
+    // 기존 이미지 번호 유지
+    previewImages.forEach((img) => {
+      if (img.type === "server" && img.productImageNo) {
+        formData.append("productImages", img.productImageNo);
+      }
+    });
+
+    // 새로 업로드할 파일
+    previewImages.forEach((img) => {
+      if (img.type === "file" && img.file) {
+        formData.append("uploadFiles", img.file);
+      }
+    });
+
+    // 경매 관련
+    if (isDeal) {
+      formData.append("dealCurrent", product.dealCurrent || 0);
+      formData.append("dealCount", 0);
+      if (product.endDate)
+        formData.append("endDate", `${product.endDate}T00:00:00`);
+    }
+
+    console.log("=== FormData contents ===");
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    const url = isDeal
+      ? `${API_SERVER_HOST}/api/product/deal/${productNo}`
+      : `${API_SERVER_HOST}/api/product/shop/${productNo}`;
+
+    try {
+      await axios.put(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      alert("수정 완료!");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      alert("수정 실패");
+    }
   };
 
   return (
     <PageWrapper>
       <form onSubmit={handleSubmit}>
-        {/* 기본 정보 */}
         <ModifyBasicInfo product={product} setProduct={setProduct} />
-
-        {/* 카테고리 선택 */}
         <CategorySizeManager
           product={product}
+          setProduct={setProduct}
           selectedSizes={selectedSizes}
           setSelectedSizes={setSelectedSizes}
           stockBySize={stockBySize}
           setStockBySize={setStockBySize}
         />
-
-        {/* 이미지 업로드 */}
         <ImageUploader
-          proudct={product}
           previewImages={previewImages}
           setPreviewImages={setPreviewImages}
+          onRemoveImage={handleRemoveImage}
         />
-
-        {/* 버튼 */}
         <ButtonGroup>
           <Button type="submit" variant="primary">
             수정 완료
