@@ -1,15 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import {
   CarouselContainer,
   Cell,
   NextBtn,
   PrevBtn,
 } from "./DetailCarouselStyle.js";
+import axios from "axios";
 
-const DetailCarousel = ({ listLength, imgLength }) => {
+const DetailCarousel = () => {
+  const { productNo } = useParams();
+  const location = useLocation();
   const [current, setCurrent] = useState(0);
   const carouselRef = useRef(null);
-  const CAROUSEL_LENGTH = imgLength - 1; // 0 to 3 (4 images)
+  const [images, setImages] = useState([]);
+  const CAROUSEL_LENGTH = images?.length ? images.length - 1 : 0; // 0 to 3 (4 images)
 
   const [imgSize, setImgSize] = useState(
     window.innerWidth > 500 ? 500 : window.innerWidth
@@ -23,9 +28,33 @@ const DetailCarousel = ({ listLength, imgLength }) => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [listLength]);
+  }, []);
+
+  // 서버에서 이미지 가져오기
+  useEffect(() => {
+    if (!productNo) return;
+
+    const fetchImages = async () => {
+      try {
+        // 경로에 따라 URL 결정
+        const isDeal = location.pathname.includes("/dealdetail/");
+        const url = isDeal
+          ? `http://localhost:8080/api/product/deal/${productNo}`
+          : `http://localhost:8080/api/product/shop/${productNo}`;
+
+        const res = await axios.get(url);
+        const imgs = (res.data.images || []).map((i) => i.img).filter(Boolean);
+        setImages(imgs);
+      } catch (err) {
+        console.error("이미지 로드 실패:", err);
+      }
+    };
+
+    fetchImages();
+  }, [productNo, location.pathname]);
 
   const nextEvent = () => {
+    if (!images || images.length === 0) return;
     const nextIndex = current < CAROUSEL_LENGTH ? current + 1 : 0;
     if (carouselRef.current) {
       carouselRef.current.style.transform = `translateX(${
@@ -36,6 +65,7 @@ const DetailCarousel = ({ listLength, imgLength }) => {
   };
 
   const prevEvent = () => {
+    if (!images || images.length === 0) return;
     const prevIndex = current > 0 ? current - 1 : CAROUSEL_LENGTH;
     if (carouselRef.current) {
       carouselRef.current.style.transform = `translateX(${
@@ -48,51 +78,22 @@ const DetailCarousel = ({ listLength, imgLength }) => {
   return (
     <CarouselContainer>
       <div ref={carouselRef}>
-        <Cell>
-          <img
-            src="https://image2.lotteimall.com/goods/29/67/51/2454516729_L.jpg"
-            alt="장원영"
-          />
-          {/* <h3>아이브</h3>
-          <p>장원영</p> */}
-        </Cell>
-        <Cell>
-          <img
-            src="https://image.baestmath.com/board-images/1624337b3c62d.gif"
-            alt="카리나"
-          />
-          <h3>에스파</h3>
-          <p>카리나</p>
-        </Cell>
-        <Cell>
-          <img
-            src="https://archive.myvibrary.com/original/1679403221374_e0c3ebdcdd.gif"
-            alt="설윤"
-          />
-          <h3>엔믹스</h3>
-          <p>설윤</p>
-        </Cell>
-        <Cell>
-          <img
-            src="https://i.namu.wiki/i/x2z_-qDM1bENMt2qrlAcONT13qnSNZRc-LNcm5G70dGj1kIhYnkFetgVvIgPRWY8r6tj0DTK3NeVjcppD5-JYg.gif"
-            alt="유나"
-          />
-          <h3>있지</h3>
-          <p>유나</p>
-        </Cell>
-        <Cell>
-          <img
-            src="https://i.namu.wiki/i/pK1bvyzYXWLuQozJoOre7DEdlVL8wJx4197EqGZPe2HN2KxTEwip50fVT2CFHG_5aDpsOpIdi9vXXmgo8_FLrA.gif"
-            alt="이안"
-          />
-          <h3>하츠투하츠</h3>
-          <p>이안</p>
-        </Cell>
+        {images.length > 0 ? (
+          images.map((img, idx) => (
+            <Cell key={idx}>
+              <img src={`http://localhost:8080${img}`} alt={`image-${idx}`} />
+            </Cell>
+          ))
+        ) : (
+          <p>이미지가 없습니다</p>
+        )}
       </div>
-      <div>
-        <PrevBtn onClick={prevEvent}>{"<"}</PrevBtn>
-        <NextBtn onClick={nextEvent}>{">"}</NextBtn>
-      </div>
+      {images && images.length > 1 && (
+        <div>
+          <PrevBtn onClick={prevEvent}>{"<"}</PrevBtn>
+          <NextBtn onClick={nextEvent}>{">"}</NextBtn>
+        </div>
+      )}
     </CarouselContainer>
   );
 };

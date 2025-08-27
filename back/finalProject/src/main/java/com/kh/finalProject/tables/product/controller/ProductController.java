@@ -113,8 +113,9 @@ public class ProductController {
     }
 
     @GetMapping("/deal/list")
-    public PageResponseDTO<ProductDealResponseDTO> pageDeal(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
-        return productService.pageDeal(category,pageRequestDTO);
+    public PageResponseDTO<ProductDealResponseDTO> pageDeal(@RequestParam(required = false) String category,
+            PageRequestDTO pageRequestDTO) {
+        return productService.pageDeal(category, pageRequestDTO);
     }
     
     @GetMapping("/deal/popular")
@@ -191,9 +192,9 @@ public class ProductController {
         return Map.of("RESULT", "SUCCESS");
     }
 
-
     @GetMapping("/shop/list")
-    public PageResponseDTO<ProductShopResponseDTO> pageShop(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
+    public PageResponseDTO<ProductShopResponseDTO> pageShop(@RequestParam(required = false) String category,
+            PageRequestDTO pageRequestDTO) {
         return productService.pageShop(category, pageRequestDTO);
     }
     @GetMapping("/shop/popular")
@@ -207,10 +208,10 @@ public class ProductController {
         productService.delete(id);
         return Map.of("RESULT", "SUCCESS");
     }
-    
+
     @PostMapping("/bid")
-    public ResponseEntity<Integer>bidding(@RequestBody BidDTO bid){
+    public ResponseEntity<Integer> bidding(@RequestBody BidDTO bid){
     	return ResponseEntity.ok(productService.bid(bid));
     }
-    
+
 }

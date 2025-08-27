@@ -15,11 +15,15 @@ export default function UploadPageComponent() {
     salesType: location.state?.salesType ? "true" : "false",
     category: "",
     price: "",
-    stock: "",
-    dealCount: "",
+    // stock: "",
     dealCurrent: "",
     endDate: "",
   });
+
+  // 사이즈, 재고, 이미지 상태
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [stockBySize, setStockBySize] = useState({});
+  const [previewImages, setPreviewImages] = useState([]);
 
   useEffect(() => {
     if (location.state?.salesType !== undefined) {
@@ -30,11 +34,6 @@ export default function UploadPageComponent() {
     }
   }, [location.state?.salesType]);
 
-  // 사이즈, 재고, 이미지 상태
-  const [selectedSizes, setSelectedSizes] = useState([]);
-  const [stockBySize, setStockBySize] = useState({});
-  const [previewImages, setPreviewImages] = useState([]);
-
   // handleSubmit (FormData 방식)
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,8 +42,6 @@ export default function UploadPageComponent() {
     const errors = [];
     if (!product.name?.trim()) errors.push("상품명을 입력해 주세요.");
     if (!product.category) errors.push("카테고리를 선택해 주세요.");
-    if (!product.price || Number(product.price) < 0)
-      errors.push("판매가는 0 이상 숫자여야 합니다.");
     if (product.salesType === "true" && !product.endDate)
       errors.push("경매 종료일을 입력해 주세요.");
 
@@ -56,49 +53,52 @@ export default function UploadPageComponent() {
     // FormData 변환
     const formData = new FormData();
     formData.append("productName", product.name);
-    formData.append("salesType", product.salesType);
     formData.append("category", product.category);
-    formData.append("price", product.price);
-
+    // salesType이 true면 price = dealCurrent
     if (product.salesType === "true") {
-      formData.append("dealCount", product.dealCount || 0);
-      formData.append("dealCurrent", product.dealCurrent || 0);
-      formData.append("endDate", product.endDate);
+      const dealCurrentValue = product.dealCurrent || 0;
+      formData.append("price", dealCurrentValue);
+      formData.append("dealCount", 0);
+      formData.append("dealCurrent", dealCurrentValue);
+
+      if (product.endDate) {
+        formData.append("endDate", `${product.endDate}T00:00:00`);
+      }
+    } else {
+      formData.append("price", product.price);
     }
 
     // 사이즈/재고
-    const sizes = selectedSizes.map((size) => ({
-      productSize: size,
-      stock: stockBySize?.[size] ?? 0,
-    }));
-    formData.append("sizes", JSON.stringify(sizes));
-
-    // 이미지 파일
-    previewImages.forEach((file) => {
-      if (file instanceof File) {
-        formData.append("files", file);
-      }
+    selectedSizes.forEach((size, idx) => {
+      formData.append(`sizes[${idx}].productSize`, size);
+      formData.append(`sizes[${idx}].stock`, stockBySize[size] ?? 0);
     });
+
+    // 이미지 파일 추가
+    previewImages.forEach((img) => {
+      if (img.file instanceof File) formData.append("uploadFiles", img.file);
+    });
+
+    const url =
+      product.salesType === "true"
+        ? "http://localhost:8080/api/product/deal"
+        : "http://localhost:8080/api/product/shop";
+
+    // formData 생성 후
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
 
     // 업로드 요청
     try {
-      const result = await axios.post(
-        "http://localhost:8080/api/product",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      console.log("[Upload success]", result);
+      await axios.post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       alert("등록이 완료되었습니다.");
       navigate("/");
     } catch (err) {
-      console.error("[Upload failed]", err);
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "서버 오류가 발생했습니다.";
-      alert(`업로드 실패: ${msg}`);
+      console.error(err);
+      alert("업로드 실패");
     }
   };
 
@@ -120,7 +120,7 @@ export default function UploadPageComponent() {
         />
         <ButtonGroup>
           <Button type="submit" variant="primary">
-            수정 완료
+            등록
           </Button>
         </ButtonGroup>
       </form>

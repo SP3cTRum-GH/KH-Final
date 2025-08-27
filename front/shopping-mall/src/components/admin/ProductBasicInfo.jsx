@@ -11,7 +11,17 @@ import {
 export default function ProductBasicInfo({ product, setProduct }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
+
+    setProduct((prev) => {
+      const updated = { ...prev, [name]: value };
+
+      // price가 바뀌었고, 경매 판매인 경우 dealCurrent도 같이 변경
+      if (name === "price" && prev.salesType === "true") {
+        updated.dealCurrent = value;
+      }
+
+      return updated;
+    });
   };
 
   return (
@@ -22,7 +32,7 @@ export default function ProductBasicInfo({ product, setProduct }) {
           상품명
           <Input
             type="text"
-            name="productName"
+            name="name"
             value={product.name}
             onChange={handleChange}
           />

@@ -29,6 +29,8 @@ public class ReviewConverter {
                 .productName(review.getProduct().getProductName())
                 .type(review.getProduct().getType())
                 .memberNo(review.getMember().getMemberNo())
+                .memberId(review.getMember().getMemberId())
+                .regDate(review.getRegDate())
                 .build();
     }
 
