@@ -14,4 +14,5 @@ public class CartItemAddDTO {
     private Long productNo;
     private String size;
     private int quantity;
+    private int price;
 }

@@ -22,7 +22,7 @@ export const Container = styled.div`
 gap: 20px;
 width: 100%;
 max-width: 1200px;
-margin: 0 auto;  // 가운데 정렬
+margin: 0 10px;  // 가운데 정렬
 
   @media (max-width: 430px) {
     /* margin-left: 40px;
@@ -82,12 +82,13 @@ export const ProductContainer = styled.div`
     }
 
     @media (max-width: 500px) {
-        width: 130px;
+        width: 100%;
         cursor: pointer;
 
     img {
-        width: 200px;
-        height: 200px;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1/1;
         background-size: cover;
         background-position: center;
         background-image: none;

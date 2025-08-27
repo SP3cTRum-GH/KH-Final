@@ -11,7 +11,7 @@ export const BtnContainer = styled.div`
 
     @media (max-width: 500px) {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         gap: 10px;
         margin-top: 10px;
     }
@@ -28,6 +28,7 @@ export const BtnContainer = styled.div`
         padding: 8px;
         border-radius: 5px;
         color: gray;
+        white-space: nowrap;
     }
 
     p:hover{

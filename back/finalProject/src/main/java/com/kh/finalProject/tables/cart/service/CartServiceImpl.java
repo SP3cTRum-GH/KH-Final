@@ -86,16 +86,15 @@ public class CartServiceImpl implements CartService {
         if (cartItemOptional.isPresent()) {
             CartItem cartItem = cartItemOptional.get();
             cartItem.setQuantity(cartItem.getQuantity() + cartItemAddDto.getQuantity());
-            cartItem.setPrice(cartItem.getProduct().getPrice()*cartItemAddDto.getQuantity());
+            cartItem.setPrice(cartItemAddDto.getPrice()*cartItemAddDto.getQuantity());
             cartItemRepository.save(cartItem);
         } else {
             CartItem newCartItem = CartItem.builder()
                     .cart(cart)
                     .product(product)
                     .quantity(cartItemAddDto.getQuantity())
-                    .price(product.getPrice())
                     .size(cartItemAddDto.getSize())
-                    .price(cartItemAddDto.getQuantity() *  product.getPrice())
+                    .price(cartItemAddDto.getQuantity() *  cartItemAddDto.getPrice())
                     .build();
             log.info(newCartItem.getPrice());
             cartItemRepository.save(newCartItem);

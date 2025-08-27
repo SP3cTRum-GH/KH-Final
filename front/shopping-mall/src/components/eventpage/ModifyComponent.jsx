@@ -65,7 +65,7 @@ const ModifyComponent = ({ no }) => {
       if (img.file) {
         formData.append("uploadFiles", img.file); // 새 이미지
       } else {
-        const fileName = img.url.split("/").pop();
+        const fileName = decodeURIComponent(img.url.split("/").pop());
         formData.append("existingFiles", fileName); // 기존 이미지
       }
     });
