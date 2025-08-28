@@ -158,6 +158,7 @@ const SelectOption = ({
       productNo: param.productNo,
       quantity: qty,
       size: selectedSize,
+      price: productData.price,
     };
 
     if (!selectCart) {

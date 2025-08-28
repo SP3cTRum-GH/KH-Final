@@ -15,7 +15,7 @@ export const getNaverLoginLink = () => {
 
 export const getMember = async (code, state) => {
   const res = await axios.get(
-    `${API_SERVER_HOST}/api/member/naver?code=${code}&state=${state}`
+    `${API_SERVER_HOST}/api/member/public/naver?code=${code}&state=${state}`
   );
   return res.data;
 };

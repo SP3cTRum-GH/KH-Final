@@ -57,17 +57,19 @@ const MyPageComponent = () => {
       regDate: "",
       size: "",
       type: false,
+      enable: false,
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [user, setUser] = useState({ email: "test@jjjj.com", name: "이름" });
-  const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed'
+  const [filterType, setFilterType] = useState("all"); // 'all', 'toReview', 'reviewed', 'disableReview'
   const purchaseCount = purchaseHistory.length;
   const [editForm, setEditForm] = useState({ memberName: "", memberEmail: "" });
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [reviews, setReviews] = useState([]); // 리뷰 목록
+  const [reviews, setReviews] = useState([]); // 리뷰 목록 (enabled)
+  const [disabledReviews, setDisabledReviews] = useState([]); // 삭제된 리뷰 목록 (disabled)
   const [reviewCount, setReviewCount] = useState(0);
 
   const member = getCookie("member");
@@ -79,8 +81,19 @@ const MyPageComponent = () => {
 
     if (member) {
       getUserReviewList(member.memberId).then((data) => {
-        setReviewCount(data.length);
-        setReviews(data); // state에 저장
+        // 리뷰 목록에서 enable === true 인 것만 필터링
+        const enabledReviews = Array.isArray(data)
+          ? data.filter((review) => review.enable === true)
+          : [];
+
+        // enable === false 인 삭제된 리뷰 필터링
+        const disabledReviewsList = Array.isArray(data)
+          ? data.filter((review) => review.enable === false)
+          : [];
+
+        setReviewCount(enabledReviews.length);
+        setReviews(enabledReviews);
+        setDisabledReviews(disabledReviewsList);
       });
     }
   }, []);
@@ -107,9 +120,7 @@ const MyPageComponent = () => {
     : 100;
 
   const paymentCompletedCount = purchaseHistory.length;
-  const reviewedCount = purchaseHistory.filter(
-    (item) => item.isReviewed
-  ).length;
+
   const toReviewCount = purchaseHistory.filter(
     (item) => !item.isReviewed
   ).length;
@@ -181,7 +192,14 @@ const MyPageComponent = () => {
       if (member?.memberId) {
         try {
           const data = await getUserReviewList(member.memberId);
-          setReviews(data);
+          const enabledReviews = Array.isArray(data)
+            ? data.filter((review) => review.enable === true)
+            : [];
+          const disabledReviewsList = Array.isArray(data)
+            ? data.filter((review) => review.enable === false)
+            : [];
+          setReviews(enabledReviews);
+          setDisabledReviews(disabledReviewsList);
         } catch (e) {
           console.error(e);
         }
@@ -236,6 +254,13 @@ const MyPageComponent = () => {
             <StatusLabel>작성된 리뷰</StatusLabel>
             <StatusValue>{reviewCount}</StatusValue>
           </StatusItem>
+          <StatusItem
+            onClick={() => setFilterType("disableReview")}
+            style={{ cursor: "pointer" }}
+          >
+            <StatusLabel>삭제된 리뷰</StatusLabel>
+            <StatusValue>{disabledReviews.length}</StatusValue>
+          </StatusItem>
         </StatusBox>
 
         {filterType === "reviewed" ? (
@@ -245,6 +270,16 @@ const MyPageComponent = () => {
             ) : (
               reviews.map((review, idx) => (
                 <ListItem key={review.reviewNo ?? idx}>
+                  {review.reviewImg ? (
+                    <ProductImage
+                      src={`${API_SERVER_HOST}${review.reviewImg}`}
+                      onError={(e) => {
+                        e.currentTarget.style.visibility = "hidden";
+                      }}
+                    />
+                  ) : (
+                    <></>
+                  )}
                   <ProductInfo>
                     <ProductName>{review.productName}</ProductName>
                     <ProductSize>
@@ -271,6 +306,38 @@ const MyPageComponent = () => {
                         삭제
                       </p>
                     </ReviewBtn>
+                  </ProductMeta>
+                </ListItem>
+              ))
+            )}
+          </>
+        ) : filterType === "disableReview" ? (
+          <>
+            {disabledReviews.length === 0 ? (
+              <p>삭제된 리뷰가 없습니다.</p>
+            ) : (
+              disabledReviews.map((review, idx) => (
+                <ListItem key={review.reviewNo ?? idx}>
+                  {review.reviewImg ? (
+                    <ProductImage
+                      src={`${API_SERVER_HOST}${review.reviewImg}`}
+                      onError={(e) => {
+                        e.currentTarget.style.visibility = "hidden";
+                      }}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  <ProductInfo>
+                    <ProductName>{review.productName}</ProductName>
+                    <ProductSize>
+                      평점 : {review.rating} 점
+                      <br />
+                      내용 : {review.content}
+                    </ProductSize>
+                  </ProductInfo>
+                  <ProductMeta>
+                    <ReviewStatus>관리자의 의해 삭제 되었습니다</ReviewStatus>
                   </ProductMeta>
                 </ListItem>
               ))

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.kh.finalProject.common.file.CustomFileUtil;
 import com.kh.finalProject.common.util.pagedto.PageRequestDTO;
 import com.kh.finalProject.common.util.pagedto.PageResponseDTO;
+import com.kh.finalProject.tables.cart.dto.CartItemAddDTO;
 import com.kh.finalProject.tables.product.component.ProductConverter;
 import com.kh.finalProject.tables.product.dto.BidDTO;
 import com.kh.finalProject.tables.product.dto.ProductDealRequestDTO;
@@ -248,6 +249,11 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public Integer bid(BidDTO bid) {
 		Product p = productRepository.findById(bid.getProductNo()).orElseThrow(null);
+		CartItemAddDTO cartItemAddDto = CartItemAddDTO.builder()
+                .memberId(bid.getMemberId())
+                .productNo(bid.getProductNo())
+                .quantity(1)
+                .build();
 		p.setDealCount(p.getDealCount()+1);
 		p.setDealCurrent(bid.getPrice());
 		

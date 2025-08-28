@@ -73,6 +73,9 @@ export const ItemBox = styled.div`
   align-items: flex-start;
   padding: 20px 0;
   border-bottom: 1px solid #eaeaea;
+  /* disabled state (visual only) */
+  opacity: ${props => (props.$disabled ? 0.5 : 1)};
+  filter: ${props => (props.$disabled ? 'grayscale(0.3)' : 'none')};
 `;
 
 export const Checkbox = styled.input.attrs({ type: 'checkbox' })`
@@ -93,6 +96,7 @@ export const ItemInfo = styled.div`
 export const ItemName = styled.p`
   font-size: 16px;
   margin-bottom: 8px;
+
 `;
 
 export const ItemOptions = styled.div`
@@ -106,6 +110,11 @@ export const OptionButton = styled.button`
   background-color: #f5f5f5;
   border: 1px solid #ccc;
   cursor: pointer;
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 `;
 
 export const Price = styled.div`
@@ -275,12 +284,15 @@ export const FilterButton = styled.button`
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
+  margin-left: 12;
 
   &[data-active='true'] {
     background: #111;
     color: #fff;
     border-color: #111;
   }
+
+  
 `;
 
 export const SectionHeader = styled.h3`
@@ -290,6 +302,7 @@ export const SectionHeader = styled.h3`
 `;
 
 export const CartDeleteButton = styled.p`
+  text-align: end;
   font-size: 14px;
   cursor: pointer;
   color: rgb(136, 136, 136)
@@ -299,4 +312,17 @@ export const DealTime = styled.p`
   font-size: 12px;
   color: rgb(201, 201, 201);
   margin-bottom: 5px;
+`
+
+export const RightBtns = styled.div`
+  height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
+  button:hover {
+  font-family: 600;
+  background-color: black;
+  color: white;
+ }
 `

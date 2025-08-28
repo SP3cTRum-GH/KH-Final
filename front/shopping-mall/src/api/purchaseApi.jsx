@@ -5,14 +5,14 @@ const prefix = `${API_SERVER_HOST}/api/purchase`;
 
 // 구매 내역 불러오기
 export const getPurchaseList = async (memberId) => {
-  const res = await axios.get(`${prefix}/logs?memberId=${memberId}`);
+  const res = await axios.get(`${prefix}user/logs?memberId=${memberId}`);
   return res.data;
 };
 
 // 즉시 구매
 export const productBuy = async (product, memberId) => {
   const res = await axios.post(
-    `${prefix}/buy-now?memberId=${memberId}`,
+    `${prefix}/user/buy-now?memberId=${memberId}`,
     product
   );
   return res.data;
@@ -20,7 +20,7 @@ export const productBuy = async (product, memberId) => {
 
 // main best5 불러오기
 export const bestItems = async () => {
-  const res = await axios.get(`${prefix}/main`);
+  const res = await axios.get(`${prefix}/public/main`);
   return res.data;
 };
 
