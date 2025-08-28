@@ -6,8 +6,7 @@ import {
   PrevBtn,
   CurrentValue,
 } from "./CarouselStyle";
-import { API_SERVER_HOST } from "../../api/HostUrl";
-import { getAllEvents } from "../../api/eventApi";
+import { getAllEvents, getEventImageUrl } from "../../api/eventApi";
 
 const Carousel = () => {
   const [events, setEvents] = useState([]);
@@ -85,11 +84,8 @@ const Carousel = () => {
           <Cell key={idx}>
             <img
               src={
-                event.imageFileNames && event.imageFileNames.length > 0
-                  ? `${API_SERVER_HOST}/api/events/view/${encodeURIComponent(
-                      event.imageFileNames[0]
-                    )}`
-                  : "https://www.news1.kr/_next/image?url=https%3A%2F%2Fi3n.news1.kr%2Fsystem%2Fphotos%2F2023%2F12%2F10%2F6371071%2Fhigh.jpg&w=1920&q=75"
+                getEventImageUrl(event.imageFileNames) ||
+                "https://www.news1.kr/_next/image?url=https%3A%2F%2Fi3n.news1.kr%2Fsystem%2Fphotos%2F2023%2F12%2F10%2F6371071%2Fhigh.jpg&w=1920&q=75"
               }
               alt={event.title || "이벤트 이미지"}
             />
