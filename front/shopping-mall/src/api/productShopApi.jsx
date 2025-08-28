@@ -70,7 +70,7 @@ export const updateShopProduct = async (formData, productNo) => {
 
 // shop 상품 이미지 조회
 export const getShopProductImages = async (productNo) => {
-  const res = await axios.get(`${prefix}/${productNo}`);
+  const res = await axios.get(`${prefix}/public/${productNo}`);
   return res.data.images || [];
 };
 
