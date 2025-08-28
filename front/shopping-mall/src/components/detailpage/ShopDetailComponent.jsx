@@ -6,7 +6,7 @@ import Review from "./Review";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { getShopOne } from "../../api/productShopApi";
-import { getReviewList } from "../../api/reviewApi";
+import { getReviewList, reviewCount } from "../../api/reviewApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
 import axios from "axios";
@@ -32,19 +32,11 @@ const hrStyle = {
 
 const ShopDetailCompont = () => {
   const [shopProductData, setShopProductData] = useState(null);
+  const [count, setCount] = useState(0);
   const reviewRef = useRef(null);
   const param = useParams();
   const [reviewList, setReviewList] = useState({ content: [], totalCount: 0 });
   const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
-
-  const test = async () => {
-    const res = await axios
-      .get(`http://localhost:8080/api/review/public/count?productNo=2`)
-      .then((data) => console.log(data));
-    return res.data;
-  };
-
-  test();
 
   // 리뷰 목록 재요청 (삭제/추가 후 카운트 반영용)
   const reloadReviews = () => {
@@ -57,6 +49,10 @@ const ShopDetailCompont = () => {
     getShopOne(param.productNo).then((data) => {
       setShopProductData(data);
     });
+
+    reviewCount(param.productNo)
+      .then((cnt) => setCount(cnt ?? 0))
+      .catch(() => setCount(0));
 
     reloadReviews();
   }, [reviewPage, reviewSize, param.productNo]);
@@ -78,7 +74,7 @@ const ShopDetailCompont = () => {
           <SelectOption
             productData={shopProductData}
             scrollToReview={scrollToReview}
-            reviewListCount={reviewList.totalCount}
+            reviewListCount={count}
           />
         ) : (
           <>Loading...</>
