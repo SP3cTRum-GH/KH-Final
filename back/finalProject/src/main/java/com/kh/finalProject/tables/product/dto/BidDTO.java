@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class BidDTO {
 	private Long productNo;
 	private int price;
+	private String memberId;
 }

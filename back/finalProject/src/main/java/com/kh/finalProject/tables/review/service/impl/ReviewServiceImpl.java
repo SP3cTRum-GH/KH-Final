@@ -65,6 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
                         .memberNo(r.getMember().getMemberNo())
                         .memberId(r.getMember().getMemberId())
                         .regDate(r.getRegDate())
+                        .enable(r.isEnable())
                         .build())
                 .toList();
 
@@ -126,7 +127,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         String oldFile = review.getReviewImg();      // 기존 파일명
         String newFile = dto.getReviewImg();         // 새 파일명(없으면 null 가능)
-
+        
         // 이미지 교체: 새 파일명 있을 때만 교체
         if(newFile != null && !newFile.isBlank()){                  // new 파일이 null이 아니고 비어있지 않다면
             review.setReviewImg(newFile);                           // review 객체에 newFile의 정보를 담는다.
@@ -135,10 +136,10 @@ public class ReviewServiceImpl implements ReviewService {
                                                                     // 단일 원소 리스트(List.of(oldFile))로 감싸서 전달해 삭제
             }
         }else {
-        	review.setReviewImg(newFile);
+        	review.setReviewImg(oldFile);
         }
         // 새 업로드가 없으면 기존 이미지 유지
-
+        
         review.setRating(dto.getRating());
         review.setContent(dto.getContent());
 
@@ -162,7 +163,8 @@ public class ReviewServiceImpl implements ReviewService {
 
             fileUtil.deleteFiles(java.util.List.of(name));
         }
-        reviewRepository.delete(r);
+        r.setEnable(false);
+        reviewRepository.save(r);
     }
 
     private String toUrl(String fileName) {
