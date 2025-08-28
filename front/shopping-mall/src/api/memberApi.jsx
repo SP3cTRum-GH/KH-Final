@@ -28,14 +28,14 @@ export const modifySocialMember = async (member) => {
 };
 
 export const getAllMembers = async () => {
-  const res = await axios.get(`${host}/all`, { withCredentials: true });
+  const res = await axios.get(`${host}/admin/all`, { withCredentials: true });
   return res.data;
 };
 
 // 비밀번호 체크
 export const checkPassword = async (memberId, password) => {
   const res = await axios.post(
-    `${host}/checkpw?memberId=${memberId}`,
+    `${host}/user/checkpw?memberId=${memberId}`,
     password,
     { headers: { "Content-Type": "text/plain" }, withCredentials: true }
   );
@@ -44,16 +44,20 @@ export const checkPassword = async (memberId, password) => {
 
 // 회원정보 수정
 export const updateMemberInfo = async (memberId, formData) => {
-  const res = await axios.put(`${host}/update?memberId=${memberId}`, formData, {
-    withCredentials: true,
-  });
+  const res = await axios.put(
+    `${host}/user/update?memberId=${memberId}`,
+    formData,
+    {
+      withCredentials: true,
+    }
+  );
   return res.data;
 };
 
 // 비밀번호 수정
 export const updateMemberPassword = async (memberId, newPassword) => {
   const res = await axios.put(
-    `${host}/updatepw?memberId=${memberId}`,
+    `${host}/user/updatepw?memberId=${memberId}`,
     newPassword,
     {
       withCredentials: true,
