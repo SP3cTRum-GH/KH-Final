@@ -25,7 +25,7 @@ const MainPage = () => {
       <Container>
         <Carousel imgLength={5} />
         <div style={{ width: "100%" }}>
-          <h1 style={{ margin: "1rem 0 1rem 100px" }}>Shop Top5</h1>
+          <h1 style={{ margin: "10px", fontSize: "25px" }}>Shop Top5</h1>
           <ItemCard
             page={"shopdetail"}
             dtoList={listData.shopMain}
@@ -33,7 +33,7 @@ const MainPage = () => {
           />
         </div>
         <div style={{ width: "100%" }}>
-          <h1 style={{ margin: "1rem 0 1rem 100px" }}>Deal Top5</h1>
+          <h1 style={{ margin: "10px", fontSize: "25px" }}>Deal Top5</h1>
           <ItemCard
             page={"dealdetail"}
             dtoList={listData.dealMain}

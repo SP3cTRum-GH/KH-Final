@@ -9,7 +9,7 @@ export const postAdd = async (formData) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    return res.data; // {result: no}
+    return res.data;
   } catch (err) {
     console.error("이벤트 등록 실패:", err);
     throw err;
@@ -29,13 +29,28 @@ export const getOne = async (no) => {
 };
 
 export const putOne = async (no, formData) => {
-  const res = await axios.put(`${host}/admin/${no}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return res.data;
+  try {
+    const res = await axios.put(`${host}/admin/${no}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  } catch (err) {
+    console.error(`이벤트 수정 실패 (no: ${no}):`, err);
+    throw err;
+  }
 };
 
 export const deleteOne = async (no) => {
   const res = await axios.delete(`${host}/admin/${no}`);
   return res.data;
+};
+
+export const softDeleteOne = async (no) => {
+  try {
+    const res = await axios.put(`${host}/admin/soft-delete/${no}`); // ✅ 전용 API 호출
+    return res.data;
+  } catch (err) {
+    console.error("이벤트 삭제 실패(soft delete):", err);
+    throw err;
+  }
 };

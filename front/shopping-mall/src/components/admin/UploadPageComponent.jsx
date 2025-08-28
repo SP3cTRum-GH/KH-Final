@@ -4,7 +4,8 @@ import ProductBasicInfo from "./ProductBasicInfo";
 import CategorySizeManager from "./CategorySizeManager";
 import ImageUploader from "./ImageUploader";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import { uploadDealProduct } from "../../api/productDealApi";
+import { uploadShopProduct } from "../../api/productShopApi";
 
 export default function UploadPageComponent() {
   const navigate = useNavigate();
@@ -97,21 +98,12 @@ export default function UploadPageComponent() {
       }
     });
 
-    const url =
-      product.salesType === "true"
-        ? "http://localhost:8080/api/product/deal"
-        : "http://localhost:8080/api/product/shop";
-
-    // formData 생성 후
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    // 업로드 요청
     try {
-      await axios.post(url, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (product.salesType === "true") {
+        await uploadDealProduct(formData);
+      } else {
+        await uploadShopProduct(formData);
+      }
       alert("등록이 완료되었습니다.");
       navigate("/");
     } catch (err) {

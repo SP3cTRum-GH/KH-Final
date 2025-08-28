@@ -52,15 +52,17 @@ export const Cell = styled.div`
 
     h3 {
         position: absolute;
-        bottom: 100px;
+        bottom: 80px;
         left: 50px;
-        font-size: 70px;
+        font-size: 50px;
         font-weight: 600;
         color: white;
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
 
         @media (max-width: 500px) {
             font-size: 30px;
-            bottom: 80px;
+            bottom: 50px;
+            left: 30px;
         }
     }
 
@@ -68,12 +70,15 @@ export const Cell = styled.div`
         position: absolute;
         bottom: 50px;
         left: 50px;
-        font-size: 50px;
+        font-size: 30px;
         font-weight: 500;
         color: white;
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+
         @media (max-width: 500px) {
             font-size: 20px;
-            bottom: 40px;
+            bottom: 30px;
+            left: 30px;
         }
     }
 `
@@ -92,7 +97,8 @@ export const PrevBtn = styled.button`
     background-color: transparent;
     border: none;
     font-size: 40px;
-    color: #999;
+    color: white;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
 
     @media (max-width: 500px) {
         top: -190px;
@@ -112,7 +118,8 @@ export const NextBtn = styled.button`
     background-color: transparent;
     border: none;
     font-size: 40px;
-    color: #999;
+    color: white;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
 
         @media (max-width: 500px) {
         top: -190px;

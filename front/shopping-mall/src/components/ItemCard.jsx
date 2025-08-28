@@ -10,7 +10,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { deleteProductItem } from "../api/productShopApi";
-import axios from "axios";
+import { attachFirstDealImages } from "../api/productDealApi";
+import { attachFirstShopImages } from "../api/productShopApi";
 
 const ItemCard = ({ page, dtoList }) => {
   const navigate = useNavigate();
@@ -24,26 +25,17 @@ const ItemCard = ({ page, dtoList }) => {
     const fetchFirstImages = async () => {
       if (!dtoList) return;
 
-      const updatedItems = await Promise.all(
-        dtoList.map(async (product) => {
-          try {
-            const type = page === "dealdetail" ? "deal" : "shop";
-            const res = await axios.get(
-              `http://localhost:8080/api/product/public/${type}/${product.productNo}`
-            );
-            const firstImg =
-              res.data.images && res.data.images.length > 0
-                ? res.data.images[0].img
-                : null;
-            return { ...product, img: firstImg };
-          } catch (err) {
-            console.error("이미지 로드 실패", err);
-            return product;
-          }
-        })
-      );
-
-      setItems(updatedItems);
+      try {
+        let updatedItems = [];
+        if (page === "dealdetail") {
+          updatedItems = await attachFirstDealImages(dtoList);
+        } else {
+          updatedItems = await attachFirstShopImages(dtoList);
+        }
+        setItems(updatedItems);
+      } catch (err) {
+        console.error("첫 번째 이미지 가져오기 실패:", err);
+      }
     };
 
     fetchFirstImages();
@@ -134,18 +126,24 @@ const ItemCard = ({ page, dtoList }) => {
                     <div
                       style={{
                         position: "absolute",
-                        top: "42%",
+                        top: "50%",
                         left: "50%",
-                        transform: "translate(-50%, -50%)",
+                        transform: "translate(-50%, -70%)",
                         backgroundColor: "rgba(0,0,0,0.5)",
                         color: "white",
-                        padding: "10px 20px",
-                        borderRadius: "8px",
-                        fontSize: "1.2rem",
+                        padding: "20px",
+                        borderRadius: "50%",
+                        fontSize: "25px",
                         fontWeight: "bold",
+                        width: "60px",
+                        height: "60px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
                       }}
                     >
-                      품절
+                      SOLD OUT
                     </div>
                   )}
 

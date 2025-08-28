@@ -149,7 +149,7 @@ const ReadComponent = ({ no }) => {
   // 대표 이미지 선택
   const bannerImg = event.imageFileNames?.length
     ? `${host}/api/events/view/${encodeURIComponent(event.imageFileNames[0])}`
-    : "https://via.placeholder.com/900x450";
+    : null;
 
   const extraImgs = event.imageFileNames?.slice(1) || [];
 
