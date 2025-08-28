@@ -58,5 +58,5 @@ export const softDeleteOne = async (no) => {
 export const getEventImageUrl = (fileNames) => {
   if (!fileNames || fileNames.length === 0) return null;
 
-  return `${host}/view/${encodeURIComponent(fileNames[0])}`;
+  return `${host}/public/view/${encodeURIComponent(fileNames[0])}`;
 };

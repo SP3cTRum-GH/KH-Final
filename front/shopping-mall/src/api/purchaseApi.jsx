@@ -5,7 +5,7 @@ const prefix = `${API_SERVER_HOST}/api/purchase`;
 
 // 구매 내역 불러오기
 export const getPurchaseList = async (memberId) => {
-  const res = await axios.get(`${prefix}user/logs?memberId=${memberId}`);
+  const res = await axios.get(`${prefix}/user/logs?memberId=${memberId}`);
   return res.data;
 };
 
@@ -26,7 +26,7 @@ export const bestItems = async () => {
 
 // 날짜별 카테고리 매출 불러오기 (sales chart 용)
 export const getSalesByDateCategory = async (fromDate, toDate) => {
-  const res = await axios.get(`${prefix}/sales/date-category`, {
+  const res = await axios.get(`${prefix}/admin/sales/date-category`, {
     params: { from: fromDate, to: toDate },
   });
   return res.data;
