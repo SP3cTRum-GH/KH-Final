@@ -34,6 +34,7 @@ public class Review {
     private String content; // 리뷰 내용
 
     @Column
+    @Builder.Default
     private boolean enable=true;
     
     @CreationTimestamp

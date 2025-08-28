@@ -39,6 +39,6 @@ export const updateReview = async (reviewNo, data) => {
 
 // 리뷰 삭제
 export const deleteReview = async (reviewNo) => {
-  const res = await axios.delete(`${prefix}/${reviewNo}`);
+  const res = await axios.post(`${prefix}/${reviewNo}`);
   return res.data;
 };
