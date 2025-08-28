@@ -132,7 +132,7 @@ export const Wrap = styled.div`
         font-size: medium;
         margin-top: 0.5px;
         padding: 6px 12px;
-        background-color: #ef4444; // 빨강 계열
+        background-color: #7f1d1d;
         color: white;
         font-weight: 500;
         border: none;
@@ -156,7 +156,7 @@ export const Wrap = styled.div`
 export const EditButton = styled(RouterLink)`
   display: inline-block;
   padding: 7.5px 12px;
-  background-color: #4f46e5; // 보라 계열
+  background-color: #1d4ed8;
   color: white;
   font-weight: 500;
   border-radius: 6px;

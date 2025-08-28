@@ -43,12 +43,8 @@ export const deleteOne = async (no) => {
 
 export const softDeleteOne = async (no) => {
   try {
-    // enable을 true로 변경
-    const formData = new FormData();
-    formData.append("enable", true);
-
-    const res = await putOne(no, formData);
-    return res;
+    const res = await axios.put(`${host}/soft-delete/${no}`); // ✅ 전용 API 호출
+    return res.data;
   } catch (err) {
     console.error("이벤트 삭제 실패(soft delete):", err);
     throw err;

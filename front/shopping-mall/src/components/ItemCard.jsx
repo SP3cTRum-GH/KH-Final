@@ -126,18 +126,24 @@ const ItemCard = ({ page, dtoList }) => {
                     <div
                       style={{
                         position: "absolute",
-                        top: "42%",
+                        top: "50%",
                         left: "50%",
-                        transform: "translate(-50%, -50%)",
+                        transform: "translate(-50%, -70%)",
                         backgroundColor: "rgba(0,0,0,0.5)",
                         color: "white",
-                        padding: "10px 20px",
-                        borderRadius: "8px",
-                        fontSize: "1.2rem",
+                        padding: "20px",
+                        borderRadius: "50%",
+                        fontSize: "25px",
                         fontWeight: "bold",
+                        width: "60px",
+                        height: "60px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
                       }}
                     >
-                      품절
+                      SOLD OUT
                     </div>
                   )}
 

@@ -24,6 +24,12 @@ const Footer = () => {
             <Paragraph>
               React, Spring Boot, Oracle 기반으로 구현되었습니다.
             </Paragraph>
+            <br />
+            <Paragraph>We don’t sell. We select.</Paragraph>
+            <Paragraph>Select + Valeur → “가치 있는 선택”</Paragraph>
+            <Paragraph>SELEUR는 제품을 나열하지 않습니다.</Paragraph>
+            <Paragraph>보여주지 않아도, 당신은 이미 알 수 있습니다.</Paragraph>
+            <Paragraph>적게 고르고, 깊게 전달합니다.</Paragraph>
           </div>
 
           <div>
