@@ -175,4 +175,9 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		return review.stream().map(reviewConverter::toDto).toList();
 	}
+
+    @Override
+    public long countByProduct(Long productNo) {
+        return reviewRepository.countByProduct_ProductNo(productNo);
+    }
 }

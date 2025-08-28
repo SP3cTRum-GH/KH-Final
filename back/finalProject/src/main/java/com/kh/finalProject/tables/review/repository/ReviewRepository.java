@@ -30,4 +30,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     
     List<Review> getReviewByMember_MemberId(String memberId);
 
+    long countByProduct_ProductNo(Long productNo);
 }

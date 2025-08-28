@@ -17,4 +17,6 @@ public interface ReviewService {
     ReviewResponseDTO update(Long reviewNo, ReviewRequestDTO dto);
     void delete(Long reviewNo);
     List<ReviewResponseDTO> getReviewForMember(String memberId);
+
+    long countByProduct(Long productNo);
 }
