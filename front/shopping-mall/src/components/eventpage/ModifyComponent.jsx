@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteOne, getOne, putOne } from "../../api/eventApi";
-import { API_SERVER_HOST } from "../../api/HostUrl";
+import { getOne, putOne, getEventImageUrl } from "../../api/eventApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import {
   PageWrapper,
@@ -15,6 +14,8 @@ import {
   Thumbnail,
 } from "../admin/ModifyPageStyle";
 import ImageUploader from "../admin/ImageUploader";
+import { useNavigate } from "react-router-dom";
+import { softDeleteOne } from "../../api/eventApi";
 
 const initState = {
   no: "",
@@ -31,6 +32,7 @@ const ModifyComponent = ({ no }) => {
   //결과 모달(result 결과에 따라서 화면이동에 사용 result = 'Modified'  or 'Deleted')
   const [result, setResult] = useState(null);
   const [previewImages, setPreviewImages] = useState([]);
+  const navigate = useNavigate();
 
   //이동용 함수
   const { moveToEventList } = useCustomMove();
@@ -39,7 +41,7 @@ const ModifyComponent = ({ no }) => {
     getOne(no).then((data) => {
       // previewImages 초기화
       const previews = data.imageFileNames?.map((fileName) => ({
-        url: `${API_SERVER_HOST}/api/events/view/${fileName}`,
+        url: getEventImageUrl([fileName]),
         file: null, // 기존 이미지라면 file은 null
       }));
       setPreviewImages(previews || []);
@@ -55,6 +57,10 @@ const ModifyComponent = ({ no }) => {
   const formatDateForInput = (dateTimeStr) => {
     if (!dateTimeStr) return "";
     return dateTimeStr.split("T")[0]; // yyyy-MM-dd
+  };
+
+  const handleRemoveImage = (url) => {
+    setPreviewImages((prev) => prev.filter((img) => img.url !== url));
   };
 
   const handleClickModify = async () => {
@@ -77,6 +83,7 @@ const ModifyComponent = ({ no }) => {
 
     try {
       await putOne(no, formData); // axios에서 FormData 전송
+      navigate("/event");
       setResult("Modified");
     } catch (err) {
       console.error("수정 실패:", err);
@@ -84,16 +91,12 @@ const ModifyComponent = ({ no }) => {
   };
 
   const handleClickDelete = async () => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return; // 삭제 확인
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
     try {
-      const res = await deleteOne(no);
-      if (res.RESULT === "SUCCESS") {
-        setResult("Deleted");
-        moveToEventList(); // 삭제 후 리스트로 이동
-      } else {
-        console.error("삭제 실패:", res);
-        alert("삭제에 실패했습니다.");
-      }
+      await softDeleteOne(no); // enable = true로 변경
+      setResult("Deleted");
+      moveToEventList(); // 리스트 페이지 이동
     } catch (err) {
       console.error("삭제 실패:", err);
       alert("삭제 중 오류가 발생했습니다.");
@@ -163,6 +166,7 @@ const ModifyComponent = ({ no }) => {
       <ImageUploader
         previewImages={previewImages}
         setPreviewImages={setPreviewImages}
+        onRemoveImage={handleRemoveImage}
       />
 
       {/* 버튼 */}

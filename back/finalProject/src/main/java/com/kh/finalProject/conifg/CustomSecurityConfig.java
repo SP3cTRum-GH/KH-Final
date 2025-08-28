@@ -37,7 +37,7 @@ public class CustomSecurityConfig {
 				.sessionManagement(
 						sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.csrf(config -> config.disable()).formLogin(config -> {
-					config.loginPage("/api/member/login");
+					config.loginPage("/api/member/public/login");
 					config.successHandler(new APILoginSuccessHandler());
 					config.failureHandler(new APILoginFailHandler());
 				}).addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class)

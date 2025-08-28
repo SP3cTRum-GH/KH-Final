@@ -42,7 +42,7 @@ export const getAccessToken = async (authCode) => {
 
 export const getMemberWithAccessToken = async (accessToken) => {
   const res = await axios.get(
-    `${API_SERVER_HOST}/api/member/google?accessToken=${accessToken}`
+    `${API_SERVER_HOST}/api/member/public/google?accessToken=${accessToken}`
   );
   return res.data;
 };

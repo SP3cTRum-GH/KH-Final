@@ -5,7 +5,6 @@ import ModifyBasicInfo from "./ProductBasicInfo";
 import CategorySizeManager from "./CategorySizeManager";
 import ImageUploader from "./ImageUploader";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import axios from "axios";
 import { API_SERVER_HOST } from "../../api/HostUrl";
 import { getShopOne, updateShopProduct } from "../../api/productShopApi";
 import { getDealOne, updateDealProduct } from "../../api/productDealApi";
@@ -104,13 +103,12 @@ export default function ModifyPageComponent() {
       formData.append(`sizes[${idx}].stock`, stockBySize[size] ?? 0);
     });
 
-    // 삭제될 서버 이미지 ID
-    deletedImageIds.forEach((id) => formData.append("deleteImageIds", id));
-
-    // 기존 이미지 번호 유지
+    // 기존 이미지 중 유지할 것들
     previewImages.forEach((img) => {
-      if (img.type === "server" && img.productImageNo) {
-        formData.append("productImages", img.productImageNo);
+      if (img.type === "server" && img.url) {
+        // 서버에서 받은 경로는 "/api/image/xxx" 형태 → DB에 저장된 파일명만 추출 필요
+        const fileName = img.url.replace(API_SERVER_HOST + "/api/image/", "");
+        formData.append("existingFiles", fileName);
       }
     });
 
@@ -129,21 +127,18 @@ export default function ModifyPageComponent() {
         formData.append("endDate", `${product.endDate}T00:00:00`);
     }
 
-    console.log("=== FormData contents ===");
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    const url = isDeal
-      ? `${API_SERVER_HOST}/api/product/deal/${productNo}`
-      : `${API_SERVER_HOST}/api/product/shop/${productNo}`;
-
     try {
-      await axios.put(url, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      alert("수정 완료!");
-      navigate("/");
+      if (isDeal) {
+        await updateDealProduct(formData, productNo);
+        alert("수정 완료!");
+        window.scrollTo(0, 0);
+        navigate("/deal");
+      } else {
+        await updateShopProduct(formData, productNo);
+        alert("수정 완료!");
+        window.scrollTo(0, 0);
+        navigate("/shop");
+      }
     } catch (err) {
       console.error(err);
       alert("수정 실패");

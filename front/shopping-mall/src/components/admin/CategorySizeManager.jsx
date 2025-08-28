@@ -63,11 +63,10 @@ export default function CategorySizeManager({
   const toggleSize = (size) => {
     if (selectedSizes.includes(size)) {
       setSelectedSizes(selectedSizes.filter((s) => s !== size));
-      setStockBySize((prev) => {
-        const next = { ...prev };
-        delete next[size];
-        return next;
-      });
+      setStockBySize((prev) => ({
+        ...prev,
+        [size]: 0,
+      }));
     } else {
       setSelectedSizes([...selectedSizes, size]);
       setStockBySize((prev) => ({ ...prev, [size]: prev?.[size] ?? 0 }));
@@ -78,7 +77,11 @@ export default function CategorySizeManager({
   const handleStockChange = (size, value) => {
     const onlyNum = String(value).replace(/[^0-9]/g, "");
     const num = onlyNum === "" ? 0 : parseInt(onlyNum, 10);
-    setStockBySize({ ...stockBySize, [size]: num });
+
+    setStockBySize((prev) => ({
+      ...prev,
+      [size]: num,
+    }));
   };
 
   // 신발 빠른 선택

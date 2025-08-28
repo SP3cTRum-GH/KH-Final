@@ -6,7 +6,8 @@ import {
   NextBtn,
   PrevBtn,
 } from "./DetailCarouselStyle.js";
-import axios from "axios";
+import { getDealProductImages } from "../../api/productDealApi.jsx";
+import { getShopProductImages } from "../../api/productShopApi.jsx";
 
 const DetailCarousel = () => {
   const { productNo } = useParams();
@@ -36,14 +37,12 @@ const DetailCarousel = () => {
 
     const fetchImages = async () => {
       try {
-        // 경로에 따라 URL 결정
         const isDeal = location.pathname.includes("/dealdetail/");
-        const url = isDeal
-          ? `http://localhost:8080/api/product/deal/${productNo}`
-          : `http://localhost:8080/api/product/shop/${productNo}`;
+        const imgsData = isDeal
+          ? await getDealProductImages(productNo)
+          : await getShopProductImages(productNo);
 
-        const res = await axios.get(url);
-        const imgs = (res.data.images || []).map((i) => i.img).filter(Boolean);
+        const imgs = imgsData.map((i) => i.img).filter(Boolean);
         setImages(imgs);
       } catch (err) {
         console.error("이미지 로드 실패:", err);
