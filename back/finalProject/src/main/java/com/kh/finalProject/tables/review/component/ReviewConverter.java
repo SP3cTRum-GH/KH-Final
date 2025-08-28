@@ -39,6 +39,7 @@ public class ReviewConverter {
                 .memberNo(review.getMember().getMemberNo())
                 .memberId(review.getMember().getMemberId())
                 .regDate(review.getRegDate())
+                .enable(review.isEnable())
                 .build();
     }
 
