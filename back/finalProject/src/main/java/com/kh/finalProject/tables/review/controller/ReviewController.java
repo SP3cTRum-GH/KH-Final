@@ -1,6 +1,7 @@
 package com.kh.finalProject.tables.review.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kh.finalProject.common.file.CustomFileUtil;
 import org.springframework.http.MediaType;
@@ -75,5 +76,10 @@ public class ReviewController {
     @GetMapping("/user")
     public List<ReviewResponseDTO> getReviewForMember(@RequestParam String memberId) {
     	return reviewService.getReviewForMember(memberId);
+    }
+
+    @GetMapping("/count")
+    public Map<String, Long> count(@RequestParam Long productNo){
+        return Map.of("count",reviewService.countByProduct(productNo));
     }
 }

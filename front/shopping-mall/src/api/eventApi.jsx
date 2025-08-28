@@ -4,7 +4,7 @@ const host = `${API_SERVER_HOST}/api/events`;
 
 export const postAdd = async (formData) => {
   try {
-    const res = await axios.post(`${host}/admin/`, formData, {
+    const res = await axios.post(`${host}/admin`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
