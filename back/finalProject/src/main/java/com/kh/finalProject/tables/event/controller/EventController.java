@@ -8,7 +8,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,7 +33,7 @@ public class EventController {
 	private final EventService eventService; // ProductServcie 주입
 	private final CustomFileUtil fileUtil;
 
-	//이벤트 작
+	// 이벤트 작
 	@PostMapping("/admin")
 	public Map<String, Long> register(EventDTO eventDTO) {
 		log.info("rgister: " + eventDTO);
@@ -47,7 +46,7 @@ public class EventController {
 		return Map.of("result", no);
 	}
 
-	//이벤트 이미지 가져오
+	// 이벤트 이미지 가져오
 	@GetMapping("/public/view/{fileName}")
 	public ResponseEntity<Resource> viewFileGET(@PathVariable String fileName) {
 		return fileUtil.getFile(fileName);
@@ -60,7 +59,7 @@ public class EventController {
 		return eventService.getList(pageRequestDTO);
 	}
 
-	//이벤트 전체 가져오기 
+	// 이벤트 전체 가져오기
 	@GetMapping("/public/all")
 	public ResponseEntity<List<EventDTO>> getAllEvents() {
 		return ResponseEntity.ok(eventService.getAllEvent());
@@ -72,7 +71,7 @@ public class EventController {
 		return eventService.get(no);
 	}
 
-	// 이벤트 수정 
+	// 이벤트 수정
 	@PutMapping("/admin/{no}")
 	public Map<String, String> modify(@PathVariable(name = "no") Long no, EventDTO eventDTO,
 			@RequestParam(value = "existingFiles", required = false) List<String> existingFiles) {
@@ -110,7 +109,7 @@ public class EventController {
 		return Map.of("RESULT", "SUCCESS");
 	}
 
-	//이벤트 삭제 
+	// 이벤트 삭제
 	@DeleteMapping("/admin/{no}")
 	public Map<String, String> remove(@PathVariable("no") Long no) {
 		// 삭제해야 할 파일들 알아내기
@@ -122,7 +121,7 @@ public class EventController {
 		return Map.of("RESULT", "SUCCESS");
 	}
 
-	@PutMapping("/soft-delete/{no}")
+	@PutMapping("/admin/soft-delete/{no}")
 	public Map<String, String> softDelete(@PathVariable Long no) {
 		EventDTO event = eventService.get(no);
 		if (event == null)
