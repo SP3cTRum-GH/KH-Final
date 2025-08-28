@@ -1,11 +1,12 @@
 import axios from "axios";
 import { API_SERVER_HOST } from "./HostUrl";
+import jwtAxios from "../util/jwtUtil";
 
 const prefix = `${API_SERVER_HOST}/api/review`;
 
 // 리뷰 등록
 export const postReview = async (product) => {
-  const res = await axios.post(`${prefix}/user`, product);
+  const res = await jwtAxios.post(`${prefix}/user`, product);
   return res.data;
 };
 
@@ -17,7 +18,7 @@ export const getReviewOne = async (reviewNo) => {
 
 // 유저 리뷰 리스트
 export const getUserReviewList = async (memberId) => {
-  const res = await axios.get(`${prefix}/user?memberId=${memberId}`);
+  const res = await jwtAxios.get(`${prefix}/user?memberId=${memberId}`);
   return res.data;
 };
 
@@ -33,12 +34,12 @@ export const getReviewList = async (pageParam, productNo) => {
 
 // 리뷰 수정
 export const updateReview = async (reviewNo, data) => {
-  const res = await axios.put(`${prefix}/user/${reviewNo}`, data);
+  const res = await jwtAxios.put(`${prefix}/user/${reviewNo}`, data);
   return res.data;
 };
 
 // 리뷰 삭제
 export const deleteReview = async (reviewNo) => {
-  const res = await axios.post(`${prefix}/admin/${reviewNo}`);
+  const res = await jwtAxios.post(`${prefix}/admin/${reviewNo}`);
   return res.data;
 };

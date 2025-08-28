@@ -1,10 +1,11 @@
 import axios from "axios";
 import { API_SERVER_HOST } from "./HostUrl";
+import jwtAxios from "../util/jwtUtil";
 const host = `${API_SERVER_HOST}/api/events`;
 
 export const postAdd = async (formData) => {
   try {
-    const res = await axios.post(`${host}/admin`, formData, {
+    const res = await jwtAxios.post(`${host}/admin`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -30,7 +31,7 @@ export const getOne = async (no) => {
 
 export const putOne = async (no, formData) => {
   try {
-    const res = await axios.put(`${host}/admin/${no}`, formData, {
+    const res = await jwtAxios.put(`${host}/admin/${no}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return res.data;
@@ -41,13 +42,13 @@ export const putOne = async (no, formData) => {
 };
 
 export const deleteOne = async (no) => {
-  const res = await axios.delete(`${host}/admin/${no}`);
+  const res = await jwtAxios.delete(`${host}/admin/${no}`);
   return res.data;
 };
 
 export const softDeleteOne = async (no) => {
   try {
-    const res = await axios.put(`${host}/admin/soft-delete/${no}`); // ✅ 전용 API 호출
+    const res = await jwtAxios.put(`${host}/admin/soft-delete/${no}`); // ✅ 전용 API 호출
     return res.data;
   } catch (err) {
     console.error("이벤트 삭제 실패(soft delete):", err);

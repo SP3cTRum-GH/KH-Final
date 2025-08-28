@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_SERVER_HOST } from "./HostUrl";
+import jwtAxios from "../util/jwtUtil";
 
 const prefix = `${API_SERVER_HOST}/api/product/deal`;
 const dealfix = `${API_SERVER_HOST}/api/product`;
@@ -12,7 +13,7 @@ export const getDealOne = async (productNo) => {
 
 // 경매 입찰 기능
 export const productBid = async (data) => {
-  const res = await axios.post(`${dealfix}/user/bid`, data);
+  const res = await jwtAxios.post(`${dealfix}/user/bid`, data);
   return res.data;
 };
 
@@ -54,7 +55,7 @@ export const getDealPopularProductList = async (pageParam, filter) => {
 
 // deal 상품 등록
 export const uploadDealProduct = async (formData) => {
-  const res = await axios.post(`${prefix}/admin`, formData, {
+  const res = await jwtAxios.post(`${prefix}/admin`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 
@@ -63,7 +64,7 @@ export const uploadDealProduct = async (formData) => {
 
 // deal 상품 수정
 export const updateDealProduct = async (formData, productNo) => {
-  const res = await axios.put(`${prefix}/admin/${productNo}`, formData, {
+  const res = await jwtAxios.put(`${prefix}/admin/${productNo}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;

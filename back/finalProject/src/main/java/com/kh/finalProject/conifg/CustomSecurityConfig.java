@@ -44,7 +44,17 @@ public class CustomSecurityConfig {
 				.exceptionHandling(config -> {
 					config.accessDeniedHandler(new CustomAccessDeniedHandler());
 				})
-				.authorizeHttpRequests(auth->auth.anyRequest().permitAll());
+				.authorizeHttpRequests(auth->auth
+						// 공개
+						.requestMatchers("/api/image/**").permitAll()
+					    .requestMatchers("/api/*/public/**").permitAll()
+					    .requestMatchers("api/product/*/public/**").permitAll()
+					    // 사용자
+					    .requestMatchers("/api/*/user/**").hasAnyRole("USER","ADMIN")
+					    // 관리자
+					    .requestMatchers("/api/*/admin/**").hasRole("ADMIN")
+					    .anyRequest().authenticated()
+					    );
 		return http.build();
 	}
 

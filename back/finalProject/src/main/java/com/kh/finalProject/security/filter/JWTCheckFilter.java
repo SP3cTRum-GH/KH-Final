@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.google.gson.Gson;
@@ -21,6 +22,17 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class JWTCheckFilter extends OncePerRequestFilter { // http 통신 요청당 한번만 사용되는 필터
+	private static final AntPathMatcher matcher = new AntPathMatcher();
+	private static final List<String> WHITELIST = List.of(
+	        "/api/image/**",
+	        "/api/*/public/**",
+	        "/api/product/*/public/**",  
+	        "/api/product/view/**",    
+	        "/swagger-ui/**",
+	        "/v3/api-docs/**",
+	        "/error"
+	    );
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -39,7 +51,8 @@ public class JWTCheckFilter extends OncePerRequestFilter { // http 통신 요청
 			String memberPhone = (String) claims.get("memberPhone");
 			String memberAddress = (String) claims.get("memberAddress");
 			Boolean memberGender = (Boolean) claims.get("memberGender");
-			Character grade = (Character) claims.get("grade");
+			String gradeStr = String.valueOf(claims.get("grade"));
+			Character grade = (gradeStr != null && !gradeStr.isEmpty()) ? gradeStr.charAt(0) : null;
 			int point = (int) claims.get("point");
 			String OAuth = (String) claims.get("OAuth");
 			List<String> roleNames = (List<String>) claims.get("roleNames");
@@ -76,12 +89,12 @@ public class JWTCheckFilter extends OncePerRequestFilter { // http 통신 요청
 		}
 		String path = request.getRequestURI();
 		log.info("check uri. .............. " + path);
-		if (path.startsWith("/api/member/")) {
-			return true;
-		} // 이미지 조회 경로는 체크하지 않하고 싶을 때
-		if (path.startsWith("/api/products/view/")) {
-			return true;
-		}
-		return true;
-	}
+		  for (String pattern : WHITELIST) {
+	            if (matcher.match(pattern, path)) {
+	                return true;
+	            }
+	        }
+	        // 그 외 경로는 필터 태움
+	        return false;
+	    }
 }

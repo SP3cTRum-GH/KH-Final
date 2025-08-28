@@ -8,7 +8,7 @@ const refreshJWT = async (accessToken, refreshToken) => {
   const host = API_SERVER_HOST;
   const header = { headers: { Authorization: `Bearer ${accessToken}` } };
   const res = await axios.get(
-    `${host}/api/member/refresh?refreshToken=${refreshToken}`,
+    `${host}/api/member/public/refresh?refreshToken=${refreshToken}`,
     header
   );
   console.log(" ----------------------------------------");
@@ -35,6 +35,7 @@ const beforeReq = (config) => {
   // Authorization 헤더 처리
   config.headers.Authorization = `Bearer ${accessToken}`;
 
+  console.log(config.headers.Authorization);
   return config;
 };
 

@@ -23,18 +23,20 @@ export const signup = async (member) => {
 };
 
 export const modifySocialMember = async (member) => {
-  const res = await jwtAxios.put(`${host}/public/social`, member);
+  const res = await axios.put(`${host}/public/social`, member);
   return res.data;
 };
 
 export const getAllMembers = async () => {
-  const res = await axios.get(`${host}/admin/all`, { withCredentials: true });
+  const res = await jwtAxios.get(`${host}/admin/all`, {
+    withCredentials: true,
+  });
   return res.data;
 };
 
 // 비밀번호 체크
 export const checkPassword = async (memberId, password) => {
-  const res = await axios.post(
+  const res = await jwtAxios.post(
     `${host}/user/checkpw?memberId=${memberId}`,
     password,
     { headers: { "Content-Type": "text/plain" }, withCredentials: true }
@@ -44,7 +46,7 @@ export const checkPassword = async (memberId, password) => {
 
 // 회원정보 수정
 export const updateMemberInfo = async (memberId, formData) => {
-  const res = await axios.put(
+  const res = await jwtAxios.put(
     `${host}/user/update?memberId=${memberId}`,
     formData,
     {
@@ -56,7 +58,7 @@ export const updateMemberInfo = async (memberId, formData) => {
 
 // 비밀번호 수정
 export const updateMemberPassword = async (memberId, newPassword) => {
-  const res = await axios.put(
+  const res = await jwtAxios.put(
     `${host}/user/updatepw?memberId=${memberId}`,
     newPassword,
     {
