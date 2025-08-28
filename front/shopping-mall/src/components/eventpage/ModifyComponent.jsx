@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteOne, getOne, putOne } from "../../api/eventApi";
-import { API_SERVER_HOST } from "../../api/HostUrl";
+import { getOne, putOne, getEventImageUrl } from "../../api/eventApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import {
   PageWrapper,
@@ -42,7 +41,7 @@ const ModifyComponent = ({ no }) => {
     getOne(no).then((data) => {
       // previewImages 초기화
       const previews = data.imageFileNames?.map((fileName) => ({
-        url: `${API_SERVER_HOST}/api/events/view/${fileName}`,
+        url: getEventImageUrl([fileName]),
         file: null, // 기존 이미지라면 file은 null
       }));
       setPreviewImages(previews || []);

@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import useCustomMove from "../../hooks/useCustomMove";
 import { getAllEvents } from "../../api/eventApi";
-import { API_SERVER_HOST } from "../../api/HostUrl";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
-const host = API_SERVER_HOST;
+import { getEventImageUrl } from "../../api/eventApi";
 
 const CardContainer = styled.div`
   /* padding: 0 5rem; */
@@ -112,12 +110,7 @@ const ListComponent = ({ page }) => {
         {events
           .filter((event) => !event.enable) // enable이 true인 이벤트는 숨김
           .map((event) => {
-            const imageUrl =
-              event.imageFileNames?.length > 0
-                ? `${host}/api/events/view/${encodeURIComponent(
-                    event.imageFileNames[0]
-                  )}`
-                : null;
+            const imageUrl = getEventImageUrl(event.imageFileNames);
 
             return (
               <CardContainer key={event.no}>
