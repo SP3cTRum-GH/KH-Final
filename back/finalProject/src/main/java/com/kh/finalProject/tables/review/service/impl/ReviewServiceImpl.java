@@ -127,7 +127,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         String oldFile = review.getReviewImg();      // 기존 파일명
         String newFile = dto.getReviewImg();         // 새 파일명(없으면 null 가능)
-        
+
         // 이미지 교체: 새 파일명 있을 때만 교체
         if(newFile != null && !newFile.isBlank()){                  // new 파일이 null이 아니고 비어있지 않다면
             review.setReviewImg(newFile);                           // review 객체에 newFile의 정보를 담는다.

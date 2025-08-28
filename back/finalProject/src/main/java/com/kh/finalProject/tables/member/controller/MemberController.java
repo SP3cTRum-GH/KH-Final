@@ -31,39 +31,39 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	private final MemberService memberService;
 
-	@PostMapping("/signup")
+	@PostMapping("/public/signup")
 	public ResponseEntity<MemberResponseDTO> signup(@RequestBody MemberRequestDTO dto) {
 		return ResponseEntity.ok(memberService.memberSignUp(dto));
 	}
 
-	@PutMapping("/update")
+	@PutMapping("/user/update")
 	public ResponseEntity<MemberResponseDTO> updateMember(@RequestParam String memberId,
 			@RequestBody MemberRequestDTO dto) {
 		return ResponseEntity.ok(memberService.memberUpdate(memberId, dto));
 	}
 
-	@PutMapping("/updatepw")
+	@PutMapping("/user/updatepw")
 	public ResponseEntity<MemberResponseDTO> updateMemberPw(@RequestParam String memberId,
 			@RequestBody String newPw) {
 		return ResponseEntity.ok(memberService.memberUpdatePw(memberId, newPw));
 	}
 
-	@PutMapping("/social")
+	@PutMapping("/public/social")
 	public ResponseEntity<MemberResponseDTO> updateSocialMember(@RequestBody MemberRequestDTO dto) {
 		return ResponseEntity.ok(memberService.socialMemberUpdate(dto));
 	}
 
-	@DeleteMapping("/{memberNo}")
+	@DeleteMapping("/admin/{memberNo}")
 	public void deleteMember(@PathVariable Long memberNo) {
 		memberService.memberDelete(memberNo);
 	}
 
-	@GetMapping("/{memberNo}")
+	@GetMapping("/user/{memberNo}")
 	public ResponseEntity<MemberResponseDTO> getOneMember(@PathVariable Long memberNo) {
 		return ResponseEntity.ok(memberService.getOneMember(memberNo));
 	}
 
-	@GetMapping
+	@GetMapping("/user")
 	public ResponseEntity<MemberResponseDTO> getLoginedMember(@AuthenticationPrincipal UserDetails user) {
 		return ResponseEntity.ok(memberService.getWithRoles(user.getUsername()));
 
@@ -79,7 +79,7 @@ public class MemberController {
 		claims.put("refreshToken", jwtRefreshToken);
 		return claims;
 	}
-	@GetMapping("/naver")
+	@GetMapping("/public/naver")
 	public Map<String, Object> getMemberFromNaver(@RequestParam String code,
             @RequestParam String state) {
 		String accessToken = memberService.getAccessToken(code, state);
@@ -92,7 +92,7 @@ public class MemberController {
 		return claims;
 	}
 
-	@GetMapping("/google")
+	@GetMapping("/public/google")
 	public Map<String, Object> getMemberFromGoogle(String accessToken) {
 		CustomUser user = memberService.getSocialMember(accessToken, 2);
 		Map<String, Object> claims = user.getClaims();
@@ -103,12 +103,12 @@ public class MemberController {
 		return claims;
 	}
 
-	@GetMapping("/all")
+	@GetMapping("/admin/all")
 	public ResponseEntity<List<MemberResponseDTO>> getAllMember() {
 		return ResponseEntity.ok(memberService.getAllMember());
 	}
 
-	@PostMapping("/checkpw")
+	@PostMapping("/user/checkpw")
 	public ResponseEntity<Boolean> checkpw(@RequestParam String memberId, @RequestBody String pw){
 		boolean match = memberService.checkPassword(memberId, pw);
 		if (match) {
