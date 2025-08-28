@@ -439,8 +439,15 @@ const CartPageComponent = () => {
 
   // ====== type에 따라 카드 UI를 다르게 렌더링하는 함수 ======
   const renderDealCard = (item) => {
+    const isDisabled =
+      item.endDate.slice(0, 10) < nowString().slice(0, 10) &&
+      item.price !== item.dealCurrent;
     return (
-      <ItemBox key={`deal-${item.cartItemNo}`}>
+      <ItemBox
+        key={`deal-${item.cartItemNo}`}
+        $disabled={isDisabled}
+        aria-disabled={isDisabled}
+      >
         <ItemImage
           src={`${API_SERVER_HOST}/api/image/${item.imgUrl}`}
           alt={item.productName}
@@ -467,18 +474,21 @@ const CartPageComponent = () => {
                   item.size.value ??
                   "-"
                 : item?.size ?? "-";
-            return (
-              <p>
-                사이즈: {displaySize} / 수량: {item.quantity ?? 0}개
-              </p>
-            );
+            return <p>수량: {item.quantity ?? 0}개</p>;
           })()}
           <Price>
             나의 입찰 가격 : {Number(item.price ?? 0).toLocaleString()} 원 /
             최고 가격 : {Number(item.dealCurrent).toLocaleString()}원{" "}
           </Price>
           <ItemOptions>
-            <OptionButton type="button" onClick={() => openModal(item)}>
+            <OptionButton
+              type="button"
+              onClick={() => {
+                if (!isDisabled) openModal(item);
+              }}
+              disabled={isDisabled}
+              aria-disabled={isDisabled}
+            >
               옵션 변경
             </OptionButton>
           </ItemOptions>
@@ -589,11 +599,7 @@ const CartPageComponent = () => {
           <DeliveryGroup>
             <SectionHeader>
               Shop
-              <FilterButton
-                type="button"
-                style={{ marginLeft: 12 }}
-                onClick={handleCheckAllShop}
-              >
+              <FilterButton type="button" onClick={handleCheckAllShop}>
                 {allShopChecked ? "전체 해제" : "전체 선택"}
               </FilterButton>
             </SectionHeader>
