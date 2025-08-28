@@ -4,7 +4,7 @@ import SelectOption from "./SelectOption";
 import ProductImageList from "./ProductImageList";
 import Review from "./Review";
 import styled from "styled-components";
-import { useParams, useNavigate, createSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getShopOne } from "../../api/productShopApi";
 import { getReviewList } from "../../api/reviewApi";
 import useCustomMove from "../../hooks/useCustomMove";
@@ -36,16 +36,19 @@ const ShopDetailCompont = () => {
   const [reviewList, setReviewList] = useState({ content: [], totalCount: 0 });
   const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
 
+  // 리뷰 목록 재요청 (삭제/추가 후 카운트 반영용)
+  const reloadReviews = () => {
+    getReviewList({ page: reviewPage, size: reviewSize }, param.productNo)
+      .then((data) => setReviewList(data))
+      .catch(() => setReviewList({ content: [], totalCount: 0 }));
+  };
+
   useEffect(() => {
     getShopOne(param.productNo).then((data) => {
       setShopProductData(data);
     });
 
-    getReviewList({ page: reviewPage, size: reviewSize }, param.productNo).then(
-      (data) => {
-        setReviewList(data);
-      }
-    );
+    reloadReviews();
   }, [reviewPage, reviewSize, param.productNo]);
 
   const scrollToReview = () => {
@@ -77,7 +80,7 @@ const ShopDetailCompont = () => {
       </div>
       <hr style={hrStyle} />
       <div ref={reviewRef} id="review">
-        <Review reviewList={reviewList} />
+        <Review reviewList={reviewList} onChanged={reloadReviews} />
         <PageComponent
           type={"shopdetail"}
           listData={reviewList}
