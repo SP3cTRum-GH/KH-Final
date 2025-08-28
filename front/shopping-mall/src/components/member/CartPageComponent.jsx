@@ -240,6 +240,31 @@ const CartPageComponent = () => {
   const [bidPrice, setBidPrice] = useState(0);
   const MIN_BID_STEP = 1000; // 딜(경매) 최소 호가 단위
 
+  const getMaxStockForSelected = () => {
+    // 선택된 사이즈의 재고 (Shop 전용)
+    if (!selectedItem?.sizes || !modalSize) return Infinity; // 재고 정보 없으면 제한 없이
+    const found = selectedItem.sizes.find(
+      (s) => String(s.value) === String(modalSize)
+    );
+    // 재고가 숫자로 제공되면 그만큼 제한, 없으면 사실상 무제한
+    return Number.isFinite(Number(found?.stock))
+      ? Number(found?.stock)
+      : Infinity;
+  };
+
+  const handleModalQuantityChange = (delta) => {
+    // Deal(경매)은 수량 변경 불가
+    if (selectedItem?.type) return;
+    setModalQuantity((prev) => {
+      let next = Number(prev ?? 1) + Number(delta ?? 0);
+      if (!Number.isFinite(next)) next = 1;
+      if (next < 1) next = 1;
+      const max = getMaxStockForSelected();
+      if (next > max) next = max;
+      return next;
+    });
+  };
+
   const openModal = (item) => {
     // 이전에는 즉시 모달을 열었지만, 이제는 상세 호출로 사이즈를 채운 뒤 오픈
     handleOpenOptions(item);
@@ -249,12 +274,6 @@ const CartPageComponent = () => {
     setIsModalOpen(false);
     setSelectedItem(null);
   };
-
-  const handleModalQuantityChange = (amount) => {
-    setModalQuantity((prev) => Math.max(1, prev + amount));
-  };
-
-  const sameId = (a, b) => Number(a) === Number(b);
 
   const handleOptionChange = async () => {
     try {
@@ -271,18 +290,26 @@ const CartPageComponent = () => {
         }
       }
 
-      // 1) 화면 즉시 반영
-      const localOverride = {
-        quantity: modalQuantity,
-        size: modalSize,
-        ...(selectedItem?.type ? { price: Number(bidPrice) } : {}),
-        __local: true, // 병합 시 식별용 플래그
-      };
-
+      // 1) 화면 즉시 반영: 수량/사이즈/가격/최고가 동시 반영 + 로컬 플래그
       setCartItems((prev) =>
         prev.map((it) =>
           it.cartItemNo === selectedItem.cartItemNo
-            ? { ...it, ...localOverride }
+            ? {
+                ...it,
+                quantity: modalQuantity,
+                size: modalSize,
+                ...(selectedItem?.type ? { price: Number(bidPrice) } : {}),
+                // 최고가는 현재값/입력값 중 큰 값으로 즉시 올림
+                ...(selectedItem?.type
+                  ? {
+                      dealCurrent: Math.max(
+                        Number(it.dealCurrent ?? 0),
+                        Number(bidPrice ?? 0)
+                      ),
+                    }
+                  : {}),
+                __local: true, // 병합 시 식별 플래그
+              }
             : it
         )
       );
@@ -298,30 +325,46 @@ const CartPageComponent = () => {
         price: Number(bidPrice),
       };
 
-      productBid(bidData)
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((err) => {
-          console.log(err);
-          return;
-        });
+      await productBid(bidData).catch((err) => {
+        console.error(err);
+        // 서버 반영 실패하더라도 로컬 변경은 유지 (원하면 롤백 처리)
+      });
 
-      const fd = {
-        productNo: selectedItem.productNo,
-        quantity: 1,
-        size: "deal",
-        price: Number(bidPrice),
-      };
+      console.log(selectedItem);
 
-      addCart(getCookie("member").memberId, fd)
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((err) => {
-          console.log(err);
-          return;
-        });
+      if (selectedItem?.type) {
+        const fd = {
+          productNo: selectedItem.productNo,
+          quantity: selectedItem.quantity,
+          size: selectedItem.size,
+          price: Number(bidPrice),
+        };
+
+        addCart(getCookie("member").memberId, fd)
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((err) => {
+            console.log(err);
+            return;
+          });
+      } else {
+        const fd = {
+          productNo: selectedItem.productNo,
+          quantity: selectedItem.quantity,
+          size: selectedItem.size,
+          price: Number(selectedItem.price),
+        };
+
+        addCart(getCookie("member").memberId, fd)
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((err) => {
+            console.log(err);
+            return;
+          });
+      }
 
       // 3) fresh 받아와서 "안전 병합" - 방금의 로컬 변경값을 우선시
       const fresh = await getCart(memberId);
@@ -331,12 +374,25 @@ const CartPageComponent = () => {
         );
         return fresh.map((it) => {
           if (it.cartItemNo !== selectedItem.cartItemNo) return it;
-          return {
+
+          const merged = {
             ...it,
             quantity: local?.quantity ?? it.quantity,
             size: local?.size ?? it.size,
             ...(selectedItem?.type ? { price: local?.price ?? it.price } : {}),
           };
+
+          // 딜(경매): 최고가는 더 큰 값 유지 (서버/로컬/기존 중 최댓값)
+          if (selectedItem?.type) {
+            merged.dealCurrent = Math.max(
+              Number(it.dealCurrent ?? 0),
+              Number(local?.price ?? 0),
+              Number(merged.dealCurrent ?? 0)
+            );
+          }
+          // 로컬 플래그 제거
+          delete merged.__local;
+          return merged;
         });
       });
     } catch (err) {
@@ -678,11 +734,31 @@ const CartPageComponent = () => {
                 <span> 원</span>
               </div>
             )}
-            {/* <QuantityControl>
-              <button onClick={() => handleModalQuantityChange(-1)}>-</button>
-              <span>{modalQuantity}</span>
-              <button onClick={() => handleModalQuantityChange(1)}>+</button>
-            </QuantityControl> */}
+            {!selectedItem?.type && (
+              <>
+                <QuantityControl>
+                  <button
+                    type="button"
+                    onClick={() => handleModalQuantityChange(-1)}
+                  >
+                    -
+                  </button>
+                  <span>{modalQuantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleModalQuantityChange(1)}
+                  >
+                    +
+                  </button>
+                </QuantityControl>
+                {Number.isFinite(getMaxStockForSelected()) &&
+                  getMaxStockForSelected() !== Infinity && (
+                    <p style={{ marginTop: 8, fontSize: 12, color: "#868e96" }}>
+                      재고: {getMaxStockForSelected()}개
+                    </p>
+                  )}
+              </>
+            )}
             <PriceDisplay>
               {selectedItem?.type ? (
                 <>입찰 가격: {Number(bidPrice ?? 0).toLocaleString()}원</>

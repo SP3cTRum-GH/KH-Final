@@ -59,14 +59,29 @@ const DealDetailComponent = () => {
     }
   };
 
-  const handleConfirmBid = (amount) => {
-    const currentPrice = dealProductData.dealCurrent;
-    if (amount <= currentPrice) {
-      alert(`입찰가는 ${currentPrice.toLocaleString()}원 보다 높아야 합니다.`);
-      return;
+  // DealDetailComponent.jsx
+  const handleConfirmBid = (val) => {
+    // 숫자로 변환 (객체가 와도 안전하게 처리)
+    const bid =
+      typeof val === "number"
+        ? val
+        : Number((val && (val.price ?? val.bidAmount ?? val.amount)) ?? val);
+
+    const currentPrice = Number(dealProductData?.dealCurrent ?? 0);
+
+    if (Number.isNaN(bid)) {
+      alert("입찰가를 숫자로 입력해 주세요.");
+      return false; // 유효하지 않음
     }
 
+    if (bid <= currentPrice) {
+      alert(`입찰가는 ${currentPrice.toLocaleString()}원 보다 높아야 합니다.`);
+      return false; // 유효하지 않음
+    }
+
+    // 유효하면 모달 닫기
     setResult(false);
+    return true; // 유효함
   };
 
   const handleOpenModal = () => {

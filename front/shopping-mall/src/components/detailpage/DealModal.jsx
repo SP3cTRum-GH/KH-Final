@@ -8,7 +8,7 @@ import {
   ButtonRow,
   Button,
 } from "./DealModalStyle";
-import { productBid } from "../../api/productDealApi";
+import { getDealOne, productBid } from "../../api/productDealApi";
 import { addCart } from "../../api/cartApi";
 import { getCookie } from "../../util/cookieUtil";
 import { useNavigate } from "react-router-dom";
@@ -65,9 +65,13 @@ const DealModal = ({ currentPrice, onConfirm, onCancel, param }) => {
         <ButtonRow>
           <Button
             className="confirm"
-            onClick={() => {
-              onConfirm?.(fd); // 부모 콜백 실행
-              handleBid(); // API 실행
+            onClick={async () => {
+              // 부모에게 숫자만 전달하여 유효성 검사 결과를 받는다
+              const ok = onConfirm ? onConfirm(Number(bidAmount)) : true;
+              if (!ok) return; // 유효하지 않으면 종료 (API 호출 금지)
+
+              await handleBid(); // API 실행
+              onCancel?.(); // 성공 시 모달 닫기
             }}
           >
             입찰
