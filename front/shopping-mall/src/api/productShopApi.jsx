@@ -6,14 +6,14 @@ const delfix = `${API_SERVER_HOST}/api/product`;
 
 // 상품 1개 가져오기
 export const getShopOne = async (productNo) => {
-  const res = await axios.get(`${prefix}/${productNo}`);
+  const res = await axios.get(`${prefix}/public/${productNo}`);
   return res.data;
 };
 
 // 페이징 리스트
 export const getShopProductList = async (pageParam) => {
   const { page, size } = pageParam;
-  const res = await axios.get(`${prefix}/list`, {
+  const res = await axios.get(`${prefix}/public/list`, {
     params: { page, size },
   });
 
@@ -23,7 +23,7 @@ export const getShopProductList = async (pageParam) => {
 // 상품 필터링(상의, 하의, 신발)
 export const getShopFilterProductList = async (pageParam, filter) => {
   const { page, size } = pageParam;
-  const res = await axios.get(`${prefix}/list?category=${filter}`, {
+  const res = await axios.get(`${prefix}/public/list?category=${filter}`, {
     params: { page, size },
   });
 
@@ -34,12 +34,12 @@ export const getShopFilterProductList = async (pageParam, filter) => {
 export const getShopPopularProductList = async (pageParam, filter) => {
   const { page, size } = pageParam;
   if (filter.length === 0) {
-    const res = await axios.get(`${prefix}/popular`, {
+    const res = await axios.get(`${prefix}/public/popular`, {
       params: { page, size },
     });
     return res.data;
   } else {
-    const res = await axios.get(`${prefix}/popular?category=${filter}`, {
+    const res = await axios.get(`${prefix}/public/popular?category=${filter}`, {
       params: { page, size },
     });
     return res.data;
@@ -48,7 +48,7 @@ export const getShopPopularProductList = async (pageParam, filter) => {
 
 // shop 상품 등록
 export const uploadShopProduct = async (formData) => {
-  const res = await axios.post(`${prefix}`, formData, {
+  const res = await axios.post(`${prefix}/admin`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -56,13 +56,13 @@ export const uploadShopProduct = async (formData) => {
 
 // 상품(shop, deal) 삭제
 export const deleteProductItem = async (productNo) => {
-  const res = await axios.delete(`${delfix}/${productNo}`);
+  const res = await axios.delete(`${delfix}/admin/${productNo}`);
   return res.data;
 };
 
 // shop 상품 수정
 export const updateShopProduct = async (formData, productNo) => {
-  const res = await axios.put(`${prefix}/${productNo}`, formData, {
+  const res = await axios.put(`${prefix}/admin/${productNo}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;

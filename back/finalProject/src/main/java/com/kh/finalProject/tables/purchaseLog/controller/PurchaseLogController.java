@@ -29,7 +29,7 @@ public class PurchaseLogController {
 
     private final PurchaseLogService purchaseLogService;
 
-    @GetMapping("/logs")
+    @GetMapping("/user/logs")
     public ResponseEntity<List<purchaseLogResponseDTO>> listAll(
             @RequestParam(required = false) String memberId) {
         return ResponseEntity.ok(purchaseLogService.listAll(memberId));
@@ -40,7 +40,7 @@ public class PurchaseLogController {
     // 날짜 필터: GET /api/purchase/sales/date-category?from=2025-08-01&to=2025-08-31
     // 카테고리 필터 GET /api/purchase/sales/date-category?category=BAG
     // 둘 다 GET /api/purchase/sales/date-category?from=2025-08-01&to=2025-08-31&category=BAG
-    @GetMapping("/sales/date-category")
+    @GetMapping("/admin/sales/date-category")
     public List<Map<String, Object>> salesByDateCategory(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
@@ -50,12 +50,12 @@ public class PurchaseLogController {
 
     // POST http://localhost:8080/api/purchase/buy-now?memberId=admin
     // Body: { "productNo": 2, "size": "S", "quantity": 2}
-    @PostMapping("/buy-now")
+    @PostMapping("/user/buy-now")
     public purchaseLogResponseDTO buyNow(@RequestParam String memberId, @RequestBody BuyNowDTO req) {
         return purchaseLogService.buyNow(memberId,req); // memberId는 현재 미사용(일관성 위해 쿼리로만 받음)
     }
     
-    @GetMapping("/main")
+    @GetMapping("/public/main")
     public ResponseEntity<MainPageDTO> best(){
     	MainPageDTO main = purchaseLogService.bestItem();
     	return ResponseEntity.ok(main);

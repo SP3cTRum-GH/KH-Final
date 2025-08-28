@@ -22,4 +22,5 @@ public class ReviewResponseDTO {
     private Long memberNo;
     private String memberId;
     private LocalDateTime regDate;
+    private boolean enable;
 }

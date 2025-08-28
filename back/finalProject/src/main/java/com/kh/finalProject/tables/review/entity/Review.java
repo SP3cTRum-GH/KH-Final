@@ -33,6 +33,10 @@ public class Review {
     @Column(nullable = false)
     private String content; // 리뷰 내용
 
+    @Column
+    @Builder.Default
+    private boolean enable=true;
+    
     @CreationTimestamp
     private LocalDateTime regDate; // 리뷰 생성일
 

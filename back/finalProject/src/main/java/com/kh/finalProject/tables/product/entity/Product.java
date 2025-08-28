@@ -1,16 +1,29 @@
 package com.kh.finalProject.tables.product.entity;
 
-import com.kh.finalProject.tables.productImages.entity.ProductImages;
-import com.kh.finalProject.tables.productsize.entity.Productsize;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.kh.finalProject.tables.cartItem.entity.CartItem;
+import com.kh.finalProject.tables.productImages.entity.ProductImages;
+import com.kh.finalProject.tables.productsize.entity.Productsize;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @SequenceGenerator(name = "product_seq_gen",
@@ -54,6 +67,9 @@ public class Product {
 
     @Column(nullable = false)
     private int dealCurrent; // 경매 입찰가
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImages> productImagesList = new ArrayList<>();
