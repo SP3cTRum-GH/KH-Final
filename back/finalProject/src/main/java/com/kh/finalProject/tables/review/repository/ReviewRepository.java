@@ -30,5 +30,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     
     List<Review> getReviewByMember_MemberId(String memberId);
 
-    long countByProduct_ProductNo(Long productNo);
+    @Query("select count(r) from Review r where r.product.productNo = :productNo and r.enable = true")
+    long countEnabledByProduct(@Param("productNo") Long productNo);
 }

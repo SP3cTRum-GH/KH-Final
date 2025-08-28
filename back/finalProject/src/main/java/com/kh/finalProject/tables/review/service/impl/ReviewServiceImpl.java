@@ -180,6 +180,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public long countByProduct(Long productNo) {
-        return reviewRepository.countByProduct_ProductNo(productNo);
+        return reviewRepository.countEnabledByProduct(productNo);
     }
 }
