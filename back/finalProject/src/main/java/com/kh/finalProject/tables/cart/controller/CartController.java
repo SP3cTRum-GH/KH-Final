@@ -24,13 +24,13 @@ public class CartController {
     private final PurchaseLogService purchaseLogService;
 
     // 목록 불러오기 (http://localhost:8080/api/cart/test?memberId=admin)
-    @GetMapping
+    @GetMapping("/user")
     public ResponseEntity<List<CartItemResponseDTO>> getCartItems(@AuthenticationPrincipal UserDetails userDetails) {
         List<CartItemResponseDTO> cartItems = cartService.getCartList(userDetails.getUsername());
         return ResponseEntity.ok(cartItems);
     }
     // 상품 담기 productNo와 quantity 입력
-    @PostMapping
+    @PostMapping("user")
     public ResponseEntity<Void> addToCart(@RequestBody CartRequestDTO cartRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
         CartItemAddDTO cartItemAddDto = CartItemAddDTO.builder()
                 .memberId(userDetails.getUsername())
@@ -42,12 +42,12 @@ public class CartController {
     }
     //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-    @GetMapping("/test")
+    @GetMapping("/user/test")
     public ResponseEntity<List<CartItemResponseDTO>> getCartItemsTest(@RequestParam String memberId) {
         return ResponseEntity.ok(cartService.getCartList(memberId));
     }
 
-    @PostMapping("/test")
+    @PostMapping("/user/test")
     public ResponseEntity<Void> addToCartTest(@RequestParam String memberId,
                                               @RequestBody CartRequestDTO cartRequestDTO) {
         cartService.addCart(CartItemAddDTO.builder()
@@ -60,7 +60,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/items/{cartItemId}")
+    @PatchMapping("/user/items/{cartItemId}")
     public void change(@RequestParam String memberId,
                        @PathVariable Long cartItemId,
                        @RequestBody Map<String,Integer> body) {
@@ -68,26 +68,26 @@ public class CartController {
     }
 
     // 개별삭제
-    @DeleteMapping("/items/{cartItemId}")
+    @DeleteMapping("/user/items/{cartItemId}")
     public void remove(@RequestParam String memberId, @PathVariable Long cartItemId) {
         cartService.removeItem(memberId, cartItemId);
     }
 
     // 전체삭제 (http://localhost:8080/api/cart/killyou?memberId=admin)
-    @DeleteMapping("/killyou")
+    @DeleteMapping("/user/killyou")
     public void clear(@RequestParam String memberId) {
         cartService.clear(memberId);
     }
 
     // 카트 전체 구매 (http://localhost:8080/api/cart/checkout/all?memberId=adimin)
-    @PostMapping("/checkout/all")
+    @PostMapping("/user/checkout/all")
     public Map<String,Object> checkoutAll(@RequestParam String memberId) {
         return Map.of("created", purchaseLogService.checkoutAll(memberId));
     }
 
     // 카트 선택 부매 (http://localhost:8080/api/cart/checkout/selected?memberId=adimin)
     // Body : { "cartItemId : [숫자1, 숫자2, 숫자3]"}
-    @PostMapping("/checkout/selected")
+    @PostMapping("/user/checkout/selected")
     public Map<String,Object> checkoutSelected(
             @RequestParam String memberId,
             @RequestBody CheckoutSelectedRequestDTO req) {

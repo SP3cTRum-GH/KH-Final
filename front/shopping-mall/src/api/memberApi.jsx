@@ -12,17 +12,17 @@ export const loginPost = async (loginParam) => {
   form.append("username", loginParam.memberId);
   form.append("password", loginParam.pw);
 
-  const res = await axios.post(`${host}/login`, form, header);
+  const res = await axios.post(`${host}/public/login`, form, header);
 
   return res.data;
 };
 
 export const signup = async (member) => {
-  const res = await axios.post(`${host}/signup`, member);
+  const res = await axios.post(`${host}/public/signup`, member);
   return res;
 };
 
 export const modifySocialMember = async (member) => {
-  const res = await jwtAxios.put(`${host}/social`, member);
+  const res = await jwtAxios.put(`${host}/public/social`, member);
   return res.data;
 };

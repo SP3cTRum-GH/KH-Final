@@ -4,7 +4,7 @@ const host = `${API_SERVER_HOST}/api/events`;
 
 export const postAdd = async (formData) => {
   try {
-    const res = await axios.post(`${host}/`, formData, {
+    const res = await axios.post(`${host}/admin/`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -17,23 +17,25 @@ export const postAdd = async (formData) => {
 };
 
 export const getAllEvents = async () => {
-  const res = await axios.get(`${host}/all`);
+  const res = await axios.get(`${host}/public/all`);
   return res.data;
 };
 
 export const getOne = async (no) => {
-  const res = await axios.get(`${host}/${no}`, { withCredentials: true });
+  const res = await axios.get(`${host}/public/${no}`, {
+    withCredentials: true,
+  });
   return res.data;
 };
 
 export const putOne = async (no, formData) => {
-  const res = await axios.put(`${host}/${no}`, formData, {
+  const res = await axios.put(`${host}/admin/${no}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
 };
 
 export const deleteOne = async (no) => {
-  const res = await axios.delete(`${host}/${no}`);
+  const res = await axios.delete(`${host}/admin/${no}`);
   return res.data;
 };

@@ -43,7 +43,7 @@ public class ProductController {
     CustomFileUtil fileUtil;
 
     // ====== DEAL(경매) ======
-    @PostMapping("/deal")
+    @PostMapping("/deal/admin")
     public Map<String, Long> createDeal(ProductDealRequestDTO productDTO) {
         // 1. 업로드 파일 받기
         List<MultipartFile> files = productDTO.getUploadFiles();
@@ -59,17 +59,17 @@ public class ProductController {
         return Map.of("result", productNo);
     }
 
-    @GetMapping("/deal/{id}")
+    @GetMapping("/deal/public/{id}")
     public ProductDealResponseDTO readDeal(@PathVariable Long id) {
         return productService.getDeal(id);
     }
 
-    @GetMapping("/deal")
+    @GetMapping("/deal/public")
     public List<ProductDealResponseDTO> listDeals() {
         return productService.listDeals();
     }
 
-    @PutMapping("/deal/{id}")
+    @PutMapping("/deal/admin/{id}")
     public Map<String, String> modifyDeal(@PathVariable Long id, ProductDealRequestDTO dto,
     		@RequestParam(value = "existingFiles", required = false) List<String> existingFiles) {
         dto.setProductNo(id);
@@ -112,19 +112,19 @@ public class ProductController {
         return Map.of("RESULT", "SUCCESS");
     }
 
-    @GetMapping("/deal/list")
+    @GetMapping("/deal/public/list")
     public PageResponseDTO<ProductDealResponseDTO> pageDeal(@RequestParam(required = false) String category,
             PageRequestDTO pageRequestDTO) {
         return productService.pageDeal(category, pageRequestDTO);
     }
     
-    @GetMapping("/deal/popular")
+    @GetMapping("/deal/public/popular")
     public PageResponseDTO<ProductDealResponseDTO> popularDeal(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
         return productService.popularDeal(category,pageRequestDTO);
     }
 
     // ====== SHOP(일반) ======
-    @PostMapping("/shop")
+    @PostMapping("/shop/admin")
     public Map<String, Long> createShop(ProductShopRequestDTO productDTO) {
         // 1. 업로드 파일 받기
         List<MultipartFile> files = productDTO.getUploadFiles();
@@ -140,17 +140,17 @@ public class ProductController {
         return Map.of("result", productNo);
     }
 
-    @GetMapping("/shop/{id}")
+    @GetMapping("/shop/public/{id}")
     public ProductShopResponseDTO readShop(@PathVariable Long id) {
         return productService.getShop(id);
     }
 
-    @GetMapping("/shop")
+    @GetMapping("/shop/public")
     public List<ProductShopResponseDTO> listShops() {
         return productService.listShops();
     }
 
-    @PutMapping("/shop/{id}")
+    @PutMapping("/shop/admin/{id}")
     public Map<String, String> modifyShop(@PathVariable Long id, ProductShopRequestDTO dto,
     		@RequestParam(value = "existingFiles", required = false) List<String> existingFiles) {
         dto.setProductNo(id);
@@ -192,25 +192,26 @@ public class ProductController {
         return Map.of("RESULT", "SUCCESS");
     }
 
-    @GetMapping("/shop/list")
+    @GetMapping("/shop/public/list")
     public PageResponseDTO<ProductShopResponseDTO> pageShop(@RequestParam(required = false) String category,
             PageRequestDTO pageRequestDTO) {
         return productService.pageShop(category, pageRequestDTO);
     }
-    @GetMapping("/shop/popular")
+    @GetMapping("/shop/public/popular")
     public PageResponseDTO<ProductShopResponseDTO> popularShop(@RequestParam(required = false) String category,PageRequestDTO pageRequestDTO) {
         return productService.popularShop(category, pageRequestDTO);
     }
 
     // 공통 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     public Map<String, String> remove(@PathVariable Long id) {
         productService.delete(id);
         return Map.of("RESULT", "SUCCESS");
     }
 
-    @PostMapping("/bid")
+    @PostMapping("/user/bid")
     public ResponseEntity<Integer> bidding(@RequestBody BidDTO bid){
+    	
     	return ResponseEntity.ok(productService.bid(bid));
     }
 

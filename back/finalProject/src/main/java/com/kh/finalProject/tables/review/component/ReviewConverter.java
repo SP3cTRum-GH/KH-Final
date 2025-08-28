@@ -29,7 +29,6 @@ public class ReviewConverter {
 
     public ReviewResponseDTO toDto(Review review) {
         return ReviewResponseDTO.builder()
-        		.enable(review.isEnable())
                 .reviewNo(review.getReviewNo())
                 .reviewImg(toUrl(review.getReviewImg()))
                 .rating(review.getRating())
@@ -40,6 +39,7 @@ public class ReviewConverter {
                 .memberNo(review.getMember().getMemberNo())
                 .memberId(review.getMember().getMemberId())
                 .regDate(review.getRegDate())
+                .enable(review.isEnable())
                 .build();
     }
 

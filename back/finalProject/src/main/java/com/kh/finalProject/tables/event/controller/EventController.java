@@ -34,7 +34,8 @@ public class EventController {
 	private final EventService eventService; // ProductServcie 주입
 	private final CustomFileUtil fileUtil;
 
-	@PostMapping("/")
+	//이벤트 작
+	@PostMapping("/admin")
 	public Map<String, Long> register(EventDTO eventDTO) {
 		log.info("rgister: " + eventDTO);
 		List<MultipartFile> files = eventDTO.getUploadFiles();
@@ -46,30 +47,33 @@ public class EventController {
 		return Map.of("result", no);
 	}
 
-	@GetMapping("/view/{fileName}")
+	//이벤트 이미지 가져오
+	@GetMapping("/public/view/{fileName}")
 	public ResponseEntity<Resource> viewFileGET(@PathVariable String fileName) {
 		return fileUtil.getFile(fileName);
 	}
 
 	// 하페이지당10개를불러오는것
-	@GetMapping("/list")
+	@GetMapping("/public/list")
 	public PageResponseDTO<EventDTO> list(PageRequestDTO pageRequestDTO) {
 		log.info("list. ............ " + pageRequestDTO);
 		return eventService.getList(pageRequestDTO);
 	}
 
-	@GetMapping("/all")
+	//이벤트 전체 가져오기 
+	@GetMapping("/public/all")
 	public ResponseEntity<List<EventDTO>> getAllEvents() {
 		return ResponseEntity.ok(eventService.getAllEvent());
 	}
 
-	// 이벤트하나만가져오는select
-	@GetMapping("/{no}")
+	// 이벤트 read
+	@GetMapping("/public/{no}")
 	public EventDTO read(@PathVariable(name = "no") Long no) {
 		return eventService.get(no);
 	}
 
-	@PutMapping("/{no}")
+	// 이벤트 수정 
+	@PutMapping("/admin/{no}")
 	public Map<String, String> modify(@PathVariable(name = "no") Long no, EventDTO eventDTO,
 			@RequestParam(value = "existingFiles", required = false) List<String> existingFiles) {
 		eventDTO.setNo(no);
@@ -106,7 +110,8 @@ public class EventController {
 		return Map.of("RESULT", "SUCCESS");
 	}
 
-	@DeleteMapping("/{no}")
+	//이벤트 삭제 
+	@DeleteMapping("/admin/{no}")
 	public Map<String, String> remove(@PathVariable("no") Long no) {
 		// 삭제해야 할 파일들 알아내기
 		List<String> oldFileNames = eventService.get(no).getImageFileNames();

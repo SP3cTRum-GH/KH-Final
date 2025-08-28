@@ -24,7 +24,7 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final CustomFileUtil fileUtil;
 
-    @GetMapping("/list")//전체 리뷰개수 count를 주거나 전체리스트를 다주거
+    @GetMapping("/public/list")//전체 리뷰개수 count를 주거나 전체리스트를 다주거
     public PageResponseDTO<ReviewResponseDTO> list(PageRequestDTO pageRequestDTO,
                                                    @RequestParam(required = false) Long productNo,
                                                    @RequestParam(required = false) Long memberNo) {
@@ -33,7 +33,7 @@ public class ReviewController {
     }
 
     // Create
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ReviewResponseDTO create(@ModelAttribute ReviewRequestDTO dto) {
       
     	MultipartFile file = dto.getUploadFile();
@@ -46,13 +46,13 @@ public class ReviewController {
         return reviewService.create(dto);
     }
     // Read
-    @GetMapping("/{reviewNo}")
+    @GetMapping("/public/{reviewNo}")
     public ReviewResponseDTO get(@PathVariable Long reviewNo) {
         return reviewService.get(reviewNo);
     }
 
     // Update
-    @PutMapping(value = "/{reviewNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/user/{reviewNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ReviewResponseDTO update(@PathVariable Long reviewNo, @ModelAttribute ReviewRequestDTO dto) {
         MultipartFile file = dto.getUploadFile();
 
@@ -67,12 +67,12 @@ public class ReviewController {
     }
 
     // Delete
-    @PostMapping("/{reviewNo}")
+    @PostMapping("/admin/{reviewNo}")
     public void delete(@PathVariable Long reviewNo) {
         reviewService.delete(reviewNo);
     }
     
-    @GetMapping
+    @GetMapping("/user")
     public List<ReviewResponseDTO> getReviewForMember(@RequestParam String memberId) {
     	return reviewService.getReviewForMember(memberId);
     }

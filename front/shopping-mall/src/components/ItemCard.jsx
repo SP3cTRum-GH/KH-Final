@@ -29,7 +29,7 @@ const ItemCard = ({ page, dtoList }) => {
           try {
             const type = page === "dealdetail" ? "deal" : "shop";
             const res = await axios.get(
-              `http://localhost:8080/api/product/${type}/${product.productNo}`
+              `http://localhost:8080/api/product/public/${type}/${product.productNo}`
             );
             const firstImg =
               res.data.images && res.data.images.length > 0
