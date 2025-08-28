@@ -43,10 +43,16 @@ export const deleteOne = async (no) => {
 
 export const softDeleteOne = async (no) => {
   try {
-    const res = await axios.put(`${host}/soft-delete/${no}`); // ✅ 전용 API 호출
+    const res = await axios.put(`${host}/soft-delete/${no}`);
     return res.data;
   } catch (err) {
     console.error("이벤트 삭제 실패(soft delete):", err);
     throw err;
   }
+};
+
+export const getEventImageUrl = (fileNames) => {
+  if (!fileNames || fileNames.length === 0) return null;
+
+  return `${host}/view/${encodeURIComponent(fileNames[0])}`;
 };

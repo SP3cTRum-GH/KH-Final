@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import useCustomMove from "../../hooks/useCustomMove";
-import { getOne } from "../../api/eventApi";
-import { API_SERVER_HOST } from "../../api/HostUrl";
+import { getOne, getEventImageUrl } from "../../api/eventApi";
 import { useSelector } from "react-redux";
-
-const host = API_SERVER_HOST;
 
 const initState = {
   no: "",
@@ -147,9 +144,7 @@ const ReadComponent = ({ no }) => {
   }, [no]);
 
   // 대표 이미지 선택
-  const bannerImg = event.imageFileNames?.length
-    ? `${host}/api/events/view/${encodeURIComponent(event.imageFileNames[0])}`
-    : null;
+  const bannerImg = getEventImageUrl(event.imageFileNames);
 
   const extraImgs = event.imageFileNames?.slice(1) || [];
 
@@ -178,7 +173,7 @@ const ReadComponent = ({ no }) => {
           {extraImgs.map((file, idx) => (
             <img
               key={idx}
-              src={`${host}/api/events/view/${encodeURIComponent(file)}`}
+              src={getEventImageUrl([file])}
               alt={`event-extra-${idx}`}
             />
           ))}
