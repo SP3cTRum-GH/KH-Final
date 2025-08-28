@@ -330,30 +330,12 @@ const CartPageComponent = () => {
         // 서버 반영 실패하더라도 로컬 변경은 유지 (원하면 롤백 처리)
       });
 
-      console.log(selectedItem);
-
       if (selectedItem?.type) {
         const fd = {
           productNo: selectedItem.productNo,
           quantity: selectedItem.quantity,
           size: selectedItem.size,
           price: Number(bidPrice),
-        };
-
-        addCart(getCookie("member").memberId, fd)
-          .then((data) => {
-            console.log(data);
-          })
-          .catch((err) => {
-            console.log(err);
-            return;
-          });
-      } else {
-        const fd = {
-          productNo: selectedItem.productNo,
-          quantity: selectedItem.quantity,
-          size: selectedItem.size,
-          price: Number(selectedItem.price),
         };
 
         addCart(getCookie("member").memberId, fd)

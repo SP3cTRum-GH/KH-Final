@@ -7,7 +7,7 @@ import styled from "styled-components";
 import DealModal from "./DealModal";
 import { getDealOne } from "../../api/productDealApi";
 import { useParams } from "react-router-dom";
-import { getReviewList } from "../../api/reviewApi";
+import { getReviewList, reviewCount } from "../../api/reviewApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
 
@@ -33,6 +33,7 @@ const hrStyle = {
 const DealDetailComponent = () => {
   const [dealProductData, setDealProductData] = useState();
   const reviewRef = useRef(null);
+  const [count, setCount] = useState(0);
   const [result, setResult] = useState(false); // 모달 창
   const param = useParams();
   const [reviewList, setReviewList] = useState({});
@@ -42,6 +43,10 @@ const DealDetailComponent = () => {
     getDealOne(param.productNo).then((data) => {
       setDealProductData(data);
     });
+
+    reviewCount(param.productNo)
+      .then((cnt) => setCount(cnt ?? 0))
+      .catch(() => setCount(0));
 
     getReviewList({ page: reviewPage, size: reviewSize }, param.productNo).then(
       (data) => {
@@ -101,7 +106,7 @@ const DealDetailComponent = () => {
             productData={dealProductData}
             scrollToReview={scrollToReview}
             handleOpenModal={handleOpenModal}
-            reviewListCount={reviewList.totalCount}
+            reviewListCount={count}
           />
         ) : (
           <>Loading...</>

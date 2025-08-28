@@ -42,3 +42,10 @@ export const deleteReview = async (reviewNo) => {
   const res = await axios.post(`${prefix}/admin/${reviewNo}`);
   return res.data;
 };
+
+// 리뷰 수량
+export const reviewCount = async (productNo) => {
+  const { data } = await axios.get(`${prefix}/count?productNo=${productNo}`);
+  // API returns either a number or an object like { count: number }
+  return typeof data === "number" ? data : data?.count ?? 0;
+};
