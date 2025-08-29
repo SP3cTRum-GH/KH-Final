@@ -6,7 +6,7 @@ import Review from "./Review";
 import styled from "styled-components";
 import DealModal from "./DealModal";
 import { getDealOne } from "../../api/productDealApi";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { getReviewList, reviewCount } from "../../api/reviewApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
@@ -31,6 +31,7 @@ const hrStyle = {
 };
 
 const DealDetailComponent = () => {
+  const location = useLocation();
   const [dealProductData, setDealProductData] = useState();
   const reviewRef = useRef(null);
   const [count, setCount] = useState(0);
@@ -54,6 +55,25 @@ const DealDetailComponent = () => {
       }
     );
   }, [reviewPage, reviewSize, param.productNo]);
+
+  // 기존 useEffect 삭제하고 아래로 교체
+  useEffect(() => {
+    if (!location.state?.focusReview) return;
+    if (!reviewRef.current) return;
+
+    const timer = setTimeout(() => {
+      scrollToReview();
+
+      // 한번 스크롤했으면 state 제거(새로고침/재방문시 재스크롤 방지)
+      window.history.replaceState(
+        {},
+        document.title,
+        location.pathname + location.search
+      );
+    }, 300); // 0.3초 지연 후 실행
+
+    return () => clearTimeout(timer);
+  }, [location.state?.focusReview, location.key, reviewList.content?.length]);
 
   const scrollToReview = () => {
     if (reviewRef.current) {
