@@ -4,12 +4,11 @@ import SelectOption from "./SelectOption";
 import ProductImageList from "./ProductImageList";
 import Review from "./Review";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { getShopOne } from "../../api/productShopApi";
 import { getReviewList, reviewCount } from "../../api/reviewApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
-import axios from "axios";
 
 const Div = styled.div`
   width: 100%;
@@ -35,6 +34,7 @@ const ShopDetailCompont = () => {
   const [count, setCount] = useState(0);
   const reviewRef = useRef(null);
   const param = useParams();
+  const location = useLocation();
   const [reviewList, setReviewList] = useState({ content: [], totalCount: 0 });
   const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
 
@@ -56,6 +56,25 @@ const ShopDetailCompont = () => {
 
     reloadReviews();
   }, [reviewPage, reviewSize, param.productNo]);
+
+  // 기존 useEffect 삭제하고 아래로 교체
+  useEffect(() => {
+    if (!location.state?.focusReview) return;
+    if (!reviewRef.current) return;
+
+    const timer = setTimeout(() => {
+      scrollToReview();
+
+      // 한번 스크롤했으면 state 제거(새로고침/재방문시 재스크롤 방지)
+      window.history.replaceState(
+        {},
+        document.title,
+        location.pathname + location.search
+      );
+    }, 300); // 0.3초 지연 후 실행
+
+    return () => clearTimeout(timer);
+  }, [location.state?.focusReview, location.key, reviewList.content?.length]);
 
   const scrollToReview = () => {
     if (reviewRef.current) {

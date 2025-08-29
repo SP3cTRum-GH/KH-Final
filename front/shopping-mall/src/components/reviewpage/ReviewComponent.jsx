@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import StarRating from "./StarRating";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getShopOne } from "../../api/productShopApi";
 import { getDealOne } from "../../api/productDealApi";
 import { postReview } from "../../api/reviewApi";
@@ -26,6 +26,7 @@ const ReviewComponent = () => {
   const [files, setFiles] = useState([]);
   const [rating, setRating] = useState(0);
   const { productNo } = useParams();
+  const navigate = useNavigate();
   const location = useLocation();
   const isType = !!location.state?.type;
   const isLogNo = location.state?.logNo;
@@ -85,6 +86,12 @@ const ReviewComponent = () => {
     postReview(sendData).then((data) => {
       console.log(data);
     });
+
+    if (isType) {
+      navigate(`/dealdetail/${productNo}`, { state: { focusReview: true } });
+    } else {
+      navigate(`/shopdetail/${productNo}`, { state: { focusReview: true } });
+    }
   };
 
   return (
