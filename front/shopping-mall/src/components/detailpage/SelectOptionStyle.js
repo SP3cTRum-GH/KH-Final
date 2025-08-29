@@ -37,7 +37,7 @@ export const SalePrice = styled.div`
 `;
 
 export const ProductTitle = styled.h2`
-  font-size: 18px;
+  font-size: 22px;
   font-weight: bold;
   margin-bottom: 10px;
   
