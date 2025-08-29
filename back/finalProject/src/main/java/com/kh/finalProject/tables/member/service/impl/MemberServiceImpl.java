@@ -114,7 +114,7 @@ public class MemberServiceImpl implements MemberService {
 
 		// 회원이 아니었다면 닉네임은 '소셜회원'으로
 		// 패스워드는 임의로 생성
-		Member socialMember = makeSocialMember(email);
+		Member socialMember = makeSocialMember(email,social);
 		memberRepository.save(socialMember);
 		CustomUser user = entityToDTO(socialMember);
 		return user;
@@ -179,7 +179,19 @@ public class MemberServiceImpl implements MemberService {
 
 	}
 
-	private Member makeSocialMember(String email) {
+	private Member makeSocialMember(String email, int social) {
+		String oauth = "";
+		switch(social) {
+		case 1:
+			oauth = "Kakao";
+			break;
+		case 2:
+			oauth = "Google";
+			break;
+		case 3:
+			oauth = "Naver";
+			break;
+		}
 
 		String tempPassword = makeTempPassword();
 		log.info("tempPassword: " + tempPassword);
@@ -187,7 +199,7 @@ public class MemberServiceImpl implements MemberService {
 		String nickname = "소셜회원";
 		Member member = Member.builder().memberId(makeTempPassword()).memberEmail(email)
 				.memberPw(passwordEncoder.encode(tempPassword)).memberName(nickname).memberAddress(nickname)
-				.memberGender(true).memberPhone(makeTempPassword()).OAuth("Kakao").build();
+				.memberGender(true).memberPhone(makeTempPassword()).grade('B').enable(true).OAuth(oauth).build();
 		member.addRole(MemberRole.USER);
 		return member;
 
