@@ -73,6 +73,8 @@ const ShopDetailCompont = () => {
       );
     }, 300); // 0.3초 지연 후 실행
 
+    reloadReviews();
+
     return () => clearTimeout(timer);
   }, [location.state?.focusReview, location.key, reviewList.content?.length]);
 
@@ -105,7 +107,11 @@ const ShopDetailCompont = () => {
       </div>
       <hr style={hrStyle} />
       <div ref={reviewRef} id="review">
-        <Review reviewList={reviewList} onChanged={reloadReviews} />
+        <Review
+          reviewList={reviewList}
+          onChanged={reloadReviews}
+          count={count}
+        />
         <PageComponent
           type={"shopdetail"}
           listData={reviewList}

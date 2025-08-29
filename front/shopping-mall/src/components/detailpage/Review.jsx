@@ -41,18 +41,18 @@ async function urlToFile(url) {
   return new File([blob], name, { type: blob.type || "image/jpeg" });
 }
 
-const Review = ({ reviewList }) => {
+const Review = ({ reviewList, count }) => {
   // enable === false 인 리뷰는 숨김 처리
   const filterVisible = (list) =>
     (list ?? []).filter((r) => r?.enable !== false);
   const initialItems = filterVisible(reviewList?.dtoList);
   const [rows, setRows] = useState(initialItems);
-  const [count, setCount] = useState(reviewList?.totalCount ?? 0);
+  const [reviewCount, setReviewCount] = useState(count ?? 0);
 
   useEffect(() => {
     const filtered = filterVisible(reviewList?.dtoList);
     setRows(filtered);
-    setCount(filtered.length);
+    setReviewCount(filtered.length);
   }, [reviewList]);
 
   // cache-busting per review image
