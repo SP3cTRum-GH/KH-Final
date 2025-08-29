@@ -50,6 +50,9 @@ public class PurchaseLog {
     @Column
     private String productName;
 
+    @Column
+    private String category;
+
     @Column(name = "product_size",nullable = false)
     private String size;
 

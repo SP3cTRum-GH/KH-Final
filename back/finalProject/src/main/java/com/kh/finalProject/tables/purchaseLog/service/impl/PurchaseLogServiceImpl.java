@@ -58,7 +58,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		List<PurchaseLog> logs = items.stream()
 				.map(ci -> PurchaseLog.builder().memberId(memberId).productNo(ci.getProduct().getProductNo())
 						.quantity(ci.getQuantity()).productName(ci.getProduct().getProductName()).isReviewed(false)
-						.size(ci.getSize()).price(ci.getPrice()) // 라인합계 구조면 그대로 사용
+						.category(ci.getProduct().getCategory()).size(ci.getSize()).price(ci.getPrice()) // 라인합계 구조면 그대로 사용
 						.build())
 				.toList();
 
@@ -98,7 +98,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		List<PurchaseLog> logs = items.stream()
 				.map(ci -> PurchaseLog.builder().memberId(memberId).productNo(ci.getProduct().getProductNo())
 						.productName(ci.getProduct().getProductName()).size(ci.getSize()).quantity(ci.getQuantity())
-						.price(ci.getPrice()) // 카트에 저장된 라인총액
+						.category(ci.getProduct().getCategory()).price(ci.getPrice()) // 카트에 저장된 라인총액
 						.isReviewed(false).build())
 				.toList();
 		purchaseLogRepository.saveAll(logs);
@@ -123,6 +123,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 			return purchaseLogResponseDTO.builder().logNo(pl.getLogNo()).regDate(pl.getRegDate())
 					.quantity(pl.getQuantity()).isReviewed(pl.getIsReviewed()).productNo(pl.getProductNo())
 					.productName(p != null ? p.getProductName() : pl.getProductName())
+					.category(pl.getCategory())
 					.type(p != null ? p.getType() : null).size(pl.getSize()).price(pl.getPrice()).img(imgUrl)
 					.memberId(pl.getMemberId()).build();
 		}).collect(java.util.stream.Collectors.toList());
@@ -150,7 +151,7 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		PurchaseLog saved = purchaseLogRepository.save(
 				PurchaseLog.builder().productNo(p.getProductNo()).memberId(memberId).productName(p.getProductName())
 						.size(req.getSize()).quantity(req.getQuantity()).price(lineTotal) // 서버계산값저장
-						.isReviewed(false).build());
+						.category(p.getCategory()).isReviewed(false).build());
 
 		return purchaseLogResponseDTO.builder().logNo(saved.getLogNo()).memberId(saved.getMemberId())
 				.regDate(saved.getRegDate()).isReviewed(saved.getIsReviewed()).productNo(saved.getProductNo())
@@ -161,16 +162,6 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 	@Override
 	public List<Map<String, Object>> salesByDateCategory(LocalDate from, LocalDate to, String category) {
 		List<PurchaseLog> rows = purchaseLogRepository.findAll();
-
-		// productNo -> category 매핑 (N+1 방지)
-		java.util.Set<Long> pnos = new java.util.HashSet<>();
-		for (PurchaseLog pl : rows)
-			pnos.add(pl.getProductNo());
-
-		java.util.Map<Long, String> pnoToCategory = new java.util.HashMap<>();
-		for (Product p : productRepository.findAllById(pnos)) {
-			pnoToCategory.put(p.getProductNo(), p.getCategory()); // 필드명 맞게
-		}
 
 		boolean hasFilter = (category != null && !category.trim().isEmpty());
 		String filter = hasFilter ? category.trim() : null;
@@ -185,7 +176,9 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 			if (to != null && d.isAfter(to))
 				continue;
 
-			String cat = pnoToCategory.getOrDefault(pl.getProductNo(), "UNKNOWN");
+			String cat = pl.getCategory();
+			if(cat == null || cat.isBlank()){cat = "UNKNOWN";}
+
 			if (hasFilter && !cat.equalsIgnoreCase(filter))
 				continue;
 

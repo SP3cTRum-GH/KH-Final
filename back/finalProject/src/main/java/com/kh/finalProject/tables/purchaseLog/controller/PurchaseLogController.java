@@ -36,7 +36,7 @@ public class PurchaseLogController {
     }
 
     // 날짜별 집계
-    //전체: GET /api/purchase/sales/date-category
+    // 전체: GET /api/purchase/sales/date-category
     // 날짜 필터: GET /api/purchase/sales/date-category?from=2025-08-01&to=2025-08-31
     // 카테고리 필터 GET /api/purchase/sales/date-category?category=BAG
     // 둘 다 GET /api/purchase/sales/date-category?from=2025-08-01&to=2025-08-31&category=BAG
