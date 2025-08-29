@@ -89,8 +89,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
 	public PageResponseDTO<ProductDealResponseDTO> popularDeal(String category, PageRequestDTO req) {
     	 Pageable pageable = PageRequest.of(req.getPage() - 1, req.getSize() ,
-        		 Sort.unsorted());
-        Page<Product> page = productRepository.findPopular(true,category, pageable);
+    			 Sort.by(Sort.Direction.DESC, "dealCount"));
+        Page<Product> page = productRepository.findByType(true,category, pageable);
 
         List<ProductDealResponseDTO> list = page.getContent().stream()
                 .map(productConverter::toDealResponse)
