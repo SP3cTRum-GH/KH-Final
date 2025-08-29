@@ -43,7 +43,7 @@ export default function ImageUploader({
         {previewImages.map((img, idx) => (
           <Thumbnail key={idx}>
             <img src={img.url} alt={`preview-${idx}`} />
-            <RemoveButton onClick={() => onRemoveImage(img.url)}>
+            <RemoveButton type="button" onClick={() => onRemoveImage(img.url)}>
               ×
             </RemoveButton>
           </Thumbnail>

@@ -9,20 +9,12 @@ export const Wrapper = styled.div`
 `;
 
 export const Container = styled.div`
-  /* display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  margin-left: 100px; */
   display: grid;
   grid-template-columns: repeat(5, minmax(120px, 1fr));
-gap: 20px;
-width: 100%;
-max-width: 1200px;
-margin: 0 10px;  // 가운데 정렬
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 10px;
 
   @media (max-width: 430px) {
     /* margin-left: 40px;
@@ -56,21 +48,14 @@ margin: 0 10px;  // 가운데 정렬
 `;
 
 export const ProductContainer = styled.div`
-    /* width: 200px; */
     width: 100%;
     cursor: pointer;
     
-
     img {
-        /* width: 200px;
-        height: 200px; */
         width: 100%;
         height: auto;
         aspect-ratio: 1/1;
         object-fit: cover;
-        /* background-size: cover;
-        background-position: center;
-        background-image: none; */
     }
 
     div {
@@ -113,8 +98,6 @@ export const PlusContainer = styled.div`
   font-size: 2rem;
   font-weight: bold;
   color: #666;
-  /* min-height: 250px;
-  width: 200px; */
   transition: all 0.2s ease;
 
   &:hover {
@@ -127,6 +110,7 @@ export const Wrap = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: 5px;
 
     > div > button {
         font-size: medium;
@@ -144,7 +128,7 @@ export const Wrap = styled.div`
     // 오른쪽 버튼 그룹
   > div > div {
     display: flex;
-    gap: 8px; // 버튼 사이 간격
+    gap: 8px;
   }
 
     h4 {

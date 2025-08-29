@@ -77,10 +77,11 @@ export default function UploadPageComponent() {
     } else {
       // 일반 상품: 선택된 사이즈별 재고
       selectedSizes.forEach((size, idx) => {
+        const stockValue = Number(stockBySize?.[size]);
         formData.append(`sizes[${idx}].productSize`, size);
         formData.append(
           `sizes[${idx}].stock`,
-          Number(stockBySize?.[size] ?? 0)
+          isNaN(stockValue) ? 0 : stockValue
         );
       });
     }
@@ -101,11 +102,15 @@ export default function UploadPageComponent() {
     try {
       if (product.salesType === "true") {
         await uploadDealProduct(formData);
+        alert("등록이 완료되었습니다.");
+        window.scrollTo(0, 0);
+        navigate("/deal");
       } else {
         await uploadShopProduct(formData);
+        alert("등록이 완료되었습니다.");
+        window.scrollTo(0, 0);
+        navigate("/shop");
       }
-      alert("등록이 완료되었습니다.");
-      navigate("/");
     } catch (err) {
       console.error(err);
       alert("업로드 실패");
