@@ -13,16 +13,18 @@ import com.kh.finalProject.tables.review.entity.Review;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    @Query(
-            value =
-                    "select r from Review r " +
-                            "where (:productNo is null or r.product.productNo = :productNo) " +
-                            "and   (:memberNo is null or r.member.memberNo = :memberNo)",
-            countQuery =
-                    "select count(r) from Review r " +
-                            "where (:productNo is null or r.product.productNo = :productNo) " +
-                            "and   (:memberNo is null or r.member.memberNo = :memberNo)"
-    )
+	@Query(
+		    value =
+		            "select r from Review r " +
+		            "where r.enable = true " +
+		            "and (:productNo is null or r.product.productNo = :productNo) " +
+		            "and (:memberNo is null or r.member.memberNo = :memberNo)",
+		    countQuery =
+		            "select count(r) from Review r " +
+		            "where r.enable = true " +
+		            "and (:productNo is null or r.product.productNo = :productNo) " +
+		            "and (:memberNo is null or r.member.memberNo = :memberNo)"
+		)
     Page<Review> search(@Param("productNo") Long productNo,
                         @Param("memberNo") Long memberNo,
                         Pageable pageable);

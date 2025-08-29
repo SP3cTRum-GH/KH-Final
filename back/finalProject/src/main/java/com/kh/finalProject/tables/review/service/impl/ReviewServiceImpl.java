@@ -49,8 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
         Pageable pageable = PageRequest.of(
                 Math.max(req.getPage(), 1) - 1,
                 Math.max(req.getSize(), 1),
-                Sort.by(Sort.Direction.DESC, "reviewNo")
-        );
+                Sort.by(Sort.Direction.DESC, "reviewNo"));
 
         Page<Review> page = reviewRepository.search(productNo, memberNo, pageable);
 
