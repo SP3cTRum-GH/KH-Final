@@ -46,6 +46,7 @@ public class CustomSecurityConfig {
 				})
 				.authorizeHttpRequests(auth->auth
 						// 공개
+						.requestMatchers("/error", "/error/**", "/favicon.ico").permitAll()
 						.requestMatchers("/api/image/**").permitAll()
 					    .requestMatchers("/api/*/public/**").permitAll()
 					    .requestMatchers("api/product/*/public/**").permitAll()

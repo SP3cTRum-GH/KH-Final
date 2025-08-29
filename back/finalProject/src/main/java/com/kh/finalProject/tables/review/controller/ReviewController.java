@@ -78,7 +78,7 @@ public class ReviewController {
     	return reviewService.getReviewForMember(memberId);
     }
 
-    @GetMapping("/count")
+    @GetMapping("/public/count")
     public Map<String, Long> count(@RequestParam Long productNo){
         return Map.of("count",reviewService.countByProduct(productNo));
     }

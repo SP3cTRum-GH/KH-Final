@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.kh.finalProject.tables.cart.entity.Cart;
@@ -221,11 +222,12 @@ public class PurchaseLogServiceImpl implements PurchaseLogService {
 		return img.startsWith("/api/image/") ? img : "/api/image/" + img;
 	}
 
+	
 	@Override
 	public MainPageDTO bestItem() {		
 		List<ProductShopResponseDTO> shopProducts = purchaseLogRepository.findBestProduct(false)
 				.stream().limit(5).map(productConverter::toShopResponse).collect(Collectors.toList());
-		List<ProductDealResponseDTO> dealProducts = purchaseLogRepository.findBestProduct(true)
+		List<ProductDealResponseDTO> dealProducts = productRepository.findByType(true,null,Pageable.unpaged())
 				.stream().limit(5).map(productConverter::toDealResponse).collect(Collectors.toList());
 
 		MainPageDTO main = new MainPageDTO(shopProducts, dealProducts);

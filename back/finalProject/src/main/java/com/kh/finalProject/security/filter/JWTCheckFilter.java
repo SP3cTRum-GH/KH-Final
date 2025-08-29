@@ -24,6 +24,7 @@ import lombok.extern.log4j.Log4j2;
 public class JWTCheckFilter extends OncePerRequestFilter { // http 통신 요청당 한번만 사용되는 필터
 	private static final AntPathMatcher matcher = new AntPathMatcher();
 	private static final List<String> WHITELIST = List.of(
+			"/error", "/error/**",
 	        "/api/image/**",
 	        "/api/*/public/**",
 	        "/api/product/*/public/**",  
