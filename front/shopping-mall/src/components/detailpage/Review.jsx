@@ -198,7 +198,6 @@ const Review = ({ reviewList, count }) => {
     if (editingId === reviewNo) cancelEdit();
 
     setRows((cur) => cur.filter((r) => (r.reviewNo ?? r.id) !== reviewNo));
-    setCount((c) => Math.max(0, c - 1));
 
     try {
       await deleteReview(reviewNo);
