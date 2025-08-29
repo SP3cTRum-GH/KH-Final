@@ -85,7 +85,7 @@ const SelectOption = ({
     handleBuyClick();
   };
 
-  const handleBuyClick = () => {
+  const handleBuyClick = async () => {
     if (!selectedSize) {
       alert("사이즈를 선택해주세요.");
       return;
@@ -113,7 +113,7 @@ const SelectOption = ({
       size: selectedSize,
     };
 
-    productBuy(fd, getCookie("member").memberId);
+    await productBuy(fd, getCookie("member").memberId);
 
     alert("구매 완료");
 

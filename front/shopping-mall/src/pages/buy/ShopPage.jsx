@@ -46,6 +46,7 @@ const ShopPage = () => {
   const handlePopular = async (category) => {
     await getShopPopularProductList({ page, size }, category).then((data) => {
       setListData(data);
+      console.log(data);
     });
   };
 

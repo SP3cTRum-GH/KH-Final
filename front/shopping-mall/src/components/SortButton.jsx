@@ -28,7 +28,7 @@ const SortButton = ({ menu, filterBtn, getList, handlePopular }) => {
   const handleMenuToggle = () => {
     const nextMode = !isPopularMode;
     setIsPopularMode(nextMode);
-    if (!activeCategory) return; // 카테고리 미선택이면 호출 안 함
+
     if (nextMode) {
       handlePopular(activeCategory);
     } else {

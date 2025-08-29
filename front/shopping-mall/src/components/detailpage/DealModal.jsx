@@ -24,10 +24,10 @@ const DealModal = ({ currentPrice, onConfirm, onCancel, param }) => {
     price: bidAmount,
   };
 
-  const handleBid = () => {
+  const handleBid = async () => {
     const bidData = { productNo: fd.productNo, price: bidAmount };
 
-    productBid(bidData)
+    await productBid(bidData)
       .then((data) => {
         console.log(data);
       })
@@ -36,7 +36,7 @@ const DealModal = ({ currentPrice, onConfirm, onCancel, param }) => {
         return;
       });
 
-    addCart(getCookie("member").memberId, fd)
+    await addCart(getCookie("member").memberId, fd)
       .then((data) => {
         console.log(data);
       })
