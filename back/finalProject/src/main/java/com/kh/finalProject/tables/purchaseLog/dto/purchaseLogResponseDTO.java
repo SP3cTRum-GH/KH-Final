@@ -19,6 +19,7 @@ public class purchaseLogResponseDTO {
     private Boolean isReviewed ; // 중복 리뷰 방지
     private Long productNo;
     private String productName;
+    private String category;
     private Boolean type;
     private String size;
     private int price;
