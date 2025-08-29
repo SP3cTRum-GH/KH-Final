@@ -7,6 +7,7 @@ import {
   CurrentValue,
 } from "./CarouselStyle";
 import { getAllEvents, getEventImageUrl } from "../../api/eventApi";
+import { useNavigate } from "react-router-dom";
 
 const Carousel = () => {
   const [events, setEvents] = useState([]);
@@ -20,6 +21,8 @@ const Carousel = () => {
   const [imgSize, setImgSize] = useState(
     window.innerWidth > 500 ? 1200 : window.innerWidth
   );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -81,7 +84,11 @@ const Carousel = () => {
     <CarouselContainer>
       <div ref={carouselRef}>
         {activeEvents.map((event, idx) => (
-          <Cell key={idx}>
+          <Cell
+            key={idx}
+            onClick={() => navigate(`/event/${event.no}`)} // 클릭 시 이동
+            style={{ cursor: "pointer" }}
+          >
             <img
               src={
                 getEventImageUrl(event.imageFileNames) ||

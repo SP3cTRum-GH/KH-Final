@@ -1,8 +1,8 @@
 package com.kh.finalProject;
 
-import com.kh.finalProject.tables.member.entity.Member;
-import com.kh.finalProject.tables.member.repository.MemberRepository;
-import com.kh.finalProject.tables.review.service.ReviewService;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,15 +10,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.kh.finalProject.tables.member.MemberRole;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
 import com.kh.finalProject.tables.member.entity.Member;
 import com.kh.finalProject.tables.member.repository.MemberRepository;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 
 @SpringBootTest
 class FinalProjectApplicationTests {
@@ -28,7 +21,7 @@ class FinalProjectApplicationTests {
 	@Autowired
 	private PasswordEncoder pe;
 
-	//@Test
+	@Test
 	public void testInsertMember() {
 
 		Member member = Member.builder()
@@ -42,13 +35,13 @@ class FinalProjectApplicationTests {
 				.enable(true)
 				.grade('F')
 				.memberAddress("관리자")
-				.build(); 
+				.build();
 		member.addRole(MemberRole.USER);
 		member.addRole(MemberRole.ADMIN);
 		db.save(member);
-		}
+	}
 
-//	@Test
+	// @Test
 	void testMember() {
 		List<Member> memberList = List.of(
 				Member.builder()
@@ -58,8 +51,7 @@ class FinalProjectApplicationTests {
 						.memberEmail("nawarayo@naver.com")
 						.memberPhone("010-2876-3814")
 						.memberGender(true)
-						.build()
-		);
+						.build());
 		db.saveAll(memberList);
 
 		List<Member> savedList = db.saveAll(memberList);
@@ -67,8 +59,8 @@ class FinalProjectApplicationTests {
 		Member getback = db.findById(id).orElseThrow();
 		System.out.println("조회된 멤버 이름: " + getback.getMemberName());
 	}
-	
-	//@Test
+
+	// @Test
 	void pwpwproblem() {
 		Member m = Member.builder()
 				.memberId("no_pw")
@@ -78,12 +70,11 @@ class FinalProjectApplicationTests {
 				.memberGender(true)
 				.build(); // 비번 없음
 
-
-			db.save(m);
+		db.save(m);
 
 	}
 
-	//@Test
+	// @Test
 	void jungborktest() {
 		Member m1 = Member.builder()
 				.memberId("su_hyun")
@@ -111,7 +102,3 @@ class FinalProjectApplicationTests {
 	}
 
 }
-
-
-
-
