@@ -40,6 +40,23 @@ const DealDetailComponent = () => {
   const [reviewList, setReviewList] = useState({});
   const { reviewPage, reviewSize, moveToReviewList } = useCustomMove();
 
+  // 리뷰 목록 재요청 (삭제/추가 후 카운트 반영용)
+  const reloadReviews = () => {
+    return getReviewList(
+      { page: reviewPage, size: reviewSize },
+      param.productNo
+    )
+      .then((data) => {
+        setReviewList(data);
+        return reviewCount(param.productNo);
+      })
+      .then((cnt) => setCount(cnt ?? 0))
+      .catch(() => {
+        setReviewList({ content: [], totalCount: 0 });
+        setCount(0);
+      });
+  };
+
   useEffect(() => {
     getDealOne(param.productNo).then((data) => {
       setDealProductData(data);
@@ -56,24 +73,37 @@ const DealDetailComponent = () => {
     );
   }, [reviewPage, reviewSize, param.productNo]);
 
-  // 기존 useEffect 삭제하고 아래로 교체
   useEffect(() => {
-    if (!location.state?.focusReview) return;
-    if (!reviewRef.current) return;
+    let cancelled = false;
 
-    const timer = setTimeout(() => {
+    async function run() {
+      if (!location.state?.focusReview) return;
+      if (!reviewRef.current) return;
+
+      // 1) 레이아웃 안정화 대기(약간의 딜레이)
+      await new Promise((r) => setTimeout(r, 300));
+      if (cancelled) return;
+
+      // 2) 스크롤
       scrollToReview();
 
-      // 한번 스크롤했으면 state 제거(새로고침/재방문시 재스크롤 방지)
+      // 3) 최신 리스트/카운트 먼저 로딩 완료까지 기다림
+      await reloadReviews();
+
+      // 4) state 제거(재방문/새로고침 시 재스크롤 방지)
       window.history.replaceState(
         {},
         document.title,
         location.pathname + location.search
       );
-    }, 300); // 0.3초 지연 후 실행
+    }
 
-    return () => clearTimeout(timer);
-  }, [location.state?.focusReview, location.key, reviewList.content?.length]);
+    run();
+    return () => {
+      cancelled = true;
+    };
+    // location.key만으로도 재진입 시 재평가가 되고, 제품이 바뀌면 param.productNo도 의존성에 포함
+  }, [location.state?.focusReview, location.key, param.productNo]);
 
   const scrollToReview = () => {
     if (reviewRef.current) {
@@ -84,7 +114,6 @@ const DealDetailComponent = () => {
     }
   };
 
-  // DealDetailComponent.jsx
   const handleConfirmBid = (val) => {
     // 숫자로 변환 (객체가 와도 안전하게 처리)
     const bid =
@@ -138,7 +167,7 @@ const DealDetailComponent = () => {
       </div>
       <hr style={hrStyle} />
       <div ref={reviewRef} id="review">
-        <Review reviewList={reviewList} />
+        <Review reviewList={reviewList} count={count} />
         <PageComponent
           type={"dealdetail"}
           listData={reviewList}
