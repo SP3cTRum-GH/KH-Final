@@ -6,13 +6,13 @@ const prefix = `${API_SERVER_HOST}/api/cart`;
 
 // 장바구니 목록
 export const getCart = async (memberId) => {
-  const res = await axios.get(`${prefix}/user/test?memberId=${memberId}`);
+  const res = await jwtAxios.get(`${prefix}/user/test?memberId=${memberId}`);
   return res.data;
 };
 
 // 장바구니 추가
 export const addCart = async (memberId, product) => {
-  const res = await axios.post(
+  const res = await jwtAxios.post(
     `${prefix}/user/test?memberId=${memberId}`,
     product
   );
@@ -21,7 +21,7 @@ export const addCart = async (memberId, product) => {
 
 // 장바구니 수량 수정
 export const updateCart = async (memberId, cartItemId, payload) => {
-  const res = await axios.patch(
+  const res = await jwtAxios.patch(
     `${prefix}/user/items/${cartItemId}?memberId=${memberId}`,
     payload
   );
@@ -30,7 +30,7 @@ export const updateCart = async (memberId, cartItemId, payload) => {
 
 // 장바구니 수량 삭제
 export const deleteCart = async (memberId, cartItemId) => {
-  const res = await axios.delete(
+  const res = await jwtAxios.delete(
     `${prefix}/user/items/${cartItemId}?memberId=${memberId}`
   );
   return res.data;
@@ -38,7 +38,7 @@ export const deleteCart = async (memberId, cartItemId) => {
 
 // 장바구니 shop 상품 구매하기
 export const cartPay = async (memberId, cartItemNos) => {
-  const res = await axios.post(
+  const res = await jwtAxios.post(
     `${prefix}/user/checkout/selected?memberId=${memberId}`,
     cartItemNos
   );

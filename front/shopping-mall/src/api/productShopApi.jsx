@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_SERVER_HOST } from "./HostUrl";
+import jwtAxios from "../util/jwtUtil";
 
 const prefix = `${API_SERVER_HOST}/api/product/shop`;
 const delfix = `${API_SERVER_HOST}/api/product`;
@@ -48,7 +49,7 @@ export const getShopPopularProductList = async (pageParam, filter) => {
 
 // shop 상품 등록
 export const uploadShopProduct = async (formData) => {
-  const res = await axios.post(`${prefix}/admin`, formData, {
+  const res = await jwtAxios.post(`${prefix}/admin`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -56,13 +57,13 @@ export const uploadShopProduct = async (formData) => {
 
 // 상품(shop, deal) 삭제
 export const deleteProductItem = async (productNo) => {
-  const res = await axios.delete(`${delfix}/admin/${productNo}`);
+  const res = await jwtAxios.delete(`${delfix}/admin/${productNo}`);
   return res.data;
 };
 
 // shop 상품 수정
 export const updateShopProduct = async (formData, productNo) => {
-  const res = await axios.put(`${prefix}/admin/${productNo}`, formData, {
+  const res = await jwtAxios.put(`${prefix}/admin/${productNo}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
