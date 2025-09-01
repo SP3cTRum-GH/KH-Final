@@ -16,6 +16,19 @@ import { getCookie } from "../../util/cookieUtil";
 import { addCart } from "../../api/cartApi";
 import { productBuy } from "../../api/purchaseApi";
 
+// 현재 시간
+const nowString = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mi = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+};
+
 const SelectOption = ({
   productData,
   scrollToReview,
@@ -29,6 +42,7 @@ const SelectOption = ({
   const reviewCount = Array.isArray(reviewListCount)
     ? reviewListCount.length
     : Number(reviewListCount ?? 0);
+
   const endDateText = productData?.endDate
     ? String(productData.endDate).slice(0, 10)
     : null;
@@ -176,6 +190,9 @@ const SelectOption = ({
     });
   };
 
+  const nowDateStr = nowString().slice(0, 10);
+  const isExpired = endDateText ? endDateText < nowDateStr : false;
+
   return (
     <OptionContainer>
       <ProductTitle>{name}</ProductTitle>
@@ -207,7 +224,7 @@ const SelectOption = ({
         <SelectWrapper>
           {isDeal ? <></> : <label htmlFor="sizeSelect">사이즈</label>}
 
-          {endDateText && <p>기간 : {endDateText}</p>}
+          {endDateText && <p>기간 : ~ {endDateText}</p>}
           {isDeal ? (
             <></>
           ) : (
@@ -279,7 +296,9 @@ const SelectOption = ({
 
         <BuyButton
           onClick={handlePrimaryClick}
-          disabled={isDeal ? false : !selectedSize || stock === 0}
+          disabled={
+            isExpired || (isDeal ? false : !selectedSize || stock === 0)
+          }
         >
           {isDeal ? "입찰하기" : "구매하기"}
         </BuyButton>
