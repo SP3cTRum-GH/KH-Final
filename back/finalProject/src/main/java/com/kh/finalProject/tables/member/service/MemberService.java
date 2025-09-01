@@ -19,7 +19,7 @@ public interface MemberService {
 	
 	MemberResponseDTO socialMemberUpdate(MemberRequestDTO memberRequestDTO);
 	
-	public String getAccessToken(String code, String state);
+	public String getAccessToken(String code, String state, int social);
 
 	CustomUser getSocialMember(String accessToken, int social);//1.kakao 2.google 3.naver
 

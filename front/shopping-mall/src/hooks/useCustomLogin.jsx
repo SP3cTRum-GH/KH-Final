@@ -17,8 +17,8 @@ const useCustomLogin = () => {
   };
   const doLogout = () => {
     //---------------로그아웃 함수
-
     dispatch(logout());
+    navigate("/");
   };
   const moveToPath = (path) => {
     //페이지 이동 replace:true 뒤로이동 방지

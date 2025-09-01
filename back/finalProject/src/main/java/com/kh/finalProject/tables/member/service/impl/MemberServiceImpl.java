@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -37,6 +38,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Transactional
 @RequiredArgsConstructor
+@PropertySource(value = "classpath:socialLogin.properties", ignoreResourceNotFound = true)
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepository memberRepository;
@@ -70,35 +72,40 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	private final RestTemplate restTemplate = new RestTemplate();
-    private String clientId = "9hz3nxGqt8IQqeYhCY5k";
-    private String clientSecret = "8k37V3m02A";
-    private String redirectUri = "http://localhost:5173/member/naver";
-	
-	public String getAccessToken(String code, String state) {
-        String tokenUrl = "https://nid.naver.com/oauth2.0/token";
-        log.info(code);
-        log.info(state);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+	private final org.springframework.core.env.Environment env;
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "authorization_code");
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("code", code);
-        params.add("state", state);
-        params.add("redirect_uri", redirectUri);
+	@Override
+	public String getAccessToken(String code, String state, int social) {
+		String prefix = "social." + social + ".";
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        ResponseEntity<NaverTokenResponse> response = restTemplate.postForEntity(
-                tokenUrl, request, NaverTokenResponse.class);
+		String clientId = env.getProperty(prefix + "client-id");
+		String clientSecret = env.getProperty(prefix + "client-secret");
+		String redirectUri = env.getProperty(prefix + "redirect-uri");
+		String tokenUrl = env.getProperty(prefix + "token-url");
 
-        log.info("응답 상태: {}", response.getStatusCode());
-        log.info("응답 본문: {}", response.getBody());
-        log.info("응답 전체: {}", response);
-        return response.getBody().getAccessToken();
-    }
-	
+		log.info(code);
+		log.info(state);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("grant_type", "authorization_code");
+		params.add("client_id", clientId);
+		params.add("client_secret", clientSecret);
+		params.add("code", code);
+		params.add("state", state);
+		params.add("redirect_uri", redirectUri);
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+		ResponseEntity<NaverTokenResponse> response = restTemplate.postForEntity(tokenUrl, request,
+				NaverTokenResponse.class);
+
+		log.info("응답 상태: {}", response.getStatusCode());
+		log.info("응답 본문: {}", response.getBody());
+		log.info("응답 전체: {}", response);
+		return response.getBody().getAccessToken();
+	}
+
 	@Override
 	public CustomUser getSocialMember(String accessToken, int social) {
 		String email = getEmailFromSocialAccessToken(accessToken, social);
@@ -114,7 +121,7 @@ public class MemberServiceImpl implements MemberService {
 
 		// 회원이 아니었다면 닉네임은 '소셜회원'으로
 		// 패스워드는 임의로 생성
-		Member socialMember = makeSocialMember(email,social);
+		Member socialMember = makeSocialMember(email, social);
 		memberRepository.save(socialMember);
 		CustomUser user = entityToDTO(socialMember);
 		return user;
@@ -122,23 +129,11 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	private String getEmailFromSocialAccessToken(String accessToken, int social) {
-		String getUserURL = "";
-		String getAccount = "";
-		// 사용자정보를 가져오는 url
-		switch (social) {
-		case 1:
-			getUserURL = "https://kapi.kakao.com/v2/user/me";
-			getAccount = "kakao_account";
-			break;
-		case 2:
-			getUserURL = "https://www.googleapis.com/oauth2/v3/userinfo";
-			getAccount = "email";
-			break;
-		case 3:
-			getUserURL = "https://openapi.naver.com/v1/nid/me";
-			getAccount = "response";
-		}
+		String prefix = "social." + social + ".";
 
+		String getUserURL = env.getProperty(prefix + "userURL");
+		String getAccount = env.getProperty(prefix + "account");
+	
 		if (accessToken == null) {
 			throw new RuntimeException("Access Token is null");
 		}
@@ -181,15 +176,15 @@ public class MemberServiceImpl implements MemberService {
 
 	private Member makeSocialMember(String email, int social) {
 		String oauth = "";
-		switch(social) {
+		switch (social) {
 		case 1:
-			oauth = "Kakao";
+			oauth = "KakaoDefault";
 			break;
 		case 2:
-			oauth = "Google";
+			oauth = "GoogleDefault";
 			break;
 		case 3:
-			oauth = "Naver";
+			oauth = "NaverDefault";
 			break;
 		}
 
@@ -266,7 +261,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public boolean checkPassword(String memberId, String pw) {
 		Member member = memberRepository.getWithRoles(memberId);
-		String encodedPassword = member.getMemberPw(); 
+		String encodedPassword = member.getMemberPw();
 		log.info(pw + encodedPassword);
 		return passwordEncoder.matches(pw, encodedPassword);
 	}
