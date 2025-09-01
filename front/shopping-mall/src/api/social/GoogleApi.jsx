@@ -2,8 +2,8 @@ import axios from "axios";
 import { API_SERVER_HOST } from "../HostUrl";
 
 const client_id = `850033102207-isabeijtllcrq2938p80o64vjl5rlgrk.apps.googleusercontent.com`; //REST키값
-const redirect_uri = `http://localhost:5173/member/google`;
-const auth_code_path = "https://accounts.google.com/o/oauth2/v2/auth";
+const redirect_uri = `http://localhost:5173/member/google`; // 구글 로그인 후 인증 코드(code)를 돌려받을 "콜백 주소"
+const auth_code_path = "https://accounts.google.com/o/oauth2/v2/auth"; // 사용자가 구글 계정으로 로그인/동의하도록 유도하는 페이지 주소
 
 export const getGoogleLoginLink = () => {
   const qs = new URLSearchParams({
