@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { modifySocialMember } from "../../api/memberApi";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const SignUpForm = styled.form`
   max-width: 450px;
@@ -68,7 +68,7 @@ const SignUpComponent = () => {
   const loginInfo = useSelector((state) => state.loginSlice);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const navigate = Navigate;
+  const navigate = useNavigate();
 
   const validate = useCallback((fd) => {
     const errs = {};

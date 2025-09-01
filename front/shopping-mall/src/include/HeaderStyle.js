@@ -1,33 +1,33 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 export const Nav = styled.div`
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    background-color: black;
-    padding:  10px;
-    margin-bottom: 50px;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    
-    > img {
-      display: none;   
-    }
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background-color: black;
+  padding: 10px;
+  margin-bottom: 50px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 
-    @media (max-width: 651px) {
+  > img {
+    display: none;
+  }
+
+  @media (max-width: 651px) {
     display: flex;
     flex-direction: row; /* 세로 정렬 */
     align-items: center;
     margin-bottom: 0;
 
-      img {
-        width: 30%;
-        display: block;
-        cursor: pointer;
-      }
+    img {
+      width: 30%;
+      display: block;
+      cursor: pointer;
+    }
   }
-`
+`;
 
 export const MenuToggle = styled.div`
   padding-top: 5px;
@@ -73,12 +73,10 @@ export const MenuToggle = styled.div`
     border-radius: 3px;
     z-index: 1;
     transform-origin: 4px 0px;
-    transition: 
-      transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
-      background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
-      opacity 0.55s ease;
+    transition: transform 0.5s cubic-bezier(0.77, 0.2, 0.05, 1),
+      background 0.5s cubic-bezier(0.77, 0.2, 0.05, 1), opacity 0.55s ease;
   }
-${({ open }) =>
+  ${({ open }) =>
     open &&
     `
       span:nth-child(1) {
@@ -91,27 +89,27 @@ ${({ open }) =>
         transform: rotate(-45deg) translate(0px, -2px);
       }
     `}
-    
-    @media (min-width: 652px) {
+
+  @media (min-width: 652px) {
     display: none; /* 데스크탑에서 햄버거 숨김 */
-  } 
-input:checked ~ span:nth-child(2) {
-  transform: rotate(45deg) translate(0px, -2px);
-  width: 34px;
-}
+  }
+  input:checked ~ span:nth-child(2) {
+    transform: rotate(45deg) translate(0px, -2px);
+    width: 34px;
+  }
 
-input:checked ~ span:nth-child(3) {
-  opacity: 0;
-}
+  input:checked ~ span:nth-child(3) {
+    opacity: 0;
+  }
 
-input:checked ~ span:nth-child(4) {
-  transform: rotate(-45deg) translate(0px, -2px);
-  width: 34px;
-} 
+  input:checked ~ span:nth-child(4) {
+    transform: rotate(-45deg) translate(0px, -2px);
+    width: 34px;
+  }
 `;
 export const MenuGroup = styled.div`
   display: flex;
-`
+`;
 
 export const Menu = styled.ul`
   list-style: none;
@@ -214,7 +212,6 @@ export const MobileMenu = styled.ul`
         color: tomato;
       }
     }
-    
   }
 
   /* 모바일에서 숨기기 */

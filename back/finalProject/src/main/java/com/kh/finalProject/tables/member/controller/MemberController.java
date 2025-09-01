@@ -69,8 +69,10 @@ public class MemberController {
 
 	}
 
-	@GetMapping("/kakao")
-	public Map<String, Object> getMemberFromKakao(String accessToken) {
+	@GetMapping("/public/kakao")
+	public Map<String, Object> getMemberFromKakao(@RequestParam String code,
+            @RequestParam String state) {
+		String accessToken = memberService.getAccessToken(code, state, 1);
 		CustomUser user = memberService.getSocialMember(accessToken, 1);
 		Map<String, Object> claims = user.getClaims();
 		String jwtAccessToken = JWTUtil.generateToken(claims, 10);
@@ -82,7 +84,7 @@ public class MemberController {
 	@GetMapping("/public/naver")
 	public Map<String, Object> getMemberFromNaver(@RequestParam String code,
             @RequestParam String state) {
-		String accessToken = memberService.getAccessToken(code, state);
+		String accessToken = memberService.getAccessToken(code, state, 3);
 		CustomUser user = memberService.getSocialMember(accessToken, 3);
 		Map<String, Object> claims = user.getClaims();
 		String jwtAccessToken = JWTUtil.generateToken(claims, 10);
@@ -93,7 +95,9 @@ public class MemberController {
 	}
 
 	@GetMapping("/public/google")
-	public Map<String, Object> getMemberFromGoogle(String accessToken) {
+	public Map<String, Object> getMemberFromGoogle(@RequestParam String code,
+            @RequestParam String state) {
+		String accessToken = memberService.getAccessToken(code, state, 2);
 		CustomUser user = memberService.getSocialMember(accessToken, 2);
 		Map<String, Object> claims = user.getClaims();
 		String jwtAccessToken = JWTUtil.generateToken(claims, 10);

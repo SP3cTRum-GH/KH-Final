@@ -32,6 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
+*.properties
 .properties
 
 images/

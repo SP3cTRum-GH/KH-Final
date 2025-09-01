@@ -20,19 +20,16 @@ const NaverRedirectPage = () => {
 
       dispatch(login(memberInfo));
 
-      // 소셜 회원이 아니라면
-      if (memberInfo && memberInfo.OAuth === null) {
-        moveToPath("/");
-      } else {
+      if (memberInfo.OAuth === "NaverDefault") {
         moveToPath("/social/signup");
+      } else {
+        moveToPath("/");
       }
     });
   }, [authCode, state]);
   return (
     <div>
       <div>Naver Login Redirect</div>
-
-      <div>{authCode}</div>
     </div>
   );
 };
