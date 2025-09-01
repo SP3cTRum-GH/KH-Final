@@ -5,6 +5,10 @@ const client_id = `850033102207-isabeijtllcrq2938p80o64vjl5rlgrk.apps.googleuser
 const redirect_uri = `http://localhost:5173/member/google`;
 const auth_code_path = "https://accounts.google.com/o/oauth2/v2/auth";
 
+//엑세스 토큰 얻기
+const access_token_url = `https://oauth2.googleapis.com/token`; //보안코드 활성화시 사용
+const client_secret = ``;
+
 export const getGoogleLoginLink = () => {
   const qs = new URLSearchParams({
     client_id,
